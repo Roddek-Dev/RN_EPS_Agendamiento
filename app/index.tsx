@@ -1,16 +1,12 @@
 import { Redirect } from 'expo-router';
-import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
-export default function AppNavigation() {
-  // Cambia el valor inicial según lo que quieras probar
-  const [isAuthenticated] = useState(true);
-
-  // Para debug, muestra el valor en consola
-  console.log("isAuthenticated (runtime):", isAuthenticated);
+export default function Index() {
+  const { isAuthenticated } = useAuth();
 
   if (isAuthenticated) {
-    return <Redirect href="/(main)/home" />;
+    return <Redirect href="/screens/home" />;
   } else {
-    return <Redirect href="/(auth)/login" />;
+    return <Redirect href="/screens/auth/login" />;
   }
 }
