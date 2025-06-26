@@ -1,6 +1,15 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+// /screens/reservas/reservas.tsx (o la ruta correcta en tu proyecto)
+
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar, Clock, Plus, Filter, Search } from 'lucide-react-native';
+import { globalStyles, colors } from '../../utils/globalStyles';
 
 export default function ReservasScreen() {
   const appointments = [
@@ -9,7 +18,7 @@ export default function ReservasScreen() {
       patient: 'María González',
       doctor: 'Dr. Juan Pérez',
       specialty: 'Cardiología',
-      date: '2024-01-15',
+      date: '2025-06-26', // Fecha actualizada para el ejemplo
       time: '10:00 AM',
       status: 'confirmed',
     },
@@ -18,7 +27,7 @@ export default function ReservasScreen() {
       patient: 'Carlos Rodríguez',
       doctor: 'Dra. Ana López',
       specialty: 'Dermatología',
-      date: '2024-01-15',
+      date: '2025-06-26',
       time: '11:30 AM',
       status: 'pending',
     },
@@ -27,22 +36,23 @@ export default function ReservasScreen() {
       patient: 'Ana Martínez',
       doctor: 'Dr. Luis García',
       specialty: 'Neurología',
-      date: '2024-01-15',
+      date: '2025-06-26',
       time: '2:00 PM',
       status: 'confirmed',
     },
   ];
 
+  // MEJORA: Esta función ahora usa los colores globales para mantener la consistencia
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return '#16a34a';
+        return colors.secondary; // Verde de éxito
       case 'pending':
-        return '#ca8a04';
+        return colors.warning; // Amarillo de advertencia
       case 'cancelled':
-        return '#dc2626';
+        return colors.accent; // Rojo de acento/error
       default:
-        return '#64748b';
+        return colors.text.muted; // Color gris por defecto
     }
   };
 
@@ -60,61 +70,92 @@ export default function ReservasScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Reservas de Citas</Text>
-        <TouchableOpacity style={styles.addButton}>
-          <Plus color="#ffffff" size={24} />
+    <SafeAreaView style={globalStyles.container}>
+      <View style={[globalStyles.spaceBetween, styles.header]}>
+        <Text style={globalStyles.title}>Reservas de Citas</Text>
+        <TouchableOpacity
+          style={[
+            globalStyles.circularButton,
+            { backgroundColor: colors.primary },
+          ]}
+        >
+          <Plus color={colors.surface} size={24} />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.filters}>
-        <TouchableOpacity style={styles.filterButton}>
-          <Search color="#64748b" size={20} />
-          <Text style={styles.filterText}>Buscar</Text>
+      <View style={globalStyles.filtersContainer}>
+        <TouchableOpacity style={globalStyles.filterButton}>
+          <Search color={colors.text.secondary} size={20} />
+          <Text style={globalStyles.filterText}>Buscar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <Filter color="#64748b" size={20} />
-          <Text style={styles.filterText}>Filtrar</Text>
+        {/* AÑADIDO: Filtros que faltaban */}
+        <TouchableOpacity style={globalStyles.filterButton}>
+          <Filter color={colors.text.secondary} size={20} />
+          <Text style={globalStyles.filterText}>Filtrar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <Calendar color="#64748b" size={20} />
-          <Text style={styles.filterText}>Fecha</Text>
+        <TouchableOpacity style={globalStyles.filterButton}>
+          <Calendar color={colors.text.secondary} size={20} />
+          <Text style={globalStyles.filterText}>Fecha</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
-        <View style={styles.todaySection}>
-          <Text style={styles.sectionTitle}>Hoy - 15 de Enero</Text>
-          <View style={styles.appointmentsList}>
+      {/* Se utiliza un padding horizontal específico para el scroll, no el global */}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={globalStyles.section}>
+          <Text style={globalStyles.sectionTitle}>Hoy - 26 de Junio</Text>
+
+          {/* AÑADIDO: Mapeo de citas para renderizarlas en la lista */}
+          <View style={globalStyles.appointmentsList}>
             {appointments.map((appointment) => (
-              <TouchableOpacity key={appointment.id} style={styles.appointmentCard}>
-                <View style={styles.appointmentHeader}>
-                  <View style={styles.timeContainer}>
-                    <Clock color="#64748b" size={16} />
-                    <Text style={styles.appointmentTime}>{appointment.time}</Text>
+              <TouchableOpacity
+                key={appointment.id}
+                style={globalStyles.appointmentCard}
+              >
+                <View style={globalStyles.appointmentHeader}>
+                  <View style={globalStyles.timeContainer}>
+                    <Clock color={colors.text.secondary} size={16} />
+                    <Text style={{ color: colors.text.primary, fontSize: 16, fontWeight: 'bold', marginLeft: 6 }}>
+                      {appointment.time}
+                    </Text>
                   </View>
-                  <View style={[styles.statusBadge, { backgroundColor: getStatusColor(appointment.status) }]}>
-                    <Text style={styles.statusText}>{getStatusText(appointment.status)}</Text>
+                  <View
+                    style={[
+                      globalStyles.statusBadge,
+                      { backgroundColor: getStatusColor(appointment.status) },
+                    ]}
+                  >
+                    <Text style={globalStyles.statusText}>
+                      {getStatusText(appointment.status)}
+                    </Text>
                   </View>
                 </View>
-                
-                <View style={styles.appointmentDetails}>
-                  <Text style={styles.patientName}>{appointment.patient}</Text>
-                  <Text style={styles.doctorName}>{appointment.doctor}</Text>
-                  <Text style={styles.specialty}>{appointment.specialty}</Text>
+                <View style={globalStyles.appointmentDetails}>
+                  <Text style={globalStyles.patientName}>
+                    {appointment.patient}
+                  </Text>
+                  <Text style={globalStyles.doctorName}>
+                    {appointment.doctor}
+                  </Text>
+                  <Text style={globalStyles.specialty}>
+                    {appointment.specialty}
+                  </Text>
                 </View>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
-        <View style={styles.upcomingSection}>
-          <Text style={styles.sectionTitle}>Próximas Citas</Text>
-          <View style={styles.emptyState}>
+        {/* AÑADIDO: Sección de "Próximas Citas" con estado vacío */}
+        <View style={globalStyles.section}>
+          <Text style={globalStyles.sectionTitle}>Próximas Citas</Text>
+          <View style={globalStyles.emptyState}>
             <Calendar color="#cbd5e1" size={48} />
-            <Text style={styles.emptyStateText}>No hay citas programadas</Text>
-            <Text style={styles.emptyStateSubtext}>Las próximas citas aparecerán aquí</Text>
+            <Text style={globalStyles.emptyStateText}>
+              No hay más citas programadas
+            </Text>
+            <Text style={globalStyles.emptyStateSubtext}>
+              Las futuras citas aparecerán aquí
+            </Text>
           </View>
         </View>
       </ScrollView>
@@ -123,147 +164,13 @@ export default function ReservasScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    paddingBottom: 16,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 4, // Reducido para acercar los filtros
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  addButton: {
-    backgroundColor: '#2563eb',
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  filters: {
-    flexDirection: 'row',
+  scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    gap: 12,
-  },
-  filterButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
-    gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  filterText: {
-    fontSize: 14,
-    color: '#64748b',
-    fontWeight: '500',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  todaySection: {
-    marginBottom: 32,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 16,
-  },
-  appointmentsList: {
-    gap: 12,
-  },
-  appointmentCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  appointmentHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  timeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  appointmentTime: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#64748b',
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#ffffff',
-  },
-  appointmentDetails: {
-    gap: 4,
-  },
-  patientName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  doctorName: {
-    fontSize: 14,
-    color: '#64748b',
-  },
-  specialty: {
-    fontSize: 14,
-    color: '#2563eb',
-    fontWeight: '500',
-  },
-  upcomingSection: {
-    marginBottom: 32,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  emptyStateText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#64748b',
-    marginTop: 12,
-  },
-  emptyStateSubtext: {
-    fontSize: 14,
-    color: '#94a3b8',
-    marginTop: 4,
   },
 });

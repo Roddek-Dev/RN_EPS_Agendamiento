@@ -1,14 +1,35 @@
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CreditCard as Edit, ArrowLeft, Calendar, Clock, User, UserCheck, Heart } from 'lucide-react-native';
-import { globalStyles, colors } from '@/app/utils/globalStyles';
+import {
+  Edit,
+  ArrowLeft,
+  Calendar,
+  Clock,
+  User,
+  UserCheck,
+  HeartPulse,
+} from 'lucide-react-native';
+import { globalStyles, colors } from '../../../utils/globalStyles';
+import React from 'react';
+
+type Appointment = {
+  id: number;
+  patient_id: number;
+  patient_name: string;
+  doctor_id: number;
+  doctor_name: string;
+  service_id: number;
+  service_name: string;
+  appointment_time: string;
+  status?: 'scheduled' | 'completed' | 'cancelled';
+};
 
 export default function AppointmentDetailScreen() {
   const { id } = useLocalSearchParams();
-  
+
   // Mock data - in real app this would come from API
-  const appointment = {
+  const appointment: Appointment = {
     id: Number(id),
     patient_id: 1,
     patient_name: 'María González',
@@ -16,118 +37,163 @@ export default function AppointmentDetailScreen() {
     doctor_name: 'Dr. Juan Pérez',
     service_id: 1,
     service_name: 'Consulta General',
-    appointment_time: '2024-01-15 10:00:00'
+    appointment_time: '2024-01-15 10:00:00',
+    status: 'scheduled',
   };
 
   const formatDateTime = (dateTimeString: string) => {
     const date = new Date(dateTimeString);
-    const dateStr = date.toLocaleDateString('es-ES', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-    const timeStr = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-    return { date: dateStr, time: timeStr };
-  };
-
-  const editAppointment = () => {
-    router.push(`/(main)/cruds/appointments/edit/${id}` as any);
-  };
-
-  const goBack = () => {
-    router.back();
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    };
+    return {
+      date: date.toLocaleDateString('es-ES', options),
+      time: date.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    };
   };
 
   const { date, time } = formatDateTime(appointment.appointment_time);
 
+  const getStatusStyles = () => {
+    switch (appointment.status) {
+      case 'completed':
+        return {
+          bg: colors.success,
+          text: colors.successText,
+          label: 'Completada',
+        };
+      case 'cancelled':
+        return { bg: colors.error, text: colors.errorText, label: 'Cancelada' };
+      default:
+        return {
+          bg: colors.pending,
+          text: colors.pendingText,
+          label: 'Programada',
+        };
+    }
+  };
+
+  const statusStyles = getStatusStyles();
+
+  const renderDetailRow = (
+    icon: React.ReactNode,
+    value: string,
+    iconColor?: string,
+    textColor?: string,
+    textWeight?: 'normal' | 'bold' | '600'
+  ) => (
+    <View style={globalStyles.detailRow}>
+      {React.cloneElement(
+        icon as React.ReactElement<{ color?: string; size?: number }>,
+        {
+          color: iconColor || colors.text.secondary,
+          size: 20,
+        }
+      )}
+      <View style={globalStyles.detailIcon} />
+      <Text
+        style={[
+          globalStyles.detailText,
+          textColor && { color: textColor },
+          textWeight && { fontWeight: textWeight },
+        ]}
+      >
+        {value}
+      </Text>
+    </View>
+  );
+
   return (
     <SafeAreaView style={globalStyles.container}>
+      {/* Header */}
       <View style={globalStyles.header}>
-        <TouchableOpacity style={[globalStyles.iconButton, { backgroundColor: colors.surface }]} onPress={goBack}>
+        <TouchableOpacity
+          style={globalStyles.iconButton}
+          onPress={() => router.back()}
+        >
           <ArrowLeft color={colors.text.secondary} size={24} />
         </TouchableOpacity>
-        <View style={{ flex: 1, marginLeft: 12 }}>
+        <View style={globalStyles.flex1}>
           <Text style={globalStyles.headerTitle}>Detalle de Cita</Text>
           <Text style={globalStyles.headerSubtitle}>ID: {id}</Text>
         </View>
-        <TouchableOpacity style={[globalStyles.iconButton, { backgroundColor: colors.primary }]} onPress={editAppointment}>
+        <TouchableOpacity
+          style={[globalStyles.iconButton, { backgroundColor: colors.primary }]}
+          onPress={() => router.push(`/(main)/cruds/appointments/edit/${id}`)}
+        >
           <Edit color={colors.surface} size={20} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={globalStyles.content}>
+      {/* Contenido */}
+      <ScrollView contentContainerStyle={globalStyles.content}>
+        {/* Información de la cita */}
         <View style={globalStyles.card}>
           <View style={globalStyles.section}>
-            <Text style={globalStyles.sectionTitle}>Información de la Cita</Text>
-            
+            <Text style={globalStyles.sectionTitle}>
+              Información de la Cita
+            </Text>
+
             <View style={globalStyles.inputContainer}>
               <Text style={globalStyles.label}>Fecha</Text>
-              <View style={[globalStyles.input, { backgroundColor: colors.background }]}>
-                <View style={globalStyles.row}>
-                  <Calendar color={colors.primary} size={20} />
-                  <Text style={[globalStyles.body, { marginLeft: 8, color: colors.primary, fontWeight: '600' }]}>
-                    {date}
-                  </Text>
-                </View>
-              </View>
+              {renderDetailRow(
+                <Calendar />,
+                date,
+                colors.primary,
+                colors.primary,
+                '600'
+              )}
             </View>
 
             <View style={globalStyles.inputContainer}>
               <Text style={globalStyles.label}>Hora</Text>
-              <View style={[globalStyles.input, { backgroundColor: colors.background }]}>
-                <View style={globalStyles.row}>
-                  <Clock color={colors.text.secondary} size={20} />
-                  <Text style={[globalStyles.body, { marginLeft: 8, fontWeight: '600' }]}>
-                    {time}
-                  </Text>
-                </View>
-              </View>
+              {renderDetailRow(<Clock />, time)}
             </View>
 
             <View style={globalStyles.inputContainer}>
               <Text style={globalStyles.label}>Paciente</Text>
-              <View style={[globalStyles.input, { backgroundColor: colors.background }]}>
-                <View style={globalStyles.row}>
-                  <User color={colors.text.secondary} size={20} />
-                  <Text style={[globalStyles.body, { marginLeft: 8 }]}>
-                    {appointment.patient_name}
-                  </Text>
-                </View>
-              </View>
+              {renderDetailRow(<User />, appointment.patient_name)}
             </View>
 
             <View style={globalStyles.inputContainer}>
               <Text style={globalStyles.label}>Doctor</Text>
-              <View style={[globalStyles.input, { backgroundColor: colors.background }]}>
-                <View style={globalStyles.row}>
-                  <UserCheck color={colors.text.secondary} size={20} />
-                  <Text style={[globalStyles.body, { marginLeft: 8 }]}>
-                    {appointment.doctor_name}
-                  </Text>
-                </View>
-              </View>
+              {renderDetailRow(<UserCheck />, appointment.doctor_name)}
             </View>
 
             <View style={globalStyles.inputContainer}>
               <Text style={globalStyles.label}>Servicio</Text>
-              <View style={[globalStyles.input, { backgroundColor: colors.background }]}>
-                <View style={globalStyles.row}>
-                  <Heart color={colors.accent} size={20} />
-                  <Text style={[globalStyles.body, { marginLeft: 8 }]}>
-                    {appointment.service_name || 'Sin servicio específico'}
-                  </Text>
-                </View>
-              </View>
+              {renderDetailRow(
+                <HeartPulse />,
+                appointment.service_name || 'Sin servicio específico',
+                colors.accent
+              )}
             </View>
           </View>
         </View>
 
+        {/* Estado de la cita */}
         <View style={globalStyles.card}>
           <Text style={globalStyles.sectionTitle}>Estado de la Cita</Text>
-          <View style={[globalStyles.statusBadge, { backgroundColor: colors.success, alignSelf: 'flex-start' }]}>
-            <Text style={[globalStyles.statusText, { color: colors.successText }]}>
-              Programada
+          <View
+            style={[
+              globalStyles.statusBadge,
+              {
+                backgroundColor: statusStyles.bg,
+                alignSelf: 'flex-start',
+                marginTop: 8,
+              },
+            ]}
+          >
+            <Text
+              style={[globalStyles.statusText, { color: statusStyles.text }]}
+            >
+              {statusStyles.label}
             </Text>
           </View>
         </View>

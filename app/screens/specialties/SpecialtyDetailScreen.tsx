@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CreditCard as Edit, ArrowLeft } from 'lucide-react-native';
-import { globalStyles, colors } from '@/app/utils/globalStyles';
+import { globalStyles, colors } from '../../../utils/globalStyles';
 
 export default function SpecialtyDetailScreen() {
   const { id } = useLocalSearchParams();

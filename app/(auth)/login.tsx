@@ -1,7 +1,18 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+// login.tsx
+
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from 'react-native';
 import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
+// Asegúrate de que la ruta a tus estilos globales sea correcta
+import { globalStyles, colors } from '../../utils/globalStyles';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -9,138 +20,83 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Image 
-            source={{ uri: 'https://images.pexels.com/photos/236380/pexels-photo-236380.jpeg?auto=compress&cs=tinysrgb&w=400' }}
-            style={styles.logo}
+    <SafeAreaView style={globalStyles.container}>
+      <View style={globalStyles.authContainer}>
+        <View style={globalStyles.authHeader}>
+          <Image
+            source={{
+              uri: 'https://images.pexels.com/photos/236380/pexels-photo-236380.jpeg?auto=compress&cs=tinysrgb&w=400',
+            }}
+            style={[globalStyles.avatarLarge, styles.logo]} // Usamos avatarLarge y sobreescribimos el margen
           />
-          <Text style={styles.title}>Bienvenido a EPS Salud</Text>
-          <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
+          <Text style={globalStyles.title}>Bienvenido a EPS Salud</Text>
+          <Text style={globalStyles.subtitle}>
+            Inicia sesión para continuar
+          </Text>
         </View>
 
-        <View style={styles.form}>
-          <View style={styles.inputContainer}>
-            <Mail color="#64748b" size={20} style={styles.inputIcon} />
+        <View style={globalStyles.authForm}>
+          <View style={globalStyles.inputWithIcon}>
+            <Mail
+              color={colors.text.secondary}
+              size={20}
+              style={globalStyles.inputIcon}
+            />
             <TextInput
-              style={styles.input}
+              style={globalStyles.textInput}
               placeholder="Correo electrónico"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
+              // ...otros props
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <Lock color="#64748b" size={20} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Contraseña"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
+          <View style={globalStyles.inputWithIcon}>
+            <Lock
+              color={colors.text.secondary}
+              size={20}
+              style={globalStyles.inputIcon}
             />
-            <TouchableOpacity
-              style={styles.eyeIcon}
-              onPress={() => setShowPassword(!showPassword)}
-            >
+            <TextInput
+              style={globalStyles.textInput}
+              placeholder="Contraseña"
+              secureTextEntry={!showPassword}
+              // ...otros props
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               {showPassword ? (
-                <EyeOff color="#64748b" size={20} />
+                <EyeOff color={colors.text.secondary} size={20} />
               ) : (
-                <Eye color="#64748b" size={20} />
+                <Eye color={colors.text.secondary} size={20} />
               )}
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.loginButton}>
-            <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
+          <TouchableOpacity
+            style={[
+              globalStyles.button,
+              globalStyles.buttonPrimary,
+              styles.loginButton, // Solo para el margen superior específico
+            ]}
+          >
+            <Text style={globalStyles.buttonText}>Iniciar Sesión</Text>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity style={globalStyles.authLinkContainer}>
+          <Text style={globalStyles.buttonTextOutline}>
+            ¿Olvidaste tu contraseña?
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
+// Los estilos locales se reducen a casi nada
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  content: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'center',
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 48,
-  },
   logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#64748b',
-    textAlign: 'center',
-  },
-  form: {
-    gap: 16,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1e293b',
-  },
-  eyeIcon: {
-    padding: 4,
+    marginBottom: 24, // Sobreescribimos el margen de avatarLarge
   },
   loginButton: {
-    backgroundColor: '#2563eb',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
     marginTop: 8,
-  },
-  loginButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  forgotPassword: {
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  forgotPasswordText: {
-    color: '#2563eb',
-    fontSize: 14,
-    fontWeight: '500',
   },
 });

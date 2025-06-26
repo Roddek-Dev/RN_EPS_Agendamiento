@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { Save, X, ArrowLeft, User, Mail } from 'lucide-react-native';
-import { globalStyles, colors } from '@/app/utils/globalStyles';
+import { globalStyles, colors } from '../../../utils/globalStyles';
 
 export default function PatientCreateScreen() {
   const [formData, setFormData] = useState({

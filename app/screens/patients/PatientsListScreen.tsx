@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, ScrollView, TextInput, Image } from 'reac
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus, Search, CreditCard as Edit, Eye, Mail } from 'lucide-react-native';
-import { globalStyles, colors } from '@/app/utils/globalStyles';
+import { globalStyles, colors } from '../../../utils/globalStyles';
 
 export default function PatientsListScreen() {
   const patients = [

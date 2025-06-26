@@ -1,5 +1,5 @@
 import { Redirect } from 'expo-router';
-import { IS_AUTHENTICATED } from '@/constants/auth';
+import { IS_AUTHENTICATED } from '../constants/auth';
 
 export default function AppNavigation() {
   if (IS_AUTHENTICATED) {
