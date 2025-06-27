@@ -1,5 +1,5 @@
 // Simulate authentication state
-export const IS_AUTHENTICATED = false; // Change to false to see login/register screens
+export const IS_AUTHENTICATED = true; // Change to false to see login/register screens
 
 // Mock user data
 export const MOCK_USER = {

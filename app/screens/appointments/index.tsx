@@ -1,82 +1,104 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+// Ruta: /(main)/cruds/appointments/index.tsx (o la ruta que corresponda)
+
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  FlatList, // 1. Importar FlatList
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Plus, Search, CreditCard as Edit, Eye, Clock, User, UserCheck, Calendar } from 'lucide-react-native';
+import {
+  Plus,
+  Search,
+  CreditCard as Edit,
+  Eye,
+  Clock,
+  User,
+  UserCheck,
+  Calendar,
+} from 'lucide-react-native';
+// 2. Importar los estilos globales y colores
+import { globalStyles, colors } from '../../../utils/globalStyles';
+
+// Datos de ejemplo
+const appointments = [
+  {
+    id: 1,
+    patient: 'María González',
+    doctor: 'Dr. Juan Pérez',
+    specialty: 'Cardiología',
+    date: '2025-06-27',
+    time: '10:00 AM',
+    duration: 30,
+    status: 'confirmed',
+    type: 'Consulta General',
+  },
+  {
+    id: 2,
+    patient: 'Carlos Rodríguez',
+    doctor: 'Dra. Ana López',
+    specialty: 'Dermatología',
+    date: '2025-06-27',
+    time: '11:30 AM',
+    duration: 45,
+    status: 'pending',
+    type: 'Revisión',
+  },
+  {
+    id: 3,
+    patient: 'Ana Martínez',
+    doctor: 'Dr. Luis García',
+    specialty: 'Neurología',
+    date: '2025-06-28',
+    time: '2:00 PM',
+    duration: 60,
+    status: 'confirmed',
+    type: 'Consulta Especializada',
+  },
+  {
+    id: 4,
+    patient: 'Luis Herrera',
+    doctor: 'Dra. Carmen Silva',
+    specialty: 'Pediatría',
+    date: '2025-06-28',
+    time: '9:00 AM',
+    duration: 30,
+    status: 'cancelled',
+    type: 'Control',
+  },
+];
 
 export default function AppointmentsListScreen() {
-  const appointments = [
-    { 
-      id: 1, 
-      patient: 'María González',
-      doctor: 'Dr. Juan Pérez',
-      specialty: 'Cardiología',
-      date: '2024-01-15',
-      time: '10:00 AM',
-      duration: 30,
-      status: 'confirmed',
-      type: 'Consulta General'
-    },
-    { 
-      id: 2, 
-      patient: 'Carlos Rodríguez',
-      doctor: 'Dra. Ana López',
-      specialty: 'Dermatología',
-      date: '2024-01-15',
-      time: '11:30 AM',
-      duration: 45,
-      status: 'pending',
-      type: 'Revisión'
-    },
-    { 
-      id: 3, 
-      patient: 'Ana Martínez',
-      doctor: 'Dr. Luis García',
-      specialty: 'Neurología',
-      date: '2024-01-16',
-      time: '2:00 PM',
-      duration: 60,
-      status: 'confirmed',
-      type: 'Consulta Especializada'
-    },
-    { 
-      id: 4, 
-      patient: 'Luis Herrera',
-      doctor: 'Dra. Carmen Silva',
-      specialty: 'Pediatría',
-      date: '2024-01-16',
-      time: '9:00 AM',
-      duration: 30,
-      status: 'cancelled',
-      type: 'Control'
-    },
-  ];
-
+  // 3. Funciones refactorizadas para usar colores globales
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return '#dcfce7';
+        return colors.success;
       case 'pending':
-        return '#fef3c7';
+        return colors.pending;
       case 'cancelled':
-        return '#fee2e2';
+        return colors.error;
       case 'completed':
-        return '#e0e7ff';
+        return colors.info;
       default:
-        return '#f1f5f9';
+        return colors.border;
     }
   };
 
   const getStatusTextColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return '#166534';
+        return colors.successText;
       case 'pending':
-        return '#92400e';
+        return colors.pendingText;
       case 'cancelled':
-        return '#991b1b';
+        return colors.errorText;
       case 'completed':
-        return '#3730a3';
+        return colors.infoText;
       default:
-        return '#64748b';
+        return colors.text.secondary;
     }
   };
 
@@ -95,224 +117,120 @@ export default function AppointmentsListScreen() {
     }
   };
 
+  // 4. Función para renderizar cada ítem en la FlatList
+  const renderAppointment = ({ item: appointment }: { item: any }) => (
+    <View style={globalStyles.listItem}>
+      <View style={globalStyles.listItemContent}>
+        <View style={globalStyles.spaceBetween}>
+          <View style={[globalStyles.row, { flexShrink: 1, marginRight: 8 }]}>
+            <Calendar color={colors.primary} size={16} />
+            <Text
+              style={[
+                globalStyles.caption,
+                { color: colors.primary, fontWeight: '600', marginLeft: 6 },
+              ]}
+            >
+              {appointment.date}
+            </Text>
+            <Clock
+              color={colors.text.secondary}
+              size={16}
+              style={{ marginLeft: 12 }}
+            />
+            <Text
+              style={[
+                globalStyles.caption,
+                { fontWeight: '600', marginLeft: 6 },
+              ]}
+            >
+              {appointment.time}
+            </Text>
+          </View>
+          <View
+            style={[
+              globalStyles.statusBadge,
+              { backgroundColor: getStatusColor(appointment.status) },
+            ]}
+          >
+            <Text
+              style={[
+                globalStyles.statusText,
+                { color: getStatusTextColor(appointment.status) },
+              ]}
+            >
+              {getStatusText(appointment.status)}
+            </Text>
+          </View>
+        </View>
+
+        <Text style={[globalStyles.itemTitle, { marginVertical: 8 }]}>
+          {appointment.type}
+        </Text>
+
+        <View style={{ gap: 4, marginBottom: 8 }}>
+          <View style={globalStyles.row}>
+            <User color={colors.text.secondary} size={14} />
+            <Text style={[globalStyles.caption, { marginLeft: 6 }]}>
+              Paciente: {appointment.patient}
+            </Text>
+          </View>
+          <View style={globalStyles.row}>
+            <UserCheck color={colors.text.secondary} size={14} />
+            <Text style={[globalStyles.caption, { marginLeft: 6 }]}>
+              Doctor: {appointment.doctor}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={globalStyles.listItemActions}>
+        <TouchableOpacity
+          style={[globalStyles.actionButton, { backgroundColor: colors.info }]}
+        >
+          <Eye color={colors.primary} size={18} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            globalStyles.actionButton,
+            { backgroundColor: colors.success },
+          ]}
+        >
+          <Edit color={colors.secondary} size={18} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.searchContainer}>
-          <Search color="#64748b" size={20} style={styles.searchIcon} />
+    <SafeAreaView style={globalStyles.container}>
+      <View style={[globalStyles.header, { gap: 12, borderBottomWidth: 0 }]}>
+        <View style={globalStyles.searchContainer}>
+          <Search
+            color={colors.text.secondary}
+            size={20}
+            style={globalStyles.searchIcon}
+          />
           <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar citas..."
-            placeholderTextColor="#94a3b8"
+            style={globalStyles.searchInput}
+            placeholder="Buscar por paciente, doctor..."
+            placeholderTextColor={colors.text.muted}
           />
         </View>
-        <TouchableOpacity style={styles.addButton}>
-          <Plus color="#ffffff" size={24} />
+        <TouchableOpacity
+          style={[globalStyles.iconButton, { backgroundColor: colors.primary }]}
+        >
+          <Plus color={colors.surface} size={24} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
-        <View style={styles.appointmentsList}>
-          {appointments.map((appointment) => (
-            <View key={appointment.id} style={styles.appointmentCard}>
-              <View style={styles.appointmentInfo}>
-                <View style={styles.appointmentHeader}>
-                  <View style={styles.dateTimeContainer}>
-                    <Calendar color="#2563eb" size={16} />
-                    <Text style={styles.appointmentDate}>{appointment.date}</Text>
-                    <Clock color="#64748b" size={16} />
-                    <Text style={styles.appointmentTime}>{appointment.time}</Text>
-                  </View>
-                  <View style={[
-                    styles.statusBadge,
-                    { backgroundColor: getStatusColor(appointment.status) }
-                  ]}>
-                    <Text style={[
-                      styles.statusText,
-                      { color: getStatusTextColor(appointment.status) }
-                    ]}>
-                      {getStatusText(appointment.status)}
-                    </Text>
-                  </View>
-                </View>
-                
-                <Text style={styles.appointmentType}>{appointment.type}</Text>
-                <Text style={styles.specialty}>{appointment.specialty}</Text>
-                
-                <View style={styles.participantsContainer}>
-                  <View style={styles.participantInfo}>
-                    <User color="#64748b" size={14} />
-                    <Text style={styles.participantText}>Paciente: {appointment.patient}</Text>
-                  </View>
-                  <View style={styles.participantInfo}>
-                    <UserCheck color="#64748b" size={14} />
-                    <Text style={styles.participantText}>Doctor: {appointment.doctor}</Text>
-                  </View>
-                </View>
-                
-                <Text style={styles.duration}>Duración: {appointment.duration} minutos</Text>
-              </View>
-              
-              <View style={styles.appointmentActions}>
-                <TouchableOpacity style={[styles.actionButton, styles.viewButton]}>
-                  <Eye color="#2563eb" size={16} />
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.actionButton, styles.editButton]}>
-                  <Edit color="#16a34a" size={16} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
+      <FlatList
+        data={appointments}
+        renderItem={renderAppointment}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
+      />
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    gap: 12,
-  },
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1e293b',
-  },
-  addButton: {
-    backgroundColor: '#2563eb',
-    width: 44,
-    height: 44,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  appointmentsList: {
-    gap: 12,
-    paddingBottom: 20,
-  },
-  appointmentCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  appointmentInfo: {
-    flex: 1,
-  },
-  appointmentHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  dateTimeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    flex: 1,
-  },
-  appointmentDate: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#2563eb',
-  },
-  appointmentTime: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#64748b',
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    marginLeft: 8,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  appointmentType: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 4,
-  },
-  specialty: {
-    fontSize: 14,
-    color: '#2563eb',
-    fontWeight: '500',
-    marginBottom: 12,
-  },
-  participantsContainer: {
-    gap: 6,
-    marginBottom: 8,
-  },
-  participantInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  participantText: {
-    fontSize: 14,
-    color: '#64748b',
-  },
-  duration: {
-    fontSize: 12,
-    color: '#64748b',
-    backgroundColor: '#f1f5f9',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-  },
-  appointmentActions: {
-    flexDirection: 'row',
-    gap: 8,
-    marginLeft: 16,
-  },
-  actionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  viewButton: {
-    backgroundColor: '#eff6ff',
-  },
-  editButton: {
-    backgroundColor: '#f0fdf4',
-  },
-});
+// 5. ¡El StyleSheet local ya no es necesario! Se puede eliminar por completo.

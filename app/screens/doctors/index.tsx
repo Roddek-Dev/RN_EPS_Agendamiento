@@ -1,304 +1,216 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Image } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Plus, Search, CreditCard as Edit, Eye, Star, Calendar } from 'lucide-react-native';
+// Ruta: /(main)/cruds/doctors/[id].tsx
 
-export default function DoctorsListScreen() {
+import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { useLocalSearchParams, router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  User,
+  Briefcase,
+  Star,
+  Phone,
+  Mail,
+  Calendar,
+  Edit,
+  ArrowLeft,
+} from 'lucide-react-native';
+import { globalStyles, colors } from '../../../utils/globalStyles';
+
+export default function DoctorDetailScreen() {
+  const { id } = useLocalSearchParams();
+  const goBack = () => router.back();
+  const editDoctor = () => router.push(`/(main)/cruds/doctors/edit/${id}`);
+
+  // Mock data - Array de doctores
   const doctors = [
-    { 
-      id: 1, 
-      name: 'Dr. Juan Pérez', 
+    {
+      id: 1,
+      name: 'Dr. Juan Pérez',
       specialty: 'Cardiología',
       experience: '10 años',
       rating: 4.8,
       appointments: 156,
       status: 'available',
-      avatar: 'https://images.pexels.com/photos/612999/pexels-photo-612999.jpeg?auto=compress&cs=tinysrgb&w=400'
+      phone: '+57 301 234 5678',
+      email: 'juan.perez@hospital.com',
+      education: 'Universidad Nacional de Colombia',
+      schedule: 'Lunes a Viernes 8:00 AM - 5:00 PM',
+      avatar:
+        'https://images.pexels.com/photos/612999/pexels-photo-612999.jpeg?auto=compress&cs=tinysrgb&w=400',
     },
-    { 
-      id: 2, 
-      name: 'Dra. María González', 
+    {
+      id: 2,
+      name: 'Dra. María González',
       specialty: 'Dermatología',
       experience: '8 años',
       rating: 4.9,
       appointments: 98,
       status: 'busy',
-      avatar: 'https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=400'
+      phone: '+57 302 345 6789',
+      email: 'maria.gonzalez@hospital.com',
+      education: 'Universidad de los Andes',
+      schedule: 'Martes a Sábado 9:00 AM - 6:00 PM',
+      avatar:
+        'https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=400',
     },
-    { 
-      id: 3, 
-      name: 'Dr. Carlos López', 
+    {
+      id: 3,
+      name: 'Dr. Carlos López',
       specialty: 'Cardiología',
       experience: '12 años',
       rating: 4.7,
       appointments: 203,
       status: 'available',
-      avatar: 'https://images.pexels.com/photos/582750/pexels-photo-582750.jpeg?auto=compress&cs=tinysrgb&w=400'
+      phone: '+57 303 456 7890',
+      email: 'carlos.lopez@hospital.com',
+      education: 'Universidad Javeriana',
+      schedule: 'Lunes a Viernes 7:00 AM - 4:00 PM',
+      avatar:
+        'https://images.pexels.com/photos/582750/pexels-photo-582750.jpeg?auto=compress&cs=tinysrgb&w=400',
     },
-    { 
-      id: 4, 
-      name: 'Dra. Ana Martínez', 
+    {
+      id: 4,
+      name: 'Dra. Ana Martínez',
       specialty: 'Pediatría',
       experience: '6 años',
       rating: 4.6,
       appointments: 87,
       status: 'offline',
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400'
+      phone: '+57 304 567 8901',
+      email: 'ana.martinez@hospital.com',
+      education: 'Universidad del Rosario',
+      schedule: 'Lunes a Jueves 8:00 AM - 3:00 PM',
+      avatar:
+        'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
     },
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'available':
-        return '#dcfce7';
-      case 'busy':
-        return '#fef3c7';
-      case 'offline':
-        return '#fee2e2';
-      default:
-        return '#f1f5f9';
-    }
-  };
+  // Encontrar el doctor específico por ID
+  const doctor = doctors.find((doc) => doc.id === parseInt(id as string));
 
-  const getStatusTextColor = (status: string) => {
-    switch (status) {
-      case 'available':
-        return '#166534';
-      case 'busy':
-        return '#92400e';
-      case 'offline':
-        return '#991b1b';
-      default:
-        return '#64748b';
-    }
-  };
+  // Si no se encuentra el doctor, mostrar mensaje de error
+  if (!doctor) {
+    return (
+      <SafeAreaView style={globalStyles.container}>
+        <View style={globalStyles.header}>
+          <TouchableOpacity style={globalStyles.iconButton} onPress={goBack}>
+            <ArrowLeft color={colors.text.secondary} size={24} />
+          </TouchableOpacity>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Text style={globalStyles.headerTitle}>Doctor no encontrado</Text>
+          </View>
+        </View>
+        <View style={[globalStyles.content, globalStyles.center]}>
+          <Text style={globalStyles.title}>Doctor no encontrado</Text>
+          <Text style={globalStyles.caption}>
+            El doctor solicitado no existe
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'available':
-        return 'Disponible';
-      case 'busy':
-        return 'Ocupado';
-      case 'offline':
-        return 'Fuera de línea';
-      default:
-        return 'Desconocido';
-    }
-  };
+  // Componente reutilizable para las filas de detalles
+  interface DetailRowProps {
+    icon: React.ComponentType<{ color: string; size: number }>;
+    value: string;
+    color?: string;
+  }
+
+  const DetailRow: React.FC<DetailRowProps> = ({
+    icon: Icon,
+    value,
+    color = colors.text.secondary,
+  }) => (
+    <View style={[globalStyles.row, { gap: 12, marginBottom: 12 }]}>
+      <Icon color={color} size={20} />
+      <Text style={globalStyles.detailText}>{value}</Text>
+    </View>
+  );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.searchContainer}>
-          <Search color="#64748b" size={20} style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar doctores..."
-            placeholderTextColor="#94a3b8"
-          />
+    <SafeAreaView style={globalStyles.container}>
+      <View style={globalStyles.header}>
+        <TouchableOpacity style={globalStyles.iconButton} onPress={goBack}>
+          <ArrowLeft color={colors.text.secondary} size={24} />
+        </TouchableOpacity>
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <Text style={globalStyles.headerTitle}>Perfil del Doctor</Text>
         </View>
-        <TouchableOpacity style={styles.addButton}>
-          <Plus color="#ffffff" size={24} />
+        <TouchableOpacity
+          style={[globalStyles.iconButton, { backgroundColor: colors.primary }]}
+          onPress={editDoctor}
+        >
+          <Edit color={colors.surface} size={20} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
-        <View style={styles.doctorsList}>
-          {doctors.map((doctor) => (
-            <View key={doctor.id} style={styles.doctorCard}>
-              <View style={styles.doctorInfo}>
-                <Image source={{ uri: doctor.avatar }} style={styles.avatar} />
-                <View style={styles.doctorDetails}>
-                  <View style={styles.doctorHeader}>
-                    <Text style={styles.doctorName}>{doctor.name}</Text>
-                    <View style={[
-                      styles.statusBadge,
-                      { backgroundColor: getStatusColor(doctor.status) }
-                    ]}>
-                      <Text style={[
-                        styles.statusText,
-                        { color: getStatusTextColor(doctor.status) }
-                      ]}>
-                        {getStatusText(doctor.status)}
-                      </Text>
-                    </View>
-                  </View>
-                  <Text style={styles.doctorSpecialty}>{doctor.specialty}</Text>
-                  <Text style={styles.doctorExperience}>{doctor.experience} de experiencia</Text>
-                  <View style={styles.doctorStats}>
-                    <View style={styles.ratingContainer}>
-                      <Star color="#fbbf24" size={16} fill="#fbbf24" />
-                      <Text style={styles.rating}>{doctor.rating}</Text>
-                    </View>
-                    <View style={styles.appointmentsContainer}>
-                      <Calendar color="#64748b" size={16} />
-                      <Text style={styles.appointments}>{doctor.appointments} citas</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-              
-              <View style={styles.doctorActions}>
-                <TouchableOpacity style={[styles.actionButton, styles.viewButton]}>
-                  <Eye color="#2563eb" size={16} />
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.actionButton, styles.editButton]}>
-                  <Edit color="#16a34a" size={16} />
-                </TouchableOpacity>
-              </View>
+      <ScrollView contentContainerStyle={globalStyles.content}>
+        {/* Sección de Perfil */}
+        <View
+          style={[
+            globalStyles.card,
+            { alignItems: 'center', marginBottom: 20 },
+          ]}
+        >
+          <Image
+            source={{ uri: doctor.avatar }}
+            style={[
+              globalStyles.avatarLarge,
+              { width: 100, height: 100, borderRadius: 50, marginBottom: 16 },
+            ]}
+          />
+          <Text style={[globalStyles.title, { fontSize: 22 }]}>
+            {doctor.name}
+          </Text>
+          <Text
+            style={[
+              globalStyles.caption,
+              {
+                color: colors.primary,
+                fontWeight: '600',
+                fontSize: 16,
+                marginBottom: 16,
+              },
+            ]}
+          >
+            {doctor.specialty}
+          </Text>
+
+          <View
+            style={[
+              globalStyles.row,
+              { justifyContent: 'space-around', width: '100%' },
+            ]}
+          >
+            <View style={globalStyles.center}>
+              <Star color="#fbbf24" size={24} fill="#fbbf24" />
+              <Text style={globalStyles.itemTitle}>{doctor.rating}</Text>
             </View>
-          ))}
+            <View style={globalStyles.center}>
+              <Briefcase color={colors.text.secondary} size={24} />
+              <Text style={globalStyles.itemTitle}>{doctor.experience}</Text>
+            </View>
+            <View style={globalStyles.center}>
+              <Calendar color={colors.text.secondary} size={24} />
+              <Text style={globalStyles.itemTitle}>{doctor.appointments}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Sección de Información Profesional */}
+        <View style={globalStyles.card}>
+          <Text style={globalStyles.sectionTitle}>Información Profesional</Text>
+          <DetailRow icon={Briefcase} value={doctor.education} />
+          <DetailRow icon={Calendar} value={`Horario: ${doctor.schedule}`} />
+        </View>
+
+        {/* Sección de Contacto */}
+        <View style={globalStyles.card}>
+          <Text style={globalStyles.sectionTitle}>Información de Contacto</Text>
+          <DetailRow icon={Phone} value={doctor.phone} />
+          <DetailRow icon={Mail} value={doctor.email} />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    gap: 12,
-  },
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1e293b',
-  },
-  addButton: {
-    backgroundColor: '#2563eb',
-    width: 44,
-    height: 44,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  doctorsList: {
-    gap: 12,
-    paddingBottom: 20,
-  },
-  doctorCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  doctorInfo: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    marginRight: 16,
-  },
-  doctorDetails: {
-    flex: 1,
-  },
-  doctorHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  doctorName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    flex: 1,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    marginLeft: 8,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  doctorSpecialty: {
-    fontSize: 16,
-    color: '#2563eb',
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  doctorExperience: {
-    fontSize: 14,
-    color: '#64748b',
-    marginBottom: 8,
-  },
-  doctorStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  rating: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1e293b',
-  },
-  appointmentsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  appointments: {
-    fontSize: 12,
-    color: '#64748b',
-  },
-  doctorActions: {
-    flexDirection: 'row',
-    gap: 8,
-    marginLeft: 16,
-  },
-  actionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  viewButton: {
-    backgroundColor: '#eff6ff',
-  },
-  editButton: {
-    backgroundColor: '#f0fdf4',
-  },
-});

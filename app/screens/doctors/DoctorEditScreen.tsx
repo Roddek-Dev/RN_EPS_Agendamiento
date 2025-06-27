@@ -86,7 +86,7 @@ export default function DoctorEditScreen() {
                 <ChevronDown color={colors.text.secondary} size={20} />
               </View>
             </TouchableOpacity>
-            <Text style={[globalStyles.small, { marginTop: 4, marginLeft: 4 }]}>
+            <Text style={{ fontSize: 12, color: colors.text.muted, marginTop: 4, marginLeft: 4 }}>
               Toque para seleccionar una especialidad
             </Text>
           </View>

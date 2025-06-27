@@ -76,7 +76,11 @@ export const globalStyles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  flex1 : { flex: 1 },
+  flex1: { flex: 1 },
+  center: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
   // --- CABECERAS DE PÁGINA (NUEVO PARA CRUDS) ---
   header: {
