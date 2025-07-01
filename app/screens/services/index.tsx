@@ -1,213 +1,150 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Plus, Search, CreditCard as Edit, Eye, DollarSign } from 'lucide-react-native';
+import { Plus, Search, Eye, Edit, Tag, FileText, DollarSign, Activity } from 'lucide-react-native';
+import { globalStyles, colors } from '../../../utils/globalStyles';
 
 export default function ServicesListScreen() {
+  const addService = () => router.push('/(main)/cruds/services/create');
+  const viewService = (id: number) => router.push(`/(main)/cruds/services/${id}`);
+  const editService = (id: number) => router.push(`/(main)/cruds/services/edit/${id}`);
+
+  // Mock data - Array de servicios
   const services = [
-    { id: 1, name: 'Consulta General', category: 'Consultas', price: 50000, duration: 30, status: 'active' },
-    { id: 2, name: 'Electrocardiograma', category: 'Exámenes', price: 75000, duration: 45, status: 'active' },
-    { id: 3, name: 'Ecocardiograma', category: 'Exámenes', price: 120000, duration: 60, status: 'active' },
-    { id: 4, name: 'Radiografía', category: 'Imágenes', price: 80000, duration: 20, status: 'active' },
-    { id: 5, name: 'Laboratorio Completo', category: 'Laboratorio', price: 95000, duration: 15, status: 'inactive' },
+    { id: 1, name: 'Consulta General', description: 'Consulta médica general con revisión completa.', price: 50000, status: 'disponible', category: 'Consultas' },
+    { id: 2, name: 'Electrocardiograma', description: 'Análisis del ritmo cardíaco.', price: 75000, status: 'disponible', category: 'Exámenes' },
+    { id: 3, name: 'Ecocardiograma', description: 'Examen del corazón por ultrasonido.', price: 120000, status: 'no disponible', category: 'Exámenes' },
+    { id: 4, name: 'Radiografía de Tórax', description: 'Examen de rayos X para el área del tórax.', price: 85000, status: 'disponible', category: 'Imágenes' },
+    { id: 5, name: 'Laboratorio Completo', description: 'Análisis de sangre y orina completo.', price: 95000, status: 'disponible', category: 'Laboratorio' },
   ];
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  // Componente para la tarjeta de servicio, basado en PatientCard
+  interface ServiceCardProps {
+    service: typeof services[0];
+  }
+
+  const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => (
+    <View style={globalStyles.card}>
+      <View style={[globalStyles.row, { alignItems: 'flex-start' }]}>
+        <View style={[globalStyles.avatar, { backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center' }]}>
+            <Tag color={colors.surface} size={24}/>
+        </View>
+
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <View style={[globalStyles.row, { justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }]}>
+            <Text style={globalStyles.itemTitle}>{service.name}</Text>
+            <View style={[{
+              backgroundColor: service.status === 'disponible' ? colors.success : colors.warning,
+              paddingHorizontal: 8,
+              paddingVertical: 4,
+              borderRadius: 6,
+            }]}>
+              <Text style={[
+                globalStyles.caption,
+                { 
+                  color: service.status === 'disponible' ? colors.successText : '#b45309',
+                  fontWeight: '600',
+                  fontSize: 12
+                }
+              ]}>
+                {service.status === 'disponible' ? 'Disponible' : 'No Disponible'}
+              </Text>
+            </View>
+          </View>
+          
+          <Text style={[globalStyles.caption, { marginBottom: 8 }]}>
+            Categoría: {service.category}
+          </Text>
+          
+          <View style={{ gap: 4, marginBottom: 8 }}>
+            <View style={[globalStyles.row, { alignItems: 'center', gap: 6 }]}>
+              <FileText color={colors.text.secondary} size={14} />
+              <Text style={[globalStyles.caption, { fontSize: 12, flex: 1 }]} numberOfLines={2}>{service.description}</Text>
+            </View>
+            <View style={[globalStyles.row, { alignItems: 'center', gap: 6, marginTop: 4 }]}>
+              <DollarSign color={colors.primary} size={16} />
+              <Text style={[globalStyles.itemTitle, { fontSize: 16, color: colors.primary }]}>
+                {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(service.price)}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      
+      <View style={[globalStyles.row, { justifyContent: 'flex-end', gap: 8, marginTop: 12 }]}>
+        <TouchableOpacity
+          style={[globalStyles.iconButton, { backgroundColor: colors.info }]}
+          onPress={() => viewService(service.id)}
+        >
+          <Eye color={colors.infoText} size={16} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[globalStyles.iconButton, { backgroundColor: colors.success }]}
+          onPress={() => editService(service.id)}
+        >
+          <Edit color={colors.successText} size={16} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.searchContainer}>
-          <Search color="#64748b" size={20} style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar servicios..."
-            placeholderTextColor="#94a3b8"
-          />
+    <SafeAreaView style={globalStyles.container}>
+      <View style={globalStyles.header}>
+        <View style={{ flex: 1 }}>
+          <Text style={globalStyles.headerTitle}>Servicios</Text>
+          <Text style={globalStyles.headerSubtitle}>
+            {services.length} servicio{services.length !== 1 ? 's' : ''} registrado{services.length !== 1 ? 's' : ''}
+          </Text>
         </View>
-        <TouchableOpacity style={styles.addButton}>
-          <Plus color="#ffffff" size={24} />
+        <TouchableOpacity
+          style={[globalStyles.iconButton, { backgroundColor: colors.primary }]}
+          onPress={addService}
+        >
+          <Plus color={colors.surface} size={24} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
-        <View style={styles.servicesList}>
+      <View style={[globalStyles.searchContainer, { marginHorizontal: 16, marginBottom: 16 }]}>
+        <Search color={colors.text.secondary} size={20} />
+        <TextInput
+          style={globalStyles.searchInput}
+          placeholder="Buscar servicios..."
+          placeholderTextColor={colors.text.muted}
+        />
+      </View>
+
+      <ScrollView 
+        contentContainerStyle={[globalStyles.content, { paddingTop: 0 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={{ gap: 12 }}>
           {services.map((service) => (
-            <View key={service.id} style={styles.serviceCard}>
-              <View style={styles.serviceInfo}>
-                <View style={styles.serviceHeader}>
-                  <Text style={styles.serviceName}>{service.name}</Text>
-                  <View style={[
-                    styles.statusBadge,
-                    { backgroundColor: service.status === 'active' ? '#dcfce7' : '#fef3c7' }
-                  ]}>
-                    <Text style={[
-                      styles.statusText,
-                      { color: service.status === 'active' ? '#166534' : '#92400e' }
-                    ]}>
-                      {service.status === 'active' ? 'Activo' : 'Inactivo'}
-                    </Text>
-                  </View>
-                </View>
-                <Text style={styles.serviceCategory}>{service.category}</Text>
-                <View style={styles.serviceDetails}>
-                  <View style={styles.priceContainer}>
-                    <DollarSign color="#2563eb" size={16} />
-                    <Text style={styles.servicePrice}>{formatPrice(service.price)}</Text>
-                  </View>
-                  <Text style={styles.serviceDuration}>{service.duration} min</Text>
-                </View>
-              </View>
-              
-              <View style={styles.serviceActions}>
-                <TouchableOpacity style={[styles.actionButton, styles.viewButton]}>
-                  <Eye color="#2563eb" size={16} />
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.actionButton, styles.editButton]}>
-                  <Edit color="#16a34a" size={16} />
-                </TouchableOpacity>
-              </View>
-            </View>
+            <ServiceCard key={service.id} service={service} />
           ))}
         </View>
+
+        {services.length === 0 && (
+          <View style={[globalStyles.center, { paddingVertical: 40 }]}>
+            <Activity color={colors.text.secondary} size={48} />
+            <Text style={[globalStyles.title, { marginTop: 16, marginBottom: 8 }]}>
+              No hay servicios registrados
+            </Text>
+            <Text style={[globalStyles.caption, { textAlign: 'center', marginBottom: 20 }]}>
+              Comienza agregando tu primer servicio al sistema
+            </Text>
+            <TouchableOpacity
+              style={[globalStyles.button, { backgroundColor: colors.primary }]}
+              onPress={addService}
+            >
+              <Plus color={colors.surface} size={20} />
+              <Text style={[globalStyles.buttonText, { color: colors.surface }]}>
+                Agregar Servicio
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    gap: 12,
-  },
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1e293b',
-  },
-  addButton: {
-    backgroundColor: '#2563eb',
-    width: 44,
-    height: 44,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  servicesList: {
-    gap: 12,
-    paddingBottom: 20,
-  },
-  serviceCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  serviceInfo: {
-    flex: 1,
-  },
-  serviceHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  serviceName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    flex: 1,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    marginLeft: 8,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  serviceCategory: {
-    fontSize: 14,
-    color: '#64748b',
-    marginBottom: 8,
-  },
-  serviceDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  servicePrice: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2563eb',
-  },
-  serviceDuration: {
-    fontSize: 14,
-    color: '#64748b',
-    backgroundColor: '#f1f5f9',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  serviceActions: {
-    flexDirection: 'row',
-    gap: 8,
-    marginLeft: 16,
-  },
-  actionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  viewButton: {
-    backgroundColor: '#eff6ff',
-  },
-  editButton: {
-    backgroundColor: '#f0fdf4',
-  },
-});

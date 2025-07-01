@@ -1,106 +1,101 @@
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, KeyboardTypeOptions } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
-import { Save, X, ArrowLeft } from 'lucide-react-native';
-import { globalStyles, colors } from '../../../utils/globalStyles';
+import { Save, X, ArrowLeft, Tag, FileText, DollarSign } from 'lucide-react-native';
+import { globalStyles, colors, spacing } from '../../../utils/globalStyles';
+
+interface FormData {
+  name: string;
+  description: string;
+  price: string;
+}
 
 export default function ServiceCreateScreen() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     description: '',
     price: '',
   });
-
-  const updateField = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
 
   const handleSave = () => {
     if (!formData.name.trim()) {
       Alert.alert('Error', 'El nombre es requerido');
       return;
     }
-    
-    // Here you would typically save to API
     Alert.alert('Éxito', 'Servicio creado correctamente');
     router.back();
   };
 
-  const handleCancel = () => {
-    router.back();
+  const handleInputChange = (field: keyof FormData, text: string) => {
+    setFormData({ ...formData, [field]: text });
   };
 
-  const goBack = () => {
-    router.back();
-  };
+  const renderInput = (
+    IconComponent: React.ComponentType<any>,
+    field: keyof FormData,
+    placeholder: string,
+    keyboardType: KeyboardTypeOptions = 'default',
+    multiline: boolean = false
+  ) => (
+    <View style={globalStyles.inputContainer}>
+      <View style={[globalStyles.inputWithIcon, multiline && { minHeight: 80, alignItems: 'flex-start' }]}>
+        <IconComponent
+          color={colors.text.secondary}
+          size={20}
+          style={[globalStyles.inputIcon, multiline && { marginTop: 12 }]}
+        />
+        <TextInput
+          style={[globalStyles.textInput, multiline && { height: 80, textAlignVertical: 'top' }]}
+          value={formData[field]}
+          onChangeText={(text) => handleInputChange(field, text)}
+          placeholder={placeholder}
+          keyboardType={keyboardType}
+          placeholderTextColor={colors.text.muted}
+          multiline={multiline}
+          numberOfLines={multiline ? 4 : 1}
+        />
+      </View>
+    </View>
+  );
 
   return (
     <SafeAreaView style={globalStyles.container}>
       <View style={globalStyles.header}>
-        <TouchableOpacity style={[globalStyles.iconButton, { backgroundColor: colors.surface }]} onPress={goBack}>
+        <TouchableOpacity style={globalStyles.iconButton} onPress={() => router.back()}>
           <ArrowLeft color={colors.text.secondary} size={24} />
         </TouchableOpacity>
-        <View style={{ flex: 1, marginLeft: 12 }}>
+        <View style={globalStyles.flex1}>
           <Text style={globalStyles.headerTitle}>Nuevo Servicio</Text>
-          <Text style={globalStyles.headerSubtitle}>Crear servicio médico</Text>
+          <Text style={globalStyles.headerSubtitle}>Registrar nuevo servicio médico</Text>
         </View>
       </View>
 
-      <ScrollView style={globalStyles.content}>
+      <ScrollView contentContainerStyle={globalStyles.content}>
         <View style={globalStyles.card}>
-          <View style={globalStyles.inputContainer}>
-            <Text style={globalStyles.label}>Nombre *</Text>
-            <TextInput
-              style={globalStyles.input}
-              value={formData.name}
-              onChangeText={(value) => updateField('name', value)}
-              placeholder="Ingrese el nombre del servicio"
-            />
-          </View>
-
-          <View style={globalStyles.inputContainer}>
-            <Text style={globalStyles.label}>Descripción</Text>
-            <TextInput
-              style={[globalStyles.input, globalStyles.textArea]}
-              value={formData.description}
-              onChangeText={(value) => updateField('description', value)}
-              placeholder="Ingrese la descripción del servicio"
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-            />
-          </View>
-
-          <View style={globalStyles.inputContainer}>
-            <Text style={globalStyles.label}>Precio (COP)</Text>
-            <TextInput
-              style={globalStyles.input}
-              value={formData.price}
-              onChangeText={(value) => updateField('price', value)}
-              placeholder="Ingrese el precio del servicio"
-              keyboardType="numeric"
-            />
-          </View>
+          {renderInput(Tag, 'name', 'Nombre del servicio *')}
+          {renderInput(FileText, 'description', 'Descripción (opcional)', 'default', true)}
+          {renderInput(DollarSign, 'price', 'Precio (COP)', 'numeric')}
         </View>
 
         <View style={globalStyles.formActions}>
-          <TouchableOpacity 
-            style={[globalStyles.button, globalStyles.buttonOutline, globalStyles.formButton]} 
-            onPress={handleCancel}
+          <TouchableOpacity
+            style={[globalStyles.button, globalStyles.buttonOutline, globalStyles.formButton]}
+            onPress={() => router.back()}
           >
             <View style={globalStyles.row}>
               <X color={colors.text.secondary} size={20} />
-              <Text style={[globalStyles.buttonTextOutline, { marginLeft: 8 }]}>Cancelar</Text>
+              <Text style={[globalStyles.buttonTextOutline, { marginLeft: spacing.sm }]}>Cancelar</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={[globalStyles.button, globalStyles.buttonPrimary, globalStyles.formButton]} 
+          <TouchableOpacity
+            style={[globalStyles.button, globalStyles.buttonPrimary, globalStyles.formButton]}
             onPress={handleSave}
           >
             <View style={globalStyles.row}>
               <Save color={colors.surface} size={20} />
-              <Text style={[globalStyles.buttonText, { marginLeft: 8 }]}>Crear</Text>
+              <Text style={[globalStyles.buttonText, { marginLeft: spacing.sm }]}>Crear</Text>
             </View>
           </TouchableOpacity>
         </View>

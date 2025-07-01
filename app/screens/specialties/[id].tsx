@@ -1,12 +1,13 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CreditCard as Edit, Users, Activity, Calendar } from 'lucide-react-native';
+import { Edit, ArrowLeft, Heart, FileText, Users, BarChart2, Calendar, Activity } from 'lucide-react-native';
+import { globalStyles, colors } from '../../../utils/globalStyles';
 
 export default function SpecialtyDetailScreen() {
   const { id } = useLocalSearchParams();
   
-  // Mock data - in real app this would come from API
+  // Mock data
   const specialty = {
     id: Number(id),
     name: 'Cardiología',
@@ -37,93 +38,116 @@ export default function SpecialtyDetailScreen() {
     router.push(`/(main)/cruds/specialties/edit/${id}` as any);
   };
 
+  // Componente reutilizable para las filas de detalles
+  interface DetailRowProps {
+    icon: React.ComponentType<{ color?: string; size?: number }>;
+    value: string | number;
+    label?: string;
+    color?: string;
+  }
+
+  const DetailRow = ({ icon: Icon, value, label, color = colors.text.secondary }: DetailRowProps) => (
+    <View style={[globalStyles.row, { gap: 12, alignItems: 'flex-start', marginBottom: 12 }]}>
+      <Icon color={color} size={20} />
+      <View>
+        {label && <Text style={globalStyles.caption}>{label}</Text>}
+        <Text style={[globalStyles.detailText, !label && {lineHeight: 20}]}>{value}</Text>
+      </View>
+    </View>
+  );
+
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <View style={styles.titleSection}>
-            <Text style={styles.title}>{specialty.name}</Text>
-            <View style={[
-              styles.statusBadge,
-              { backgroundColor: specialty.status === 'active' ? '#dcfce7' : '#fef3c7' }
-            ]}>
-              <Text style={[
-                styles.statusText,
-                { color: specialty.status === 'active' ? '#166534' : '#92400e' }
-              ]}>
-                {specialty.status === 'active' ? 'Activa' : 'Inactiva'}
-              </Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.editButton} onPress={editSpecialty}>
-            <Edit color="#ffffff" size={20} />
-          </TouchableOpacity>
+    <SafeAreaView style={globalStyles.container}>
+      <View style={globalStyles.header}>
+        <TouchableOpacity style={globalStyles.iconButton} onPress={() => router.back()}>
+          <ArrowLeft color={colors.text.secondary} size={24} />
+        </TouchableOpacity>
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <Text style={globalStyles.headerTitle}>Detalle de Especialidad</Text>
         </View>
+        <TouchableOpacity
+          style={[globalStyles.iconButton, { backgroundColor: colors.primary }]}
+          onPress={editSpecialty}
+        >
+          <Edit color={colors.surface} size={20} />
+        </TouchableOpacity>
+      </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Descripción</Text>
-          <Text style={styles.description}>{specialty.description}</Text>
-        </View>
-
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <View style={styles.statIcon}>
-              <Users color="#2563eb" size={24} />
-            </View>
-            <Text style={styles.statNumber}>{specialty.doctors.length}</Text>
-            <Text style={styles.statLabel}>Doctores</Text>
+      <ScrollView contentContainerStyle={globalStyles.content}>
+        <View style={[globalStyles.card, { alignItems: 'center', marginBottom: 20 }]}>
+          <View style={[globalStyles.avatarLarge, { width: 100, height: 100, borderRadius: 50, marginBottom: 16, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center' }]}>
+            <Heart color={colors.surface} size={48} />
           </View>
-          <View style={styles.statCard}>
-            <View style={styles.statIcon}>
-              <Calendar color="#16a34a" size={24} />
-            </View>
-            <Text style={styles.statNumber}>{specialty.appointments.total}</Text>
-            <Text style={styles.statLabel}>Citas Totales</Text>
+          <Text style={[globalStyles.title, { fontSize: 22, textAlign: 'center' }]}>{specialty.name}</Text>
+          <View style={[{ 
+            backgroundColor: specialty.status === 'active' ? '#dcfce7' : '#fef3c7',
+            paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, marginBottom: 16
+          }]}>
+            <Text style={[globalStyles.caption, { 
+              color: specialty.status === 'active' ? '#166534' : '#92400e',
+              fontWeight: '600', fontSize: 14
+            }]}>
+              {specialty.status === 'active' ? 'Activa' : 'Inactiva'}
+            </Text>
           </View>
-          <View style={styles.statCard}>
-            <View style={styles.statIcon}>
-              <Activity color="#dc2626" size={24} />
+          <View style={[globalStyles.row, { justifyContent: 'space-around', width: '100%' }]}>
+            <View style={globalStyles.center}>
+              <Users color={colors.text.secondary} size={24} />
+              <Text style={globalStyles.itemTitle}>{specialty.doctors.length} doctores</Text>
             </View>
-            <Text style={styles.statNumber}>{specialty.appointments.thisMonth}</Text>
-            <Text style={styles.statLabel}>Este Mes</Text>
+            <View style={globalStyles.center}>
+              <BarChart2 color={colors.text.secondary} size={24} />
+              <Text style={globalStyles.itemTitle}>{specialty.appointments.total} citas</Text>
+            </View>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Doctores Disponibles</Text>
-          <View style={styles.doctorsList}>
-            {specialty.doctors.map((doctor) => (
-              <View key={doctor.id} style={styles.doctorCard}>
-                <View style={styles.doctorInfo}>
-                  <Text style={styles.doctorName}>{doctor.name}</Text>
-                  <Text style={styles.doctorExperience}>{doctor.experience} de experiencia</Text>
-                </View>
+        <View style={globalStyles.card}>
+          <Text style={globalStyles.sectionTitle}>Información General</Text>
+          <DetailRow icon={FileText} value={specialty.description} label="Descripción" />
+        </View>
+
+        <View style={globalStyles.card}>
+          <Text style={globalStyles.sectionTitle}>Doctores Disponibles</Text>
+          {specialty.doctors.map((doctor) => (
+            <View key={doctor.id} style={[globalStyles.row, { justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }]}>
+              <View>
+                <Text style={globalStyles.itemTitle}>{doctor.name}</Text>
+                <Text style={globalStyles.caption}>{doctor.experience} de experiencia</Text>
               </View>
-            ))}
-          </View>
+            </View>
+          ))}
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Servicios Disponibles</Text>
-          <View style={styles.servicesList}>
+        <View style={globalStyles.card}>
+          <Text style={globalStyles.sectionTitle}>Servicios Disponibles</Text>
+          <View style={{ gap: 8 }}>
             {specialty.services.map((service, index) => (
-              <View key={index} style={styles.serviceItem}>
-                <Text style={styles.serviceText}>{service}</Text>
+              <View key={index} style={[globalStyles.row, { alignItems: 'center', gap: 8, paddingVertical: 6 }]}>
+                <Activity color={colors.primary} size={16} />
+                <Text style={globalStyles.detailText}>{service}</Text>
               </View>
             ))}
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Información del Sistema</Text>
-          <View style={styles.metadataCard}>
-            <View style={styles.metadataItem}>
-              <Text style={styles.metadataLabel}>Fecha de Creación:</Text>
-              <Text style={styles.metadataValue}>{specialty.createdAt}</Text>
+        <View style={globalStyles.card}>
+          <Text style={globalStyles.sectionTitle}>Estadísticas</Text>
+          <DetailRow icon={Calendar} value={`${specialty.appointments.thisMonth} citas`} label="Este mes" />
+          <DetailRow icon={BarChart2} value={`${specialty.appointments.total} citas`} label="En total" />
+          <DetailRow icon={Activity} value={`${specialty.appointments.pending} citas`} label="Pendientes" />
+        </View>
+        
+        <View style={globalStyles.card}>
+          <Text style={globalStyles.sectionTitle}>Información del Sistema</Text>
+          <View style={{ gap: 8 }}>
+            <View style={[globalStyles.row, { justifyContent: 'space-between', paddingVertical: 8 }]}>
+              <Text style={[globalStyles.caption, { fontWeight: '500' }]}>Fecha de Creación:</Text>
+              <Text style={globalStyles.detailText}>{specialty.createdAt}</Text>
             </View>
-            <View style={styles.metadataItem}>
-              <Text style={styles.metadataLabel}>Última Actualización:</Text>
-              <Text style={styles.metadataValue}>{specialty.updatedAt}</Text>
+            <View style={[globalStyles.row, { justifyContent: 'space-between', paddingVertical: 8, borderTopWidth: 1, borderTopColor: '#f1f5f9' }]}>
+              <Text style={[globalStyles.caption, { fontWeight: '500' }]}>Última Actualización:</Text>
+              <Text style={globalStyles.detailText}>{specialty.updatedAt}</Text>
             </View>
           </View>
         </View>
@@ -131,170 +155,3 @@ export default function SpecialtyDetailScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  content: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 24,
-  },
-  titleSection: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 8,
-  },
-  statusBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  editButton: {
-    backgroundColor: '#2563eb',
-    width: 44,
-    height: 44,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 16,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 12,
-  },
-  description: {
-    fontSize: 16,
-    color: '#64748b',
-    lineHeight: 24,
-    backgroundColor: '#ffffff',
-    padding: 16,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginHorizontal: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  statIcon: {
-    marginBottom: 8,
-  },
-  statNumber: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#64748b',
-    textAlign: 'center',
-  },
-  doctorsList: {
-    gap: 8,
-  },
-  doctorCard: {
-    backgroundColor: '#ffffff',
-    padding: 12,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  doctorInfo: {
-    flex: 1,
-  },
-  doctorName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1e293b',
-    marginBottom: 4,
-  },
-  doctorExperience: {
-    fontSize: 14,
-    color: '#64748b',
-  },
-  servicesList: {
-    gap: 8,
-  },
-  serviceItem: {
-    backgroundColor: '#ffffff',
-    padding: 12,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  serviceText: {
-    fontSize: 16,
-    color: '#1e293b',
-  },
-  metadataCard: {
-    backgroundColor: '#ffffff',
-    padding: 16,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  metadataItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
-  },
-  metadataLabel: {
-    fontSize: 14,
-    color: '#64748b',
-    fontWeight: '500',
-  },
-  metadataValue: {
-    fontSize: 14,
-    color: '#1e293b',
-  },
-});
