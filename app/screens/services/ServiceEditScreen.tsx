@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { ScrollView, Alert } from "react-native"
-import { router } from "expo-router"
+import { router, useLocalSearchParams } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Tag, FileText, DollarSign } from "lucide-react-native"
 import { globalStyles, colors } from "../../../utils/globalStyles"
@@ -12,20 +12,21 @@ import { FormActions } from "../../../components/forms/FormActions"
 import { useFormValidation } from "../../../hooks/useFormValidation"
 import { validationRules } from "../../../utils/validationRules"
 
-export default function ServiceCreateScreen() {
+export default function ServiceEditScreen() {
+  const { id } = useLocalSearchParams()
   const [loading, setLoading] = useState(false)
 
   const { getFieldProps, validateForm, getFormData } = useFormValidation({
     name: {
-      value: "",
+      value: "Consulta General",
       rules: { required: true, minLength: 3 },
     },
     description: {
-      value: "",
+      value: "Consulta médica general con revisión completa del paciente.",
       rules: {},
     },
     price: {
-      value: "",
+      value: "50000",
       rules: validationRules.price,
     },
   })
@@ -38,10 +39,10 @@ export default function ServiceCreateScreen() {
       const formData = getFormData()
       await new Promise((resolve) => setTimeout(resolve, 1500))
       console.log("Service data:", formData)
-      Alert.alert("Éxito", "Servicio creado correctamente")
+      Alert.alert("Éxito", "Servicio actualizado correctamente")
       router.back()
     } catch (error) {
-      Alert.alert("Error", "No se pudo crear el servicio")
+      Alert.alert("Error", "No se pudo actualizar el servicio")
     } finally {
       setLoading(false)
     }
@@ -49,7 +50,7 @@ export default function ServiceCreateScreen() {
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <ProfileHeader title="Nuevo Servicio" subtitle="Registrar nuevo servicio médico" onBack={() => router.back()} />
+      <ProfileHeader title="Editar Servicio" subtitle={`ID del servicio: ${id}`} onBack={() => router.back()} />
 
       <ScrollView contentContainerStyle={globalStyles.content}>
         <FormField
@@ -79,7 +80,7 @@ export default function ServiceCreateScreen() {
         <FormActions
           onCancel={() => router.back()}
           onSave={handleSave}
-          saveText="Crear Servicio"
+          saveText="Guardar Cambios"
           loading={loading}
           saveButtonColor={colors.accent}
         />

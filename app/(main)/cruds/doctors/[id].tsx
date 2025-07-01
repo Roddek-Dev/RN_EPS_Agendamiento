@@ -1,3 +1,3 @@
-import DoctorDetailScreen from '@/app/screens/doctors/DoctorDetailScreen';
+import DoctorDetailScreen from "@/app/screens/doctors/[id]"
 
-export default DoctorDetailScreen;
+export default DoctorDetailScreen

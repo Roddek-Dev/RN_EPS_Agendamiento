@@ -1,122 +1,114 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
-import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  Stethoscope,
-  Heart,
-  Users,
-  UserCheck,
-  Calendar,
-  ChevronRight,
-} from 'lucide-react-native';
-import { globalStyles, colors, typography } from '../../../utils/globalStyles';
+import { View, Text, TouchableOpacity, ScrollView } from "react-native"
+import { router } from "expo-router"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { Stethoscope, Heart, Users, UserCheck, Calendar, ChevronRight, TrendingUp } from "lucide-react-native"
+import { globalStyles, colors, spacing } from "../../../utils/globalStyles"
 
 export default function CrudsHomeScreen() {
   const modules = [
     {
-      id: 'specialties',
-      title: 'Especialidades',
-      description: 'Gestionar especialidades médicas',
+      id: "specialties",
+      title: "Especialidades",
+      description: "Gestionar especialidades médicas",
       icon: Stethoscope,
-      color: '#2563eb',
+      color: colors.primary,
       count: 12,
     },
     {
-      id: 'services',
-      title: 'Servicios',
-      description: 'Administrar servicios disponibles',
+      id: "services",
+      title: "Servicios",
+      description: "Administrar servicios disponibles",
       icon: Heart,
-      color: '#dc2626',
+      color: colors.accent,
       count: 25,
     },
     {
-      id: 'patients',
-      title: 'Pacientes',
-      description: 'Registro de pacientes',
+      id: "patients",
+      title: "Pacientes",
+      description: "Registro de pacientes",
       icon: Users,
-      color: '#16a34a',
+      color: colors.secondary,
       count: 156,
     },
     {
-      id: 'doctors',
-      title: 'Doctores',
-      description: 'Directorio médico',
+      id: "doctors",
+      title: "Doctores",
+      description: "Directorio médico",
       icon: UserCheck,
-      color: '#ca8a04',
+      color: colors.warning,
       count: 8,
     },
     {
-      id: 'appointments',
-      title: 'Citas',
-      description: 'Historial de citas médicas',
+      id: "appointments",
+      title: "Citas",
+      description: "Historial de citas médicas",
       icon: Calendar,
-      color: '#7c3aed',
+      color: colors.purple,
       count: 342,
     },
-  ];
+  ]
 
   const navigateToModule = (moduleId: string) => {
-    router.push(`/(main)/cruds/${moduleId}` as any);
-  };
+    router.push(`/(main)/cruds/${moduleId}` as any)
+  }
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <ScrollView
-        contentContainerStyle={[globalStyles.content, styles.content]}
-      >
-        <View style={styles.header}>
-          <Text style={globalStyles.title}>Gestión de Datos</Text>
-          <Text style={globalStyles.subtitle}>
-            Administra la información del sistema
-          </Text>
+      <ScrollView contentContainerStyle={globalStyles.content} showsVerticalScrollIndicator={false}>
+        {/* Header mejorado */}
+        <View style={[globalStyles.section, { alignItems: "center", marginBottom: spacing.xxxl }]}>
+          <Text style={globalStyles.titleLarge}>Gestión de Datos</Text>
+          <Text style={globalStyles.subtitle}>Administra la información del sistema</Text>
         </View>
 
-        <View style={styles.modulesList}>
-          {modules.map((module) => (
-            <TouchableOpacity
-              key={module.id}
-              style={[globalStyles.card, styles.moduleCard]}
-              onPress={() => navigateToModule(module.id)}
-            >
-              <View style={styles.moduleHeader}>
-                <View
-                  style={[styles.moduleIcon, { backgroundColor: module.color }]}
-                >
-                  <module.icon color="#ffffff" size={24} />
+        {/* Módulos */}
+        <View style={[globalStyles.section, { marginBottom: spacing.xxxl }]}>
+          <View style={globalStyles.listContainer}>
+            {modules.map((module) => (
+              <TouchableOpacity
+                key={module.id}
+                style={globalStyles.listCard}
+                onPress={() => navigateToModule(module.id)}
+              >
+                <View style={[globalStyles.avatar, { backgroundColor: module.color, justifyContent: "center" }]}>
+                  <module.icon color={colors.text.inverse} size={24} />
                 </View>
-                <View style={styles.moduleInfo}>
+
+                <View style={globalStyles.listItemContent}>
                   <Text style={globalStyles.itemTitle}>{module.title}</Text>
-                  <Text style={globalStyles.caption}>{module.description}</Text>
+                  <Text style={globalStyles.itemSubtitle}>{module.description}</Text>
+                  <View style={[globalStyles.row, { marginTop: spacing.sm }]}>
+                    <Text style={[globalStyles.captionMuted, { color: colors.primary }]}>{module.count} registros</Text>
+                  </View>
                 </View>
-                <View style={styles.moduleActions}>
-                  <View style={[globalStyles.statusBadge, styles.countBadge]}>
-                    <Text style={globalStyles.statusText}>{module.count}</Text>
+
+                <View style={globalStyles.listItemActions}>
+                  <View style={[globalStyles.statusBadge, { backgroundColor: colors.info }]}>
+                    <Text style={[globalStyles.statusText, { color: colors.infoText }]}>{module.count}</Text>
                   </View>
                   <ChevronRight color={colors.text.secondary} size={20} />
                 </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
-        <View style={[globalStyles.card, styles.statsSection]}>
-          <Text style={globalStyles.sectionTitle}>Estadísticas Generales</Text>
-          <View style={styles.statsGrid}>
-            <View style={styles.statItem}>
+        {/* Estadísticas generales */}
+        <View style={globalStyles.card}>
+          <View style={[globalStyles.spaceBetween, { marginBottom: spacing.lg }]}>
+            <Text style={globalStyles.sectionTitle}>Estadísticas Generales</Text>
+            <TrendingUp color={colors.primary} size={20} />
+          </View>
+          <View style={globalStyles.statContainer}>
+            <View style={globalStyles.statItem}>
               <Text style={globalStyles.statNumber}>543</Text>
               <Text style={globalStyles.statLabel}>Total Registros</Text>
             </View>
-            <View style={styles.statItem}>
+            <View style={globalStyles.statItem}>
               <Text style={globalStyles.statNumber}>24</Text>
               <Text style={globalStyles.statLabel}>Activos Hoy</Text>
             </View>
-            <View style={styles.statItem}>
+            <View style={globalStyles.statItem}>
               <Text style={globalStyles.statNumber}>98%</Text>
               <Text style={globalStyles.statLabel}>Disponibilidad</Text>
             </View>
@@ -124,54 +116,5 @@ export default function CrudsHomeScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
-
-const styles = StyleSheet.create({
-  content: {
-    padding: 20,
-  },
-  header: {
-    marginBottom: 32,
-  },
-  modulesList: {
-    gap: 16,
-    marginBottom: 32,
-  },
-  moduleCard: {
-    // backgroundColor, borderRadius, padding, sombra ya están en globalStyles.card
-  },
-  moduleHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  moduleIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  moduleInfo: {
-    flex: 1,
-  },
-  moduleActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  countBadge: {
-    // backgroundColor, padding, borderRadius ya están en globalStyles.statusBadge
-  },
-  statsSection: {
-    // backgroundColor, borderRadius, padding, sombra ya están en globalStyles.card
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-});

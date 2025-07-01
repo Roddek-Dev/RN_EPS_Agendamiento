@@ -1,26 +1,29 @@
 "use client"
 
 import { useState } from "react"
-import { ScrollView, Alert } from "react-native"
-import { router } from "expo-router"
+import { ScrollView, Alert, Switch, View, Text } from "react-native"
+import { router, useLocalSearchParams } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
-import { Heart, FileText } from "lucide-react-native"
+import { Heart, FileText, Activity } from "lucide-react-native"
 import { globalStyles, colors } from "../../../utils/globalStyles"
 import { ProfileHeader } from "../../../components/ProfileHeader"
 import { FormField } from "../../../components/forms/FormField"
 import { FormActions } from "../../../components/forms/FormActions"
 import { useFormValidation } from "../../../hooks/useFormValidation"
 
-export default function SpecialtyCreateScreen() {
+export default function SpecialtyEditScreen() {
+  const { id } = useLocalSearchParams()
   const [loading, setLoading] = useState(false)
+  const [isActive, setIsActive] = useState(true)
 
   const { getFieldProps, validateForm, getFormData } = useFormValidation({
     name: {
-      value: "",
+      value: "Cardiología",
       rules: { required: true, minLength: 3 },
     },
     description: {
-      value: "",
+      value:
+        "Especialidad médica que se encarga del estudio, diagnóstico y tratamiento de las enfermedades del corazón y del aparato circulatorio.",
       rules: {},
     },
   })
@@ -30,13 +33,13 @@ export default function SpecialtyCreateScreen() {
 
     setLoading(true)
     try {
-      const formData = getFormData()
+      const formData = { ...getFormData(), isActive }
       await new Promise((resolve) => setTimeout(resolve, 1500))
       console.log("Specialty data:", formData)
-      Alert.alert("Éxito", "Especialidad creada correctamente")
+      Alert.alert("Éxito", "Especialidad actualizada correctamente")
       router.back()
     } catch (error) {
-      Alert.alert("Error", "No se pudo crear la especialidad")
+      Alert.alert("Error", "No se pudo actualizar la especialidad")
     } finally {
       setLoading(false)
     }
@@ -45,8 +48,8 @@ export default function SpecialtyCreateScreen() {
   return (
     <SafeAreaView style={globalStyles.container}>
       <ProfileHeader
-        title="Nueva Especialidad"
-        subtitle="Registrar nueva especialidad médica"
+        title="Editar Especialidad"
+        subtitle={`ID de la especialidad: ${id}`}
         onBack={() => router.back()}
       />
 
@@ -67,10 +70,33 @@ export default function SpecialtyCreateScreen() {
           {...getFieldProps("description")}
         />
 
+        <View style={globalStyles.inputContainer}>
+          <View
+            style={[
+              globalStyles.inputWithIcon,
+              { backgroundColor: colors.surface, borderWidth: 1, borderColor: "#e2e8f0" },
+            ]}
+          >
+            <Activity color={colors.text.secondary} size={20} style={globalStyles.inputIcon} />
+            <View style={{ flex: 1 }}>
+              <Text style={[globalStyles.detailText, { fontWeight: "500" }]}>Estado de la especialidad</Text>
+              <Text style={[globalStyles.caption, { marginTop: 2 }]}>
+                {isActive ? "La especialidad está activa" : "La especialidad está inactiva"}
+              </Text>
+            </View>
+            <Switch
+              value={isActive}
+              onValueChange={setIsActive}
+              trackColor={{ false: "#e2e8f0", true: colors.primary }}
+              thumbColor={isActive ? colors.surface : "#94a3b8"}
+            />
+          </View>
+        </View>
+
         <FormActions
           onCancel={() => router.back()}
           onSave={handleSave}
-          saveText="Crear Especialidad"
+          saveText="Guardar Cambios"
           loading={loading}
           saveButtonColor={colors.primary}
         />
