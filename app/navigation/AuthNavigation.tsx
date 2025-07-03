@@ -1,4 +1,3 @@
-
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { LogIn, UserPlus } from 'lucide-react-native';
 

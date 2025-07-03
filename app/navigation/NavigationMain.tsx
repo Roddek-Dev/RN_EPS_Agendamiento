@@ -2,7 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Home, Calendar, Settings } from 'lucide-react-native';
 import Inicio from "../screens/home";
 import Reservas from "../screens/reservas";
-import CrudsStacks from "../screens/index";
+import CrudsStacks from "./stacks/CrudsStacks";
 
 const Tab = createBottomTabNavigator();
 export default function MainNavigation() {

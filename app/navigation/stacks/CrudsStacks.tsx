@@ -9,67 +9,16 @@ import DoctorStack from "./DoctorStack";
 const Stack = createNativeStackNavigator();
 export default function CrudsLayout() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: true }}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen 
         name="index" 
         component={CrudsHomeScreen}
-        options={{ 
-          title: 'Gestión de Datos',
-          headerStyle: { backgroundColor: '#2563eb' },
-          headerTintColor: '#ffffff',
-          headerTitleStyle: { fontWeight: 'bold' },
-        }} 
       />
-      <Stack.Screen 
-        name="specialties" 
-        component={SpecialtieStack}
-        options={{ 
-          title: 'Especialidades',
-          headerStyle: { backgroundColor: '#2563eb' },
-          headerTintColor: '#ffffff',
-          headerTitleStyle: { fontWeight: 'bold' },
-        }} 
-      />
-      <Stack.Screen 
-        name="services" 
-        component={ServiceStack}
-        options={{ 
-          title: 'Servicios',
-          headerStyle: { backgroundColor: '#2563eb' },
-          headerTintColor: '#ffffff',
-          headerTitleStyle: { fontWeight: 'bold' },
-        }} 
-      />
-      <Stack.Screen 
-        name="patients" 
-        component={PatientStack}
-        options={{ 
-          title: 'Pacientes',
-          headerStyle: { backgroundColor: '#2563eb' },
-          headerTintColor: '#ffffff',
-          headerTitleStyle: { fontWeight: 'bold' },
-        }} 
-      />
-      <Stack.Screen 
-          name="doctors" 
-          component={DoctorStack}
-          options={{ 
-          title: 'Doctores',
-          headerStyle: { backgroundColor: '#2563eb' },
-          headerTintColor: '#ffffff',
-          headerTitleStyle: { fontWeight: 'bold' },
-        }} 
-      />
-      <Stack.Screen 
-        name="appointments" 
-        component={AppointmentStack}
-        options={{ 
-          title: 'Citas',
-          headerStyle: { backgroundColor: '#2563eb' },
-          headerTintColor: '#ffffff',
-          headerTitleStyle: { fontWeight: 'bold' },
-        }} 
-      />
+      <Stack.Screen name="specialties" component={SpecialtieStack} />
+      <Stack.Screen name="services" component={ServiceStack} />
+      <Stack.Screen name="patients" component={PatientStack} />
+      <Stack.Screen name="doctors" component={DoctorStack} />
+      <Stack.Screen name="appointments" component={AppointmentStack} />
     </Stack.Navigator>
   );
 }
