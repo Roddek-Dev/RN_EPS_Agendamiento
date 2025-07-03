@@ -1,18 +1,17 @@
-"use client"
-
-import { useState } from "react"
-import { ScrollView, Alert } from "react-native"
-import { router } from "expo-router"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { Heart, FileText } from "lucide-react-native"
-import { globalStyles, colors } from "@/utils/globalStyles"
-import { ProfileHeader } from "@/components/ProfileHeader"
-import { FormField } from "@/components/forms/FormField"
-import { FormActions } from "@/components/forms/FormActions"
-import { useFormValidation } from "@/hooks/useFormValidation"
+import React, { useState } from "react";
+import { ScrollView, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Heart, FileText } from "lucide-react-native";
+import { globalStyles, colors } from "@/utils/globalStyles";
+import { ProfileHeader } from "@/components/ProfileHeader";
+import { FormField } from "@/components/forms/FormField";
+import { FormActions } from "@/components/forms/FormActions";
+import { useFormValidation } from "@/hooks/useFormValidation";
 
 export default function SpecialtyCreateScreen() {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
   const { getFieldProps, validateForm, getFormData } = useFormValidation({
     name: {
@@ -23,31 +22,31 @@ export default function SpecialtyCreateScreen() {
       value: "",
       rules: {},
     },
-  })
+  });
 
   const handleSave = async () => {
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const formData = getFormData()
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      console.log("Specialty data:", formData)
-      Alert.alert("Éxito", "Especialidad creada correctamente")
-      router.back()
+      const formData = getFormData();
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log("Specialty data:", formData);
+      Alert.alert("Éxito", "Especialidad creada correctamente");
+      navigation.goBack();
     } catch (error) {
-      Alert.alert("Error", "No se pudo crear la especialidad")
+      Alert.alert("Error", "No se pudo crear la especialidad");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={globalStyles.container}>
       <ProfileHeader
         title="Nueva Especialidad"
         subtitle="Registrar nueva especialidad médica"
-        onBack={() => router.back()}
+        onBack={() => navigation.goBack()}
       />
 
       <ScrollView contentContainerStyle={globalStyles.content}>
@@ -68,7 +67,7 @@ export default function SpecialtyCreateScreen() {
         />
 
         <FormActions
-          onCancel={() => router.back()}
+          onCancel={() => navigation.goBack()}
           onSave={handleSave}
           saveText="Crear Especialidad"
           loading={loading}
@@ -76,5 +75,5 @@ export default function SpecialtyCreateScreen() {
         />
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }

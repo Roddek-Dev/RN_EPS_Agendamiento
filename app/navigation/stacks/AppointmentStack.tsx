@@ -1,3 +1,4 @@
+import React from 'react';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AppointmentsScreen from "../../screens/appointments/List";
 import DetailScreen from "../../screens/appointments/Detail";
@@ -5,7 +6,8 @@ import CreateScreen from "../../screens/appointments/Create";
 import EditScreen from "../../screens/appointments/Edit";
 
 const Stack = createNativeStackNavigator();
-export default function AppointmentsLayout() {
+
+export default function AppointmentsStack() {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -21,7 +23,7 @@ export default function AppointmentsLayout() {
         options={{ title: 'Citas' }}
       />
       <Stack.Screen
-        name="[id]"
+        name="detail"
         component={DetailScreen}
         options={{ title: 'Detalle de Cita' }}
       />
@@ -31,7 +33,7 @@ export default function AppointmentsLayout() {
         options={{ title: 'Crear Cita' }}
       />
       <Stack.Screen
-        name="edit/[id]"
+        name="edit"
         component={EditScreen}
         options={{ title: 'Editar Cita' }}
       />

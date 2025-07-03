@@ -8,6 +8,9 @@ declare global {
 
 export function useFrameworkReady() {
   useEffect(() => {
-    window.frameworkReady?.();
+    // Solo ejecutar en web
+    if (typeof window !== 'undefined') {
+      window.frameworkReady?.();
+    }
   }, []);
 }

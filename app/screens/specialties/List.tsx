@@ -1,14 +1,17 @@
-import { View, Text, ScrollView } from "react-native"
-import { router } from "expo-router"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { Heart, FileText, Users, Activity } from "lucide-react-native"
-import { globalStyles, colors } from "@/utils/globalStyles"
-import { SearchHeader } from "@/components/SearchHeader"
-import { StatusBadge } from "@/components/StatusBadge"
-import { ActionButtons } from "@/components/ActionButtons"
-import { EmptyState } from "@/components/EmptyState"
+import React from 'react';
+import { View, Text, ScrollView } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Heart, FileText, Users, Activity } from "lucide-react-native";
+import { globalStyles, colors } from "@/utils/globalStyles";
+import { SearchHeader } from "@/components/SearchHeader";
+import { StatusBadge } from "@/components/StatusBadge";
+import { ActionButtons } from "@/components/ActionButtons";
+import { EmptyState } from "@/components/EmptyState";
 
 export default function SpecialtiesListScreen() {
+  const navigation = useNavigation();
+
   const specialties = [
     {
       id: 1,
@@ -45,7 +48,7 @@ export default function SpecialtiesListScreen() {
       doctors: 1,
       status: "inactive" as const,
     },
-  ]
+  ];
 
   const SpecialtyCard = ({ specialty }: { specialty: (typeof specialties)[0] }) => (
     <View style={globalStyles.listCard}>
@@ -84,17 +87,17 @@ export default function SpecialtiesListScreen() {
       </View>
 
       <ActionButtons
-        onView={() => router.push(`/(main)/cruds/specialties/${specialty.id}`)}
-        onEdit={() => router.push(`/(main)/cruds/specialties/edit/${specialty.id}`)}
+        onView={() => navigation.navigate("detail" as never, { id: specialty.id } as never)}
+        onEdit={() => navigation.navigate("edit" as never, { id: specialty.id } as never)}
       />
     </View>
-  )
+  );
 
   return (
     <SafeAreaView style={globalStyles.container}>
       <SearchHeader
         placeholder="Buscar especialidades..."
-        onAdd={() => router.push("/(main)/cruds/specialties/create")}
+        onAdd={() => navigation.navigate("create" as never)}
       />
 
       <ScrollView
@@ -113,10 +116,10 @@ export default function SpecialtiesListScreen() {
             title="No hay especialidades registradas"
             subtitle="Comienza agregando tu primera especialidad al sistema"
             buttonText="Agregar Especialidad"
-            onButtonPress={() => router.push("/(main)/cruds/specialties/create")}
+            onButtonPress={() => navigation.navigate("create" as never)}
           />
         )}
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
