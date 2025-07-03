@@ -1,16 +1,18 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
-import AppNavigation from './navigation/AppNavigation';
 
 export default function RootLayout() {
   useFrameworkReady();
 
   return (
-    <NavigationContainer>
-      <AppNavigation />
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="+not-found" />
+      </Stack>
       <StatusBar style="auto" />
-    </NavigationContainer>
+    </>
   );
 }
