@@ -1,84 +1,84 @@
-"use client"
-
-import { useState } from "react"
-import { ScrollView, Alert } from "react-native"
-import { router, useLocalSearchParams } from "expo-router"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { Tag, FileText, DollarSign } from "lucide-react-native"
-import { globalStyles, colors } from "@/utils/globalStyles"
-import { ProfileHeader } from "@/components/ProfileHeader"
-import { FormField } from "@/components/forms/FormField"
-import { FormActions } from "@/components/forms/FormActions"
-import { useFormValidation } from "@/hooks/useFormValidation"
-import { validationRules } from "@/utils/validationRules"
+import { useState } from 'react';
+import { ScrollView, Alert } from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Tag, FileText, DollarSign } from 'lucide-react-native';
+import { globalStyles, colors } from '@/utils/globalStyles';
+import { ProfileHeader } from '@/components/ProfileHeader';
+import { FormField } from '@/components/forms/FormField';
+import { FormActions } from '@/components/forms/FormActions';
+import { useFormValidation } from '@/hooks/useFormValidation';
+import { validationRules } from '@/utils/validationRules';
+import {
+  ServiceStackParamList,
+  ServiceNavigationProp,
+} from '@/app/navigation/types';
 
 export default function ServiceEditScreen() {
-  const { id } = useLocalSearchParams()
-  const [loading, setLoading] = useState(false)
+  const navigation = useNavigation<ServiceNavigationProp>();
+  const route = useRoute<RouteProp<ServiceStackParamList, 'Edit'>>();
+  const { id } = route.params;
+  const [loading, setLoading] = useState(false);
 
   const { getFieldProps, validateForm, getFormData } = useFormValidation({
     name: {
-      value: "Consulta General",
+      value: 'Consulta General',
       rules: { required: true, minLength: 3 },
     },
     description: {
-      value: "Consulta médica general con revisión completa del paciente.",
+      value: 'Consulta médica general con revisión completa del paciente.',
       rules: {},
     },
-    price: {
-      value: "50000",
-      rules: validationRules.price,
-    },
-  })
+    price: { value: '50000', rules: validationRules.price },
+  });
 
   const handleSave = async () => {
-    if (!validateForm()) return
-
-    setLoading(true)
+    if (!validateForm()) return;
+    setLoading(true);
     try {
-      const formData = getFormData()
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      console.log("Service data:", formData)
-      Alert.alert("Éxito", "Servicio actualizado correctamente")
-      router.back()
+      const formData = getFormData();
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log('Service data:', formData);
+      Alert.alert('Éxito', 'Servicio actualizado correctamente');
+      navigation.goBack();
     } catch (error) {
-      Alert.alert("Error", "No se pudo actualizar el servicio")
+      Alert.alert('Error', 'No se pudo actualizar el servicio');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <ProfileHeader title="Editar Servicio" subtitle={`ID del servicio: ${id}`} onBack={() => router.back()} />
-
+      <ProfileHeader
+        title="Editar Servicio"
+        subtitle={`ID del servicio: ${id}`}
+        onBack={() => navigation.goBack()}
+      />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <FormField
           label="Nombre del servicio"
           placeholder="Ej: Consulta General"
           icon={<Tag color={colors.text.secondary} size={20} />}
           required
-          {...getFieldProps("name")}
+          {...getFieldProps('name')}
         />
-
         <FormField
           label="Descripción"
           placeholder="Descripción del servicio (opcional)"
           icon={<FileText color={colors.text.secondary} size={20} />}
           multiline
-          {...getFieldProps("description")}
+          {...getFieldProps('description')}
         />
-
         <FormField
           label="Precio (COP)"
           placeholder="50000"
           icon={<DollarSign color={colors.text.secondary} size={20} />}
           keyboardType="numeric"
-          {...getFieldProps("price")}
+          {...getFieldProps('price')}
         />
-
         <FormActions
-          onCancel={() => router.back()}
+          onCancel={() => navigation.goBack()}
           onSave={handleSave}
           saveText="Guardar Cambios"
           loading={loading}
@@ -86,5 +86,5 @@ export default function ServiceEditScreen() {
         />
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }

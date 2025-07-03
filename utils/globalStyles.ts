@@ -1,141 +1,143 @@
-import { StyleSheet } from "react-native"
+import { StyleSheet } from 'react-native';
 
-// === SISTEMA DE DISEÑO UNIFICADO ===
+// === SISTEMA DE DISEÑO UNIFICADO (OPTIMIZADO) ===
 export const colors = {
-  // Colores primarios
-  primary: "#2563eb",
-  secondary: "#16a34a",
-  accent: "#dc2626",
-  warning: "#ca8a04",
-  purple: "#7c3aed",
+  // Colores primarios con un toque más moderno
+  primary: '#007AFF', // Un azul estándar y vibrante, excelente para la accesibilidad
+  secondary: '#34C759', // Verde para éxito y acciones secundarias positivas
+  accent: '#FF3B30', // Rojo brillante para errores o acciones destructivas
+  warning: '#FF9500', // Naranja para advertencias
+  purple: '#AF52DE', // Un púrpura más suave y agradable
 
-  // Colores de superficie
-  background: "#f8fafc",
-  surface: "#ffffff",
-  surfaceVariant: "#f1f5f9",
+  // Colores de superficie y fondo para una UI más limpia
+  background: '#F2F2F7', // Un fondo gris claro que reduce la fatiga visual
+  surface: '#FFFFFF',
+  surfaceVariant: '#E5E5EA', // Ideal para fondos de elementos sutiles
 
-  // Sistema de texto
+  // Sistema de texto mejorado para máxima legibilidad
   text: {
-    primary: "#1e293b",
-    secondary: "#64748b",
-    muted: "#94a3b8",
-    inverse: "#ffffff",
+    primary: '#1C1C1E', // Negro intenso para el texto principal
+    secondary: '#636366', // Gris oscuro para información secundaria
+    muted: '#8E8E93', // Gris más claro para texto deshabilitado o de apoyo
+    inverse: '#FFFFFF',
   },
 
-  // Bordes y divisores
-  border: "#e2e8f0",
-  borderLight: "#f1f5f9",
-  borderDark: "#cbd5e1",
+  // Bordes y divisores más sutiles
+  border: '#D1D1D6',
+  borderLight: '#E5E5EA',
+  borderDark: '#C7C7CC',
 
-  // Estados semánticos
-  success: "#dcfce7",
-  successText: "#166534",
-  successBorder: "#bbf7d0",
+  // Estados semánticos con mayor contraste y claridad
+  success: '#E8F5E9',
+  successText: '#1B5E20',
+  successBorder: '#A5D6A7',
+  pending: '#FFF8E1',
+  pendingText: '#6D4C41',
+  pendingBorder: '#FFD54F',
+  error: '#FFEBEE',
+  errorText: '#B71C1C',
+  errorBorder: '#EF9A9A',
+  info: '#E3F2FD',
+  infoText: '#0D47A1',
+  infoBorder: '#90CAF9',
 
-  pending: "#fef3c7",
-  pendingText: "#92400e",
-  pendingBorder: "#fde68a",
+  // Overlay y sombras
+  overlay: 'rgba(0, 0, 0, 0.45)',
+  shadowColor: '#000000',
+};
 
-  error: "#fee2e2",
-  errorText: "#991b1b",
-  errorBorder: "#fecaca",
-
-  info: "#eff6ff",
-  infoText: "#2563eb",
-  infoBorder: "#dbeafe",
-
-  // Overlays y sombras
-  overlay: "rgba(0, 0, 0, 0.5)",
-  shadowColor: "#000000",
-}
-
+// Escala de espaciado más armónica y consistente
 export const spacing = {
   xs: 4,
   sm: 8,
   md: 12,
   lg: 16,
+  xl: 24, // Aumentado para dar más aire a los layouts
+  xxl: 32,
+  xxxl: 40,
+  xxxxl: 56,
+};
+
+// Radios de borde para un look más suave y actual
+export const borderRadius = {
+  sm: 8,
+  md: 12,
+  lg: 16,
   xl: 20,
   xxl: 24,
-  xxxl: 32,
-  xxxxl: 48,
-}
-
-export const borderRadius = {
-  sm: 6,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  xxl: 24,
   full: 9999,
-}
+};
 
+// Sombras más naturales y sutiles para un efecto de profundidad refinado
 export const shadows = {
   sm: {
     shadowColor: colors.shadowColor,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
   },
   md: {
     shadowColor: colors.shadowColor,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 6,
   },
   lg: {
     shadowColor: colors.shadowColor,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowRadius: 16,
+    elevation: 10,
   },
-}
+};
 
+// Tipografía con pesos y tamaños ajustados para una jerarquía visual clara
+// (con `as const` para garantizar la compatibilidad con TypeScript)
 export const typography = {
   // Títulos
   h1: {
-    fontSize: 28,
-    fontWeight: "bold" as const,
+    fontSize: 30,
+    fontWeight: 'bold' as const,
     color: colors.text.primary,
-    lineHeight: 36,
+    lineHeight: 38,
   },
   h2: {
-    fontSize: 24,
-    fontWeight: "bold" as const,
+    fontSize: 26,
+    fontWeight: 'bold' as const,
     color: colors.text.primary,
-    lineHeight: 32,
+    lineHeight: 34,
   },
   h3: {
-    fontSize: 20,
-    fontWeight: "bold" as const,
+    fontSize: 22,
+    fontWeight: '600' as const,
     color: colors.text.primary,
-    lineHeight: 28,
+    lineHeight: 30,
   },
   h4: {
     fontSize: 18,
-    fontWeight: "600" as const,
+    fontWeight: '600' as const,
     color: colors.text.primary,
-    lineHeight: 24,
+    lineHeight: 26,
   },
 
   // Texto del cuerpo
   body: {
     fontSize: 16,
-    fontWeight: "400" as const,
+    fontWeight: '400' as const,
     color: colors.text.primary,
     lineHeight: 24,
   },
   bodyMedium: {
     fontSize: 16,
-    fontWeight: "500" as const,
+    fontWeight: '500' as const,
     color: colors.text.primary,
     lineHeight: 24,
   },
   bodySemibold: {
     fontSize: 16,
-    fontWeight: "600" as const,
+    fontWeight: '600' as const,
     color: colors.text.primary,
     lineHeight: 24,
   },
@@ -143,13 +145,13 @@ export const typography = {
   // Texto pequeño
   caption: {
     fontSize: 14,
-    fontWeight: "400" as const,
+    fontWeight: '400' as const,
     color: colors.text.secondary,
     lineHeight: 20,
   },
   captionMedium: {
     fontSize: 14,
-    fontWeight: "500" as const,
+    fontWeight: '500' as const,
     color: colors.text.secondary,
     lineHeight: 20,
   },
@@ -157,17 +159,17 @@ export const typography = {
   // Texto muy pequeño
   small: {
     fontSize: 12,
-    fontWeight: "400" as const,
+    fontWeight: '400' as const,
     color: colors.text.muted,
-    lineHeight: 16,
+    lineHeight: 18,
   },
   smallMedium: {
     fontSize: 12,
-    fontWeight: "500" as const,
+    fontWeight: '500' as const,
     color: colors.text.muted,
-    lineHeight: 16,
+    lineHeight: 18,
   },
-}
+};
 
 // === HOJA DE ESTILOS GLOBAL ===
 export const globalStyles = StyleSheet.create({
@@ -186,43 +188,42 @@ export const globalStyles = StyleSheet.create({
 
   // Flexbox helpers
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   rowStart: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   rowEnd: {
-    flexDirection: "row",
-    alignItems: "flex-end",
+    flexDirection: 'row',
+    alignItems: 'flex-end',
   },
   spaceBetween: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   spaceAround: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
   center: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   flex1: { flex: 1 },
 
   // === CABECERAS ===
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
-    ...shadows.sm,
   },
   headerTitle: {
     ...typography.h3,
@@ -238,21 +239,21 @@ export const globalStyles = StyleSheet.create({
   card: {
     backgroundColor: colors.surface,
     borderRadius: borderRadius.lg,
-    padding: spacing.xl,
+    padding: spacing.lg,
     marginBottom: spacing.lg,
     ...shadows.md,
   },
   cardCompact: {
     backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
     marginBottom: spacing.md,
     ...shadows.sm,
   },
   cardFlat: {
     backgroundColor: colors.surface,
     borderRadius: borderRadius.lg,
-    padding: spacing.xl,
+    padding: spacing.lg,
     marginBottom: spacing.lg,
     borderWidth: 1,
     borderColor: colors.border,
@@ -264,71 +265,74 @@ export const globalStyles = StyleSheet.create({
   },
   sectionTitle: {
     ...typography.h4,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.xl, // Añadido para alinear con el contenido
   },
   sectionTitleLarge: {
     ...typography.h3,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.xl, // Añadido para alinear con el contenido
   },
 
   // === BOTONES ===
   button: {
-    flexDirection: "row",
+    flexDirection: 'row',
     borderRadius: borderRadius.md,
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xl,
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 52,
-    ...shadows.sm,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 48,
   },
   buttonPrimary: {
     backgroundColor: colors.primary,
+    ...shadows.sm,
   },
   buttonSecondary: {
     backgroundColor: colors.secondary,
+    ...shadows.sm,
   },
   buttonAccent: {
     backgroundColor: colors.accent,
+    ...shadows.sm,
   },
   buttonWarning: {
     backgroundColor: colors.warning,
+    ...shadows.sm,
   },
   buttonOutline: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: colors.primary,
   },
   buttonGhost: {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
   },
 
   // Texto de botones
   buttonText: {
     ...typography.bodySemibold,
     color: colors.text.inverse,
-    marginLeft: spacing.sm,
+    marginHorizontal: spacing.sm,
   },
   buttonTextOutline: {
     ...typography.bodySemibold,
-    color: colors.text.secondary,
-    marginLeft: spacing.sm,
+    color: colors.primary,
+    marginHorizontal: spacing.sm,
   },
   buttonTextGhost: {
     ...typography.bodySemibold,
     color: colors.primary,
-    marginLeft: spacing.sm,
+    marginHorizontal: spacing.sm,
   },
 
   // Botones especiales
   iconButton: {
     width: 44,
     height: 44,
-    borderRadius: borderRadius.full,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: colors.surfaceVariant,
-    ...shadows.sm,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   iconButtonPrimary: {
     backgroundColor: colors.primary,
@@ -341,55 +345,58 @@ export const globalStyles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   inputContainer: {
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
   },
   input: {
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.lg,
-    minHeight: 52,
-    justifyContent: "center",
+    paddingHorizontal: spacing.md,
+    height: 50,
     ...typography.body,
   },
   inputFocused: {
     borderColor: colors.primary,
+    borderWidth: 1.5,
     ...shadows.sm,
   },
   inputError: {
-    borderColor: colors.errorText,
+    borderColor: colors.accent,
+    borderWidth: 1.5,
   },
   inputWithIcon: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.lg,
-    minHeight: 52,
+    paddingHorizontal: spacing.md,
+    height: 50,
   },
   inputIcon: {
-    marginRight: spacing.md,
+    marginRight: spacing.sm,
   },
   textInput: {
     flex: 1,
     ...typography.body,
-    paddingVertical: spacing.md,
+    height: '100%',
   },
   textArea: {
-    minHeight: 100,
-    textAlignVertical: "top",
-    paddingTop: spacing.lg,
+    minHeight: 120,
+    textAlignVertical: 'top',
+    paddingTop: spacing.md,
   },
 
   // Acciones de formulario
   formActions: {
-    flexDirection: "row",
-    gap: spacing.lg,
+    flexDirection: 'row',
+    gap: spacing.md,
     marginTop: spacing.xl,
-    paddingTop: spacing.xl,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
   },
   formButton: {
     flex: 1,
@@ -399,12 +406,13 @@ export const globalStyles = StyleSheet.create({
   title: typography.h1,
   titleLarge: {
     ...typography.h1,
-    fontSize: 32,
-    lineHeight: 40,
+    fontSize: 34,
+    lineHeight: 42,
   },
   subtitle: {
     ...typography.body,
     color: colors.text.secondary,
+    marginTop: spacing.xs,
   },
   itemTitle: typography.h4,
   itemSubtitle: typography.caption,
@@ -423,42 +431,43 @@ export const globalStyles = StyleSheet.create({
   avatar: {
     width: 60,
     height: 60,
-    borderRadius: borderRadius.full,
-    marginRight: spacing.lg,
+    borderRadius: 30,
+    marginRight: spacing.md,
+    backgroundColor: colors.surfaceVariant,
   },
   avatarSmall: {
     width: 40,
     height: 40,
-    borderRadius: borderRadius.full,
+    borderRadius: 20,
+    backgroundColor: colors.surfaceVariant,
   },
   avatarLarge: {
     width: 80,
     height: 80,
-    borderRadius: borderRadius.full,
-    marginBottom: spacing.xxl,
+    borderRadius: 40,
+    marginBottom: spacing.xl,
+    backgroundColor: colors.surfaceVariant,
   },
   avatarXLarge: {
     width: 100,
     height: 100,
-    borderRadius: borderRadius.full,
-    marginBottom: spacing.xxl,
+    borderRadius: 50,
+    marginBottom: spacing.xl,
+    backgroundColor: colors.surfaceVariant,
   },
 
   // === BÚSQUEDA ===
   searchContainer: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.full,
-    paddingHorizontal: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceVariant,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
     height: 44,
-    marginRight: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   searchIcon: {
-    marginRight: spacing.md,
+    marginRight: spacing.sm,
   },
   searchInput: {
     flex: 1,
@@ -471,29 +480,28 @@ export const globalStyles = StyleSheet.create({
   },
   listItem: {
     backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
     ...shadows.sm,
-    flexDirection: "row",
-    alignItems: "center",
   },
   listCard: {
     backgroundColor: colors.surface,
     borderRadius: borderRadius.lg,
     padding: spacing.lg,
-    marginBottom: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     ...shadows.md,
-    flexDirection: "row",
-    alignItems: "flex-start",
   },
   listItemContent: {
     flex: 1,
+    marginLeft: spacing.md,
   },
   listItemActions: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: spacing.sm,
-    marginLeft: spacing.lg,
+    marginLeft: spacing.md,
   },
 
   // === BOTONES DE ACCIÓN ===
@@ -501,9 +509,8 @@ export const globalStyles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: borderRadius.md,
-    justifyContent: "center",
-    alignItems: "center",
-    ...shadows.sm,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   // === BADGES Y ESTADOS ===
@@ -511,31 +518,31 @@ export const globalStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.full,
-    alignSelf: "flex-start",
+    alignSelf: 'flex-start',
   },
   statusText: {
     ...typography.smallMedium,
-    textTransform: "uppercase",
+    fontWeight: '600' as const,
+    textTransform: 'uppercase',
   },
 
   // === FILTROS ===
   filtersContainer: {
-    flexDirection: "row",
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    gap: spacing.md,
+    flexDirection: 'row',
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
+    gap: spacing.sm,
   },
   filterButton: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.md,
-    gap: spacing.sm,
-    borderColor: colors.border,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    gap: spacing.xs,
     borderWidth: 1,
-    ...shadows.sm,
+    borderColor: colors.border,
   },
   filterButtonActive: {
     backgroundColor: colors.primary,
@@ -557,23 +564,26 @@ export const globalStyles = StyleSheet.create({
   appointmentCard: {
     backgroundColor: colors.surface,
     borderRadius: borderRadius.lg,
-    padding: spacing.xl,
+    padding: spacing.lg,
     ...shadows.md,
-    marginBottom: spacing.md,
   },
   appointmentHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: spacing.lg,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: spacing.md,
   },
   timeContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
+    padding: spacing.sm,
+    backgroundColor: colors.surfaceVariant,
+    borderRadius: borderRadius.sm,
   },
   appointmentDetails: {
     gap: spacing.xs,
+    flex: 1,
   },
   patientName: {
     ...typography.bodySemibold,
@@ -588,15 +598,15 @@ export const globalStyles = StyleSheet.create({
 
   // === DETALLES ===
   detailRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.borderLight,
   },
   detailIcon: {
     marginRight: spacing.lg,
-    marginTop: 2,
+    marginTop: 3,
   },
   detailText: {
     ...typography.body,
@@ -609,13 +619,13 @@ export const globalStyles = StyleSheet.create({
 
   // === ESTADÍSTICAS ===
   statContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     paddingVertical: spacing.lg,
-    width: "100%",
+    width: '100%',
   },
   statItem: {
-    alignItems: "center",
+    alignItems: 'center',
     minWidth: 80,
   },
   statNumber: {
@@ -625,20 +635,20 @@ export const globalStyles = StyleSheet.create({
   },
   statLabel: {
     ...typography.small,
-    textAlign: "center",
+    textAlign: 'center',
+    color: colors.text.secondary,
   },
 
   // === PERFILES ===
   profileSection: {
-    alignItems: "center",
-    marginBottom: spacing.xxxl,
+    alignItems: 'center',
     paddingVertical: spacing.xl,
   },
   profileAvatar: {
     width: 100,
     height: 100,
-    borderRadius: borderRadius.full,
-    marginBottom: spacing.xl,
+    borderRadius: 50,
+    marginBottom: spacing.lg,
   },
 
   // === METADATOS ===
@@ -646,101 +656,104 @@ export const globalStyles = StyleSheet.create({
     backgroundColor: colors.surfaceVariant,
     padding: spacing.lg,
     borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
   },
   metadataItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
+    borderBottomColor: colors.border,
   },
   metadataLabel: {
     ...typography.captionMedium,
+    color: colors.text.secondary,
   },
   metadataValue: {
     ...typography.caption,
-    textAlign: "right",
+    textAlign: 'right',
     flex: 1,
     marginLeft: spacing.md,
   },
 
   // === ESTADOS VACÍOS ===
   emptyState: {
-    alignItems: "center",
-    paddingVertical: spacing.xxxxl,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xxl,
     marginVertical: spacing.xl,
   },
   emptyStateText: {
-    ...typography.bodySemibold,
+    ...typography.h4,
     color: colors.text.secondary,
     marginTop: spacing.lg,
-    textAlign: "center",
+    textAlign: 'center',
   },
   emptyStateSubtext: {
     ...typography.caption,
     color: colors.text.muted,
-    marginTop: spacing.xs,
-    textAlign: "center",
+    marginTop: spacing.sm,
+    textAlign: 'center',
+    paddingHorizontal: spacing.xl,
   },
 
   // === ACCIONES RÁPIDAS ===
   quickActionCard: {
-    width: 80,
-    backgroundColor: colors.surface,
-    padding: spacing.lg,
+    alignItems: 'center',
+    padding: spacing.md,
     borderRadius: borderRadius.lg,
-    alignItems: "center",
-    marginRight: spacing.lg,
-    marginBottom: spacing.lg,
     ...shadows.md,
+    backgroundColor: colors.surface,
+    width: 90,
   },
   quickActionIcon: {
     width: 48,
     height: 48,
-    borderRadius: borderRadius.lg,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: spacing.md,
+    borderRadius: borderRadius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+    backgroundColor: colors.primary, // Ejemplo de fondo
   },
   quickActionText: {
-    ...typography.captionMedium,
-    textAlign: "center",
+    ...typography.smallMedium,
+    textAlign: 'center',
+    color: colors.text.secondary,
   },
 
   // === INFORMACIÓN DE CONTACTO ===
   contactInfo: {
-    gap: spacing.xs,
+    gap: spacing.sm,
     marginBottom: spacing.md,
   },
   contactItem: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
   },
   contactText: {
-    ...typography.small,
+    ...typography.caption,
   },
 
   // === AUTH SCREENS ===
   authContainer: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     padding: spacing.xxxl,
+    backgroundColor: colors.background,
   },
   authHeader: {
-    alignItems: "center",
+    alignItems: 'center',
     marginBottom: spacing.xxxxl,
   },
   authForm: {
-    gap: spacing.xl,
+    gap: spacing.lg,
   },
   authLinkContainer: {
-    alignItems: "center",
-    marginTop: spacing.xxxl,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: spacing.xxl,
   },
   authLinkText: {
     ...typography.caption,
@@ -748,5 +761,6 @@ export const globalStyles = StyleSheet.create({
   authLink: {
     ...typography.captionMedium,
     color: colors.primary,
+    marginLeft: spacing.xs,
   },
-})
+});

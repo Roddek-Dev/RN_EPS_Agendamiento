@@ -1,6 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import CrudsHomeScreen from "../../screens/index";
+import CrudsHomeScreen from "../../screens/CrudsHome";
 import AppointmentStack from "./AppointmentStack";
 import SpecialtieStack from "./SpecialtieStack";
 import ServiceStack from "./ServiceStack";

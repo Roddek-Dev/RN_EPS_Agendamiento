@@ -1,121 +1,109 @@
-"use client"
-
-import { useState } from "react"
-import { ScrollView, Alert, Switch, View, Text } from "react-native"
-import { useLocalSearchParams, router } from "expo-router"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { User, Mail, Phone, MapPin, Calendar } from "lucide-react-native"
-import { globalStyles, colors, spacing } from "@/utils/globalStyles"
-import { ProfileHeader } from "@/components/ProfileHeader"
-import { FormField } from "@/components/forms/FormField"
-import { FormActions } from "@/components/forms/FormActions"
-import { useFormValidation } from "@/hooks/useFormValidation"
-import { validationRules } from "@/utils/validationRules"
+import { useState } from 'react';
+import { ScrollView, Alert, Switch, View, Text } from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { User, Mail, Phone, MapPin, Calendar } from 'lucide-react-native';
+import { globalStyles, colors, spacing } from '@/utils/globalStyles';
+import { ProfileHeader } from '@/components/ProfileHeader';
+import { FormField } from '@/components/forms/FormField';
+import { FormActions } from '@/components/forms/FormActions';
+import { useFormValidation } from '@/hooks/useFormValidation';
+import { validationRules } from '@/utils/validationRules';
+import {
+  PatientStackParamList,
+  PatientNavigationProp,
+} from '@/app/navigation/types';
 
 export default function PatientEditScreen() {
-  const { id } = useLocalSearchParams()
-  const [loading, setLoading] = useState(false)
-  const [isActive, setIsActive] = useState(true)
-  const [bloodType, setBloodType] = useState("O+")
+  const navigation = useNavigation<PatientNavigationProp>();
+  const route = useRoute<RouteProp<PatientStackParamList, 'Edit'>>();
+  const { id } = route.params;
+  const [loading, setLoading] = useState(false);
+  const [isActive, setIsActive] = useState(true);
+  const [bloodType, setBloodType] = useState('O+');
 
   const { getFieldProps, validateForm, getFormData } = useFormValidation({
-    name: {
-      value: "María González",
-      rules: validationRules.name,
-    },
+    name: { value: 'María González', rules: validationRules.name },
     email: {
-      value: "maria.gonzalez@example.com",
+      value: 'maria.gonzalez@example.com',
       rules: validationRules.email,
     },
-    phone: {
-      value: "+57 300 123 4567",
-      rules: validationRules.phone,
-    },
-    address: {
-      value: "Calle 123 #45-67, Bogotá",
-      rules: { required: true },
-    },
+    phone: { value: '+57 300 123 4567', rules: validationRules.phone },
+    address: { value: 'Calle 123 #45-67, Bogotá', rules: { required: true } },
     birthDate: {
-      value: "1990-05-15",
-      rules: {
-        required: true,
-        pattern: /^\d{4}-\d{2}-\d{2}$/,
-      },
+      value: '1990-05-15',
+      rules: { required: true, pattern: /^\d{4}-\d{2}-\d{2}$/ },
     },
-  })
+  });
 
   const handleSave = async () => {
-    if (!validateForm()) return
-
-    setLoading(true)
+    if (!validateForm()) return;
+    setLoading(true);
     try {
-      const formData = { ...getFormData(), bloodType, isActive }
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      console.log("Patient data:", formData)
-      Alert.alert("Éxito", "Paciente actualizado")
-      router.back()
+      const formData = { ...getFormData(), bloodType, isActive };
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log('Patient data:', formData);
+      Alert.alert('Éxito', 'Paciente actualizado');
+      navigation.goBack();
     } catch (error) {
-      Alert.alert("Error", "No se pudo actualizar el paciente")
+      Alert.alert('Error', 'No se pudo actualizar el paciente');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <ProfileHeader title="Editar Paciente" subtitle={`ID: ${id}`} onBack={() => router.back()} />
-
+      <ProfileHeader
+        title="Editar Paciente"
+        subtitle={`ID: ${id}`}
+        onBack={() => navigation.goBack()}
+      />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <FormField
           label="Nombre completo"
           placeholder="Nombre del paciente"
           icon={<User color={colors.text.secondary} size={20} />}
           required
-          {...getFieldProps("name")}
+          {...getFieldProps('name')}
         />
-
         <FormField
           label="Teléfono"
           placeholder="+57 300 123 4567"
           icon={<Phone color={colors.text.secondary} size={20} />}
           keyboardType="phone-pad"
-          {...getFieldProps("phone")}
+          {...getFieldProps('phone')}
         />
-
         <FormField
           label="Correo electrónico"
           placeholder="paciente@email.com"
           icon={<Mail color={colors.text.secondary} size={20} />}
           keyboardType="email-address"
           required
-          {...getFieldProps("email")}
+          {...getFieldProps('email')}
         />
-
         <FormField
           label="Dirección"
           placeholder="Dirección del paciente"
           icon={<MapPin color={colors.text.secondary} size={20} />}
           required
-          {...getFieldProps("address")}
+          {...getFieldProps('address')}
         />
-
         <FormField
           label="Fecha de nacimiento"
           placeholder="YYYY-MM-DD"
           icon={<Calendar color={colors.text.secondary} size={20} />}
           required
-          {...getFieldProps("birthDate")}
+          {...getFieldProps('birthDate')}
         />
-
         <FormField
           label="Tipo Sanguíneo"
           placeholder="Ej: O+, A-, etc."
           value={bloodType}
           onChangeText={setBloodType}
         />
-
         <View style={globalStyles.inputContainer}>
-          <View style={[globalStyles.row, { justifyContent: "space-between" }]}>
+          <View style={[globalStyles.row, { justifyContent: 'space-between' }]}>
             <Text style={globalStyles.label}>Estado</Text>
             <Switch
               value={isActive}
@@ -125,12 +113,11 @@ export default function PatientEditScreen() {
             />
           </View>
           <Text style={[globalStyles.caption, { marginTop: spacing.xs }]}>
-            {isActive ? "Paciente activo" : "Paciente inactivo"}
+            {isActive ? 'Paciente activo' : 'Paciente inactivo'}
           </Text>
         </View>
-
         <FormActions
-          onCancel={() => router.back()}
+          onCancel={() => navigation.goBack()}
           onSave={handleSave}
           saveText="Guardar Cambios"
           loading={loading}
@@ -138,5 +125,5 @@ export default function PatientEditScreen() {
         />
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }

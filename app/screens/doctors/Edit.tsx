@@ -1,98 +1,88 @@
-"use client"
-
-import { useState } from "react"
-import { ScrollView, Alert, Switch, View, Text } from "react-native"
-import { useLocalSearchParams, router } from "expo-router"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { User, Briefcase, Phone, Mail } from "lucide-react-native"
-import { globalStyles, colors } from "@/utils/globalStyles"
-import { ProfileHeader } from "@/components/ProfileHeader"
-import { FormField } from "@/components/forms/FormField"
-import { FormActions } from "@/components/forms/FormActions"
-import { useFormValidation } from "@/hooks/useFormValidation"
-import { validationRules } from "@/utils/validationRules"
+import { useState } from 'react';
+import { ScrollView, Alert, Switch, View, Text } from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { User, Briefcase, Phone, Mail } from 'lucide-react-native';
+import { globalStyles, colors } from '@/utils/globalStyles';
+import { ProfileHeader } from '@/components/ProfileHeader';
+import { FormField } from '@/components/forms/FormField';
+import { FormActions } from '@/components/forms/FormActions';
+import { useFormValidation } from '@/hooks/useFormValidation';
+import { validationRules } from '@/utils/validationRules';
+import {
+  DoctorStackParamList,
+  DoctorNavigationProp,
+} from '@/app/navigation/types';
 
 export default function DoctorEditScreen() {
-  const { id } = useLocalSearchParams()
-  const [loading, setLoading] = useState(false)
-  const [isAvailable, setIsAvailable] = useState(true)
+  const navigation = useNavigation<DoctorNavigationProp>();
+  const route = useRoute<RouteProp<DoctorStackParamList, 'Edit'>>();
+  const { id } = route.params;
+  const [loading, setLoading] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(true);
 
   const { getFieldProps, validateForm, getFormData } = useFormValidation({
-    name: {
-      value: "Dr. Juan Pérez",
-      rules: validationRules.name,
-    },
-    specialty: {
-      value: "Cardiología",
-      rules: { required: true },
-    },
-    phone: {
-      value: "+57 310 123 4567",
-      rules: validationRules.phone,
-    },
-    email: {
-      value: "juan.perez@clinica.com",
-      rules: validationRules.email,
-    },
-  })
+    name: { value: 'Dr. Juan Pérez', rules: validationRules.name },
+    specialty: { value: 'Cardiología', rules: { required: true } },
+    phone: { value: '+57 310 123 4567', rules: validationRules.phone },
+    email: { value: 'juan.perez@clinica.com', rules: validationRules.email },
+  });
 
   const handleSave = async () => {
-    if (!validateForm()) return
-
-    setLoading(true)
+    if (!validateForm()) return;
+    setLoading(true);
     try {
-      const formData = { ...getFormData(), isAvailable }
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      console.log("Doctor data:", formData)
-      Alert.alert("Éxito", "Doctor actualizado")
-      router.back()
+      const formData = { ...getFormData(), isAvailable };
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log('Doctor data:', formData);
+      Alert.alert('Éxito', 'Doctor actualizado');
+      navigation.goBack();
     } catch (error) {
-      Alert.alert("Error", "No se pudo actualizar el doctor")
+      Alert.alert('Error', 'No se pudo actualizar el doctor');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <ProfileHeader title="Editar Doctor" subtitle={`ID: ${id}`} onBack={() => router.back()} />
-
+      <ProfileHeader
+        title="Editar Doctor"
+        subtitle={`ID: ${id}`}
+        onBack={() => navigation.goBack()}
+      />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <FormField
           label="Nombre completo"
           placeholder="Nombre del doctor"
           icon={<User color={colors.text.secondary} size={20} />}
           required
-          {...getFieldProps("name")}
+          {...getFieldProps('name')}
         />
-
         <FormField
           label="Especialidad"
           placeholder="Especialidad médica"
           icon={<Briefcase color={colors.text.secondary} size={20} />}
           required
-          {...getFieldProps("specialty")}
+          {...getFieldProps('specialty')}
         />
-
         <FormField
           label="Teléfono"
           placeholder="+57 310 123 4567"
           icon={<Phone color={colors.text.secondary} size={20} />}
           keyboardType="phone-pad"
-          {...getFieldProps("phone")}
+          {...getFieldProps('phone')}
         />
-
         <FormField
           label="Correo electrónico"
           placeholder="doctor@clinica.com"
           icon={<Mail color={colors.text.secondary} size={20} />}
           keyboardType="email-address"
           required
-          {...getFieldProps("email")}
+          {...getFieldProps('email')}
         />
-
         <View style={globalStyles.inputContainer}>
-          <View style={[globalStyles.row, { justifyContent: "space-between" }]}>
+          <View style={[globalStyles.row, { justifyContent: 'space-between' }]}>
             <Text style={globalStyles.label}>Disponibilidad</Text>
             <Switch
               value={isAvailable}
@@ -102,12 +92,13 @@ export default function DoctorEditScreen() {
             />
           </View>
           <Text style={[globalStyles.caption, { marginTop: 4 }]}>
-            {isAvailable ? "Doctor disponible para citas" : "Doctor no disponible"}
+            {isAvailable
+              ? 'Doctor disponible para citas'
+              : 'Doctor no disponible'}
           </Text>
         </View>
-
         <FormActions
-          onCancel={() => router.back()}
+          onCancel={() => navigation.goBack()}
           onSave={handleSave}
           saveText="Guardar Cambios"
           loading={loading}
@@ -115,5 +106,5 @@ export default function DoctorEditScreen() {
         />
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
