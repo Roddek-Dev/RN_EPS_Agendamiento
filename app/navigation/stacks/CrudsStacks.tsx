@@ -1,3 +1,4 @@
+import React from 'react';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import CrudsHomeScreen from "../../screens/index";
 import AppointmentStack from "./AppointmentStack";
@@ -7,7 +8,8 @@ import PatientStack from "./PatientStack";
 import DoctorStack from "./DoctorStack";
 
 const Stack = createNativeStackNavigator();
-export default function CrudsLayout() {
+
+export default function CrudsStacks() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: true }}>
       <Stack.Screen 
@@ -28,6 +30,7 @@ export default function CrudsLayout() {
           headerStyle: { backgroundColor: '#2563eb' },
           headerTintColor: '#ffffff',
           headerTitleStyle: { fontWeight: 'bold' },
+          headerShown: false,
         }} 
       />
       <Stack.Screen 
@@ -38,6 +41,7 @@ export default function CrudsLayout() {
           headerStyle: { backgroundColor: '#2563eb' },
           headerTintColor: '#ffffff',
           headerTitleStyle: { fontWeight: 'bold' },
+          headerShown: false,
         }} 
       />
       <Stack.Screen 
@@ -48,16 +52,18 @@ export default function CrudsLayout() {
           headerStyle: { backgroundColor: '#2563eb' },
           headerTintColor: '#ffffff',
           headerTitleStyle: { fontWeight: 'bold' },
+          headerShown: false,
         }} 
       />
       <Stack.Screen 
-          name="doctors" 
-          component={DoctorStack}
-          options={{ 
+        name="doctors" 
+        component={DoctorStack}
+        options={{ 
           title: 'Doctores',
           headerStyle: { backgroundColor: '#2563eb' },
           headerTintColor: '#ffffff',
           headerTitleStyle: { fontWeight: 'bold' },
+          headerShown: false,
         }} 
       />
       <Stack.Screen 
@@ -68,6 +74,7 @@ export default function CrudsLayout() {
           headerStyle: { backgroundColor: '#2563eb' },
           headerTintColor: '#ffffff',
           headerTitleStyle: { fontWeight: 'bold' },
+          headerShown: false,
         }} 
       />
     </Stack.Navigator>

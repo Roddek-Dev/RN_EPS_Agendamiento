@@ -1,10 +1,12 @@
+import React from 'react';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Home, Calendar, Settings } from 'lucide-react-native';
 import Inicio from "../screens/home";
 import Reservas from "../screens/reservas";
-import CrudsStacks from "../screens/index";
+import CrudsStacks from "./stacks/CrudsStacks";
 
 const Tab = createBottomTabNavigator();
+
 export default function MainNavigation() {
   return (
     <Tab.Navigator
@@ -49,6 +51,6 @@ export default function MainNavigation() {
           tabBarIcon: ({ color, size }) => <Settings color={color} size={size} />,
         }}
       />
-      </Tab.Navigator>
+    </Tab.Navigator>
   );
 }
