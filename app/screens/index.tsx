@@ -1,10 +1,13 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native"
-import { router } from "expo-router"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { Stethoscope, Heart, Users, UserCheck, Calendar, ChevronRight, TrendingUp } from "lucide-react-native"
-import { globalStyles, colors, spacing } from "@/utils/globalStyles"
+import React from 'react';
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Stethoscope, Heart, Users, UserCheck, Calendar, ChevronRight, TrendingUp } from "lucide-react-native";
+import { globalStyles, colors, spacing } from "@/utils/globalStyles";
 
 export default function CrudsHomeScreen() {
+  const navigation = useNavigation();
+
   const modules = [
     {
       id: "specialties",
@@ -46,11 +49,11 @@ export default function CrudsHomeScreen() {
       color: colors.purple,
       count: 342,
     },
-  ]
+  ];
 
   const navigateToModule = (moduleId: string) => {
-    router.push(`/(main)/cruds/${moduleId}` as any)
-  }
+    navigation.navigate(moduleId as never);
+  };
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -116,5 +119,5 @@ export default function CrudsHomeScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }

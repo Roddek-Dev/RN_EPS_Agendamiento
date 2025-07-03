@@ -1,3 +1,4 @@
+import React from 'react';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SpecialtiesScreen from "../../screens/specialties/List";
 import DetailScreen from "../../screens/specialties/Detail";
@@ -5,7 +6,8 @@ import CreateScreen from "../../screens/specialties/Create";
 import EditScreen from "../../screens/specialties/Edit";
 
 const Stack = createNativeStackNavigator();
-export default function SpecialtiesLayout() {
+
+export default function SpecialtiesStack() {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -21,7 +23,7 @@ export default function SpecialtiesLayout() {
         options={{ title: 'Especialidades' }}
       />
       <Stack.Screen
-        name="[id]"
+        name="detail"
         component={DetailScreen}
         options={{ title: 'Detalle de Especialidad' }}
       />
@@ -31,7 +33,7 @@ export default function SpecialtiesLayout() {
         options={{ title: 'Crear Especialidad' }}
       />
       <Stack.Screen
-        name="edit/[id]"
+        name="edit"
         component={EditScreen}
         options={{ title: 'Editar Especialidad' }}
       />

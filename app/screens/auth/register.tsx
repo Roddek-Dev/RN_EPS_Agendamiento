@@ -1,17 +1,16 @@
-"use client"
-
-import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native"
-import { useState } from "react"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { User, Mail, Lock, Phone, MapPin } from "lucide-react-native"
-import { router } from "expo-router"
-import { globalStyles, colors } from "@/utils/globalStyles"
-import { FormField } from "@/components/forms/FormField"
-import { useFormValidation } from "@/hooks/useFormValidation"
-import { validationRules } from "@/utils/validationRules"
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { User, Mail, Lock, Phone, MapPin } from "lucide-react-native";
+import { useNavigation } from "@react-navigation/native";
+import { globalStyles, colors } from "@/utils/globalStyles";
+import { FormField } from "@/components/forms/FormField";
+import { useFormValidation } from "@/hooks/useFormValidation";
+import { validationRules } from "@/utils/validationRules";
 
 export default function RegisterScreen() {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
   const { getFieldProps, validateForm, getFormData } = useFormValidation({
     name: {
@@ -39,37 +38,37 @@ export default function RegisterScreen() {
       rules: {
         required: true,
         custom: (value: string) => {
-          const formData = getFormData()
+          const formData = getFormData();
           if (value !== formData.password) {
-            return "Las contraseñas no coinciden"
+            return "Las contraseñas no coinciden";
           }
-          return null
+          return null;
         },
       },
     },
-  })
+  });
 
   const handleRegister = async () => {
     if (!validateForm()) {
-      return
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const formData = getFormData()
+      const formData = getFormData();
       // Simular llamada a API
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      console.log("Register data:", formData)
+      console.log("Register data:", formData);
       Alert.alert("Éxito", "Cuenta creada correctamente", [
-        { text: "OK", onPress: () => router.replace("/(auth)/login") },
-      ])
+        { text: "OK", onPress: () => navigation.navigate("login" as never) },
+      ]);
     } catch (error) {
-      Alert.alert("Error", "No se pudo crear la cuenta")
+      Alert.alert("Error", "No se pudo crear la cuenta");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -143,12 +142,12 @@ export default function RegisterScreen() {
         <View style={globalStyles.authLinkContainer}>
           <Text style={globalStyles.authLinkText}>
             ¿Ya tienes cuenta?{" "}
-            <Text style={globalStyles.authLink} onPress={() => router.push("/(auth)/login")}>
+            <Text style={globalStyles.authLink} onPress={() => navigation.navigate("login" as never)}>
               Inicia sesión
             </Text>
           </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }

@@ -1,3 +1,4 @@
+import React from 'react';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import CrudsHomeScreen from "../../screens/index";
 import AppointmentStack from "./AppointmentStack";
@@ -7,7 +8,8 @@ import PatientStack from "./PatientStack";
 import DoctorStack from "./DoctorStack";
 
 const Stack = createNativeStackNavigator();
-export default function CrudsLayout() {
+
+export default function CrudsStacks() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen 

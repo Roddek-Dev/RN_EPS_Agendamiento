@@ -1,3 +1,4 @@
+import React from 'react';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ServicesScreen from "../../screens/services/List";
 import DetailScreen from "../../screens/services/Detail";
@@ -5,7 +6,8 @@ import CreateScreen from "../../screens/services/Create";
 import EditScreen from "../../screens/services/Edit";
 
 const Stack = createNativeStackNavigator();
-export default function ServicesLayout() {
+
+export default function ServicesStack() {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -21,7 +23,7 @@ export default function ServicesLayout() {
         options={{ title: 'Servicios' }}
       />
       <Stack.Screen
-        name="[id]"
+        name="detail"
         component={DetailScreen}
         options={{ title: 'Detalle de Servicio' }}
       />
@@ -31,7 +33,7 @@ export default function ServicesLayout() {
         options={{ title: 'Crear Servicio' }}
       />
       <Stack.Screen
-        name="edit/[id]"
+        name="edit"
         component={EditScreen}
         options={{ title: 'Editar Servicio' }}
       />

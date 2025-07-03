@@ -1,3 +1,4 @@
+import React from 'react';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import DoctorsScreen from "../../screens/doctors/List";
 import DetailScreen from "../../screens/doctors/Detail";
@@ -5,7 +6,8 @@ import CreateScreen from "../../screens/doctors/Create";
 import EditScreen from "../../screens/doctors/Edit";
 
 const Stack = createNativeStackNavigator();
-export default function DoctorsLayout() {
+
+export default function DoctorsStack() {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -21,7 +23,7 @@ export default function DoctorsLayout() {
         options={{ title: 'Doctores' }}
       />
       <Stack.Screen
-        name="[id]"
+        name="detail"
         component={DetailScreen}
         options={{ title: 'Detalle de Doctor' }}
       />
@@ -31,7 +33,7 @@ export default function DoctorsLayout() {
         options={{ title: 'Crear Doctor' }}
       />
       <Stack.Screen
-        name="edit/[id]"
+        name="edit"
         component={EditScreen}
         options={{ title: 'Editar Doctor' }}
       />

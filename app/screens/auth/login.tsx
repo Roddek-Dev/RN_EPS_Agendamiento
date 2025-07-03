@@ -1,17 +1,16 @@
-"use client"
-
-import { View, Text, TouchableOpacity, Image, Alert } from "react-native"
-import { useState } from "react"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { Mail, Lock } from "lucide-react-native"
-import { router } from "expo-router"
-import { globalStyles, colors } from "@/utils/globalStyles"
-import { FormField } from "@/components/forms/FormField"
-import { useFormValidation } from "@/hooks/useFormValidation"
-import { validationRules } from "@/utils/validationRules"
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, Image, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Mail, Lock } from "lucide-react-native";
+import { useNavigation } from "@react-navigation/native";
+import { globalStyles, colors } from "@/utils/globalStyles";
+import { FormField } from "@/components/forms/FormField";
+import { useFormValidation } from "@/hooks/useFormValidation";
+import { validationRules } from "@/utils/validationRules";
 
 export default function LoginScreen() {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
   const { getFieldProps, validateForm, getFormData } = useFormValidation({
     email: {
@@ -22,30 +21,30 @@ export default function LoginScreen() {
       value: "",
       rules: { required: true, minLength: 6 },
     },
-  })
+  });
 
   const handleLogin = async () => {
     if (!validateForm()) {
-      return
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const formData = getFormData()
+      const formData = getFormData();
       // Simular llamada a API
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Aquí iría la lógica de autenticación real
-      console.log("Login data:", formData)
+      console.log("Login data:", formData);
 
-      // Navegar a la app principal
-      router.replace("/(main)/home")
+      // Navegar a la app principal - esto requeriría cambiar IS_AUTHENTICATED
+      Alert.alert("Éxito", "Inicio de sesión exitoso");
     } catch (error) {
-      Alert.alert("Error", "Credenciales inválidas")
+      Alert.alert("Error", "Credenciales inválidas");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -94,5 +93,5 @@ export default function LoginScreen() {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
+  );
 }
