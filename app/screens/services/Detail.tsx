@@ -13,14 +13,11 @@ import { ProfileHeader } from '@/components/ProfileHeader';
 import { DetailRow } from '@/components/DetailRow';
 import { StatItem } from '@/components/StatItem';
 import { MetadataSection } from '@/components/MetadataSection';
-import {
-  ServiceStackParamList,
-  ServiceNavigationProp,
-} from '@/app/navigation/types';
+import { AppNavigationProp, ServiceStackParamList } from '@/app/navigation/types';
 
 export default function ServiceDetailScreen() {
-  const navigation = useNavigation<ServiceNavigationProp>();
-  const route = useRoute<RouteProp<ServiceStackParamList, 'Detail'>>();
+  const navigation = useNavigation<AppNavigationProp>();
+  const route = useRoute<RouteProp<ServiceStackParamList, 'ServiceDetail'>>();
   const { id } = route.params;
 
   const service = {
@@ -42,7 +39,7 @@ export default function ServiceDetailScreen() {
       <ProfileHeader
         title="Detalle del Servicio"
         onBack={() => navigation.goBack()}
-        onEdit={() => navigation.navigate('Edit', { id: id })}
+        onEdit={() => navigation.navigate('ServiceEdit', { id: id })}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <View

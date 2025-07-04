@@ -11,9 +11,9 @@ import { useFormValidation } from '@/hooks/useFormValidation';
 import { AppNavigationProp, AppointmentStackParamList } from '@/app/navigation/types';
 
 export default function AppointmentEditScreen() {
+  const navigation = useNavigation<AppNavigationProp>();
   const route = useRoute<RouteProp<AppointmentStackParamList, 'AppointmentEdit'>>();
   const { id } = route.params;
-  const navigation = useNavigation<AppNavigationProp>();
   const [loading, setLoading] = useState(false);
 
   const patients = [{ id: '1', name: 'María González' }];

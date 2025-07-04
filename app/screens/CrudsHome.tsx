@@ -8,43 +8,44 @@ import { globalStyles, colors, spacing } from "@/utils/globalStyles";
 export default function CrudsHomeScreen() {
   const navigation = useNavigation();
 
+  // ✅ CAMBIA LOS 'id' EN ESTE ARRAY
   const modules = [
     {
-      id: "specialties",
-      title: "Especialidades",
-      description: "Gestionar especialidades médicas",
+      id: 'SpecialtyList', // antes era "specialties"
+      title: 'Especialidades',
+      description: 'Gestionar especialidades médicas',
       icon: Stethoscope,
       color: colors.primary,
       count: 12,
     },
     {
-      id: "services",
-      title: "Servicios",
-      description: "Administrar servicios disponibles",
+      id: 'ServiceList', // antes era "services"
+      title: 'Servicios',
+      description: 'Administrar servicios disponibles',
       icon: Heart,
       color: colors.accent,
       count: 25,
     },
     {
-      id: "patients",
-      title: "Pacientes",
-      description: "Registro de pacientes",
+      id: 'PatientList', // antes era "patients"
+      title: 'Pacientes',
+      description: 'Registro de pacientes',
       icon: Users,
       color: colors.secondary,
       count: 156,
     },
     {
-      id: "doctors",
-      title: "Doctores",
-      description: "Directorio médico",
+      id: 'DoctorList', // antes era "doctors"
+      title: 'Doctores',
+      description: 'Directorio médico',
       icon: UserCheck,
       color: colors.warning,
       count: 8,
     },
     {
-      id: "appointments",
-      title: "Citas",
-      description: "Historial de citas médicas",
+      id: 'AppointmentList', // antes era "appointments"
+      title: 'Citas',
+      description: 'Historial de citas médicas',
       icon: Calendar,
       color: colors.purple,
       count: 342,
@@ -52,9 +53,10 @@ export default function CrudsHomeScreen() {
   ];
 
   const navigateToModule = (moduleId: string) => {
+    // Esta función ahora recibirá el nombre correcto (ej. "SpecialtyList")
+    // y la navegación funcionará.
     navigation.navigate(moduleId as never);
   };
-
   return (
     <SafeAreaView style={globalStyles.container}>
       <ScrollView contentContainerStyle={globalStyles.content} showsVerticalScrollIndicator={false}>

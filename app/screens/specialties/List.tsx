@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { SpecialtyNavigationProp } from '@/app/navigation/types';
+import { AppNavigationProp } from '@/app/navigation/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Heart, FileText, Users, Activity } from 'lucide-react-native';
 import { globalStyles, colors } from '@/utils/globalStyles';
@@ -8,10 +8,9 @@ import { SearchHeader } from '@/components/SearchHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { ActionButtons } from '@/components/ActionButtons';
 import { EmptyState } from '@/components/EmptyState';
-import { CrudsStackParamList } from '@/app/navigation/types';
 
 export default function SpecialtiesListScreen() {
-  const navigation = useNavigation<SpecialtyNavigationProp>();
+  const navigation = useNavigation<AppNavigationProp>();
 
   const specialties = [
     {
@@ -116,8 +115,8 @@ export default function SpecialtiesListScreen() {
         </View>
       </View>
       <ActionButtons
-        onView={() => navigation.navigate('Detail', { id: specialty.id })}
-        onEdit={() => navigation.navigate('Edit', { id: specialty.id })}
+        onView={() => navigation.navigate('SpecialtyDetail', { id: specialty.id })}
+        onEdit={() => navigation.navigate('SpecialtyEdit', { id: specialty.id })}
       />
     </View>
   );
@@ -126,7 +125,7 @@ export default function SpecialtiesListScreen() {
     <SafeAreaView style={globalStyles.container}>
       <SearchHeader
         placeholder="Buscar especialidades..."
-        onAdd={() => navigation.navigate('Create')}
+        onAdd={() => navigation.navigate('SpecialtyCreate')}
       />
       <ScrollView
         contentContainerStyle={[globalStyles.content, { paddingTop: 0 }]}
@@ -144,7 +143,7 @@ export default function SpecialtiesListScreen() {
             title="No hay especialidades registradas"
             subtitle="Comienza agregando tu primera especialidad al sistema"
             buttonText="Agregar Especialidad"
-            onButtonPress={() => navigation.navigate('Create')}
+            onButtonPress={() => navigation.navigate('SpecialtyCreate')}
           />
         )}
       </ScrollView>

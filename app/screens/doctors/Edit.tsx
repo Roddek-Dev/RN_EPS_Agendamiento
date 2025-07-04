@@ -9,14 +9,11 @@ import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validationRules } from '@/utils/validationRules';
-import {
-  DoctorStackParamList,
-  DoctorNavigationProp,
-} from '@/app/navigation/types';
+import { AppNavigationProp, DoctorStackParamList } from '@/app/navigation/types';
 
 export default function DoctorEditScreen() {
-  const navigation = useNavigation<DoctorNavigationProp>();
-  const route = useRoute<RouteProp<DoctorStackParamList, 'Edit'>>();
+  const navigation = useNavigation<AppNavigationProp>();
+  const route = useRoute<RouteProp<DoctorStackParamList, 'DoctorEdit'>>();
   const { id } = route.params;
   const [loading, setLoading] = useState(false);
   const [isAvailable, setIsAvailable] = useState(true);

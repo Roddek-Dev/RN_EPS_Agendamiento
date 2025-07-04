@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { DoctorNavigationProp } from '@/app/navigation/types';
+import { AppNavigationProp } from '@/app/navigation/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Star, Briefcase, Calendar } from 'lucide-react-native';
 import { globalStyles, colors } from '@/utils/globalStyles';
@@ -8,10 +8,9 @@ import { SearchHeader } from '@/components/SearchHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { ActionButtons } from '@/components/ActionButtons';
 import { ContactInfo } from '@/components/ContactInfo';
-import { CrudsStackParamList } from '@/app/navigation/types';
 
 export default function DoctorsListScreen() {
-  const navigation = useNavigation<DoctorNavigationProp>();
+  const navigation = useNavigation<AppNavigationProp>();
 
   const doctors = [
     {
@@ -124,8 +123,8 @@ export default function DoctorsListScreen() {
         </View>
       </View>
       <ActionButtons
-        onView={() => navigation.navigate('Detail', { id: doctor.id })}
-        onEdit={() => navigation.navigate('Edit', { id: doctor.id })}
+        onView={() => navigation.navigate('DoctorDetail', { id: doctor.id })}
+        onEdit={() => navigation.navigate('DoctorEdit', { id: doctor.id })}
       />
     </View>
   );
@@ -134,7 +133,7 @@ export default function DoctorsListScreen() {
     <SafeAreaView style={globalStyles.container}>
       <SearchHeader
         placeholder="Buscar doctores..."
-        onAdd={() => navigation.navigate('Create')}
+        onAdd={() => navigation.navigate('DoctorCreate')}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <View style={{ gap: 12 }}>

@@ -7,7 +7,6 @@ import { globalStyles, colors } from '@/utils/globalStyles';
 import { SearchHeader } from '@/components/SearchHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { ActionButtons } from '@/components/ActionButtons';
-import { CrudsStackParamList } from '@/app/navigation/types';
 
 export default function AppointmentsListScreen() {
   const navigation = useNavigation<AppNavigationProp>();

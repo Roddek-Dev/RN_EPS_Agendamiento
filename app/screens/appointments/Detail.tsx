@@ -14,14 +14,11 @@ import { globalStyles, colors } from '@/utils/globalStyles';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { DetailRow } from '@/components/DetailRow';
 import { StatusBadge } from '@/components/StatusBadge';
-import {
-  AppointmentStackParamList,
-  AppointmentNavigationProp,
-} from '@/app/navigation/types';
+import { AppNavigationProp, AppointmentStackParamList } from '@/app/navigation/types';
 
 export default function AppointmentDetailScreen() {
-  const navigation = useNavigation<AppointmentNavigationProp>();
-  const route = useRoute<RouteProp<AppointmentStackParamList, 'Detail'>>();
+  const navigation = useNavigation<AppNavigationProp>();
+  const route = useRoute<RouteProp<AppointmentStackParamList, 'AppointmentDetail'>>();
   const { id } = route.params;
 
   const appointment = {
@@ -44,7 +41,7 @@ export default function AppointmentDetailScreen() {
         title="Detalle de Cita"
         subtitle={`ID de la Cita: ${id}`}
         onBack={() => navigation.goBack()}
-        onEdit={() => navigation.navigate('Edit', { id: id })}
+        onEdit={() => navigation.navigate('AppointmentEdit', { id: id })}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <View style={globalStyles.card}>

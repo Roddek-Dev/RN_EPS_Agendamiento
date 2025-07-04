@@ -9,14 +9,11 @@ import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validationRules } from '@/utils/validationRules';
-import {
-  ServiceStackParamList,
-  ServiceNavigationProp,
-} from '@/app/navigation/types';
+import { AppNavigationProp, ServiceStackParamList } from '@/app/navigation/types';
 
 export default function ServiceEditScreen() {
-  const navigation = useNavigation<ServiceNavigationProp>();
-  const route = useRoute<RouteProp<ServiceStackParamList, 'Edit'>>();
+  const navigation = useNavigation<AppNavigationProp>();
+  const route = useRoute<RouteProp<ServiceStackParamList, 'ServiceEdit'>>();
   const { id } = route.params;
   const [loading, setLoading] = useState(false);
 

@@ -7,17 +7,15 @@ import {
   Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { AppNavigationProp } from '@/app/navigation/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus, Search, Eye, Edit } from 'lucide-react-native';
 import { globalStyles, colors } from '@/utils/globalStyles';
 import { StatusBadge } from '@/components/StatusBadge';
 import { ContactInfo } from '@/components/ContactInfo';
-import { PatientNavigationProp } from '@/app/navigation/types'; // Importar el tipo unificado
-
 
 export default function PatientsListScreen() {
-  const navigation =
-    useNavigation<PatientNavigationProp>();
+  const navigation = useNavigation<AppNavigationProp>();
 
   const patients = [
     {
@@ -95,9 +93,7 @@ export default function PatientsListScreen() {
       <View style={globalStyles.listItemActions}>
         <TouchableOpacity
           style={[globalStyles.actionButton, { backgroundColor: colors.info }]}
-          onPress={() =>
-            navigation.navigate('PatientDetail', { id: patient.id })
-          }
+          onPress={() => navigation.navigate('PatientDetail', { id: patient.id })}
         >
           <Eye color={colors.infoText} size={16} />
         </TouchableOpacity>
@@ -106,7 +102,7 @@ export default function PatientsListScreen() {
             globalStyles.actionButton,
             { backgroundColor: colors.success },
           ]}
-          onPress={() => navigation.navigate('Edit', { id: patient.id })}
+          onPress={() => navigation.navigate('PatientEdit', { id: patient.id })}
         >
           <Edit color={colors.successText} size={16} />
         </TouchableOpacity>
@@ -131,7 +127,7 @@ export default function PatientsListScreen() {
         </View>
         <TouchableOpacity
           style={[globalStyles.iconButton, { backgroundColor: colors.primary }]}
-          onPress={() => navigation.navigate('Create')}
+          onPress={() => navigation.navigate('PatientCreate')}
         >
           <Plus color={colors.surface} size={24} />
         </TouchableOpacity>

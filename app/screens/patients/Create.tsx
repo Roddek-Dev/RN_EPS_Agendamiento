@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ScrollView, Alert, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { AppNavigationProp } from '@/app/navigation/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User, Mail, Phone, MapPin, Calendar } from 'lucide-react-native';
 import { globalStyles, colors } from '@/utils/globalStyles';
@@ -9,10 +10,9 @@ import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validationRules } from '@/utils/validationRules';
-import { PatientNavigationProp } from '@/app/navigation/types';
 
 export default function PatientCreateScreen() {
-  const navigation = useNavigation<PatientNavigationProp>();
+  const navigation = useNavigation<AppNavigationProp>();
   const [loading, setLoading] = useState(false);
 
   const { getFieldProps, validateForm, getFormData, resetForm } =

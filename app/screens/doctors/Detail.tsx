@@ -15,14 +15,11 @@ import { ProfileHeader } from '@/components/ProfileHeader';
 import { DetailRow } from '@/components/DetailRow';
 import { StatItem } from '@/components/StatItem';
 import { MetadataSection } from '@/components/MetadataSection';
-import {
-  DoctorStackParamList,
-  DoctorNavigationProp,
-} from '@/app/navigation/types';
+import { AppNavigationProp, DoctorStackParamList } from '@/app/navigation/types';
 
 export default function DoctorDetailScreen() {
-  const navigation = useNavigation<DoctorNavigationProp>();
-  const route = useRoute<RouteProp<DoctorStackParamList, 'Detail'>>();
+  const navigation = useNavigation<AppNavigationProp>();
+  const route = useRoute<RouteProp<DoctorStackParamList, 'DoctorDetail'>>();
   const { id } = route.params;
 
   const doctor = {
@@ -53,7 +50,7 @@ export default function DoctorDetailScreen() {
         subtitle={doctor.name}
         status={doctor.status}
         onBack={() => navigation.goBack()}
-        onEdit={() => navigation.navigate('Edit', { id: id })}
+        onEdit={() => navigation.navigate('DoctorEdit', { id: id })}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <View style={globalStyles.profileSection}>

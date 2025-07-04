@@ -14,14 +14,11 @@ import { ProfileHeader } from '@/components/ProfileHeader';
 import { DetailRow } from '@/components/DetailRow';
 import { StatItem } from '@/components/StatItem';
 import { MetadataSection } from '@/components/MetadataSection';
-import {
-  SpecialtyStackParamList,
-  SpecialtyNavigationProp,
-} from '@/app/navigation/types';
+import { AppNavigationProp, SpecialtyStackParamList } from '@/app/navigation/types';
 
 export default function SpecialtyDetailScreen() {
-  const navigation = useNavigation<SpecialtyNavigationProp>();
-  const route = useRoute<RouteProp<SpecialtyStackParamList, 'Detail'>>();
+  const navigation = useNavigation<AppNavigationProp>();
+  const route = useRoute<RouteProp<SpecialtyStackParamList, 'SpecialtyDetail'>>();
   const { id } = route.params;
 
   const specialty = {
@@ -52,7 +49,7 @@ export default function SpecialtyDetailScreen() {
       <ProfileHeader
         title="Detalle de Especialidad"
         onBack={() => navigation.goBack()}
-        onEdit={() => navigation.navigate('Edit', { id: id })}
+        onEdit={() => navigation.navigate('SpecialtyEdit', { id: id })}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <View

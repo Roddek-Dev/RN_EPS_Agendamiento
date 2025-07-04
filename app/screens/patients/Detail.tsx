@@ -13,14 +13,11 @@ import {
 import { globalStyles, colors } from '@/utils/globalStyles';
 import { StatusBadge } from '@/components/StatusBadge';
 import { StatItem } from '@/components/StatItem';
-import {
-  PatientStackParamList,
-  PatientNavigationProp,
-} from '@/app/navigation/types';
+import { AppNavigationProp, PatientStackParamList } from '@/app/navigation/types';
 
 export default function PatientDetailScreen() {
-  const navigation = useNavigation<PatientNavigationProp>();
-  const route = useRoute<RouteProp<PatientStackParamList, 'Detail'>>();
+  const navigation = useNavigation<AppNavigationProp>();
+  const route = useRoute<RouteProp<PatientStackParamList, 'PatientDetail'>>();
   const { id } = route.params;
 
   const patient = {
@@ -78,7 +75,7 @@ export default function PatientDetailScreen() {
         </View>
         <TouchableOpacity
           style={[globalStyles.iconButton, { backgroundColor: colors.primary }]}
-          onPress={() => navigation.navigate('Edit', { id: id })}
+          onPress={() => navigation.navigate('PatientEdit', { id: id })}
         >
           <Edit color={colors.surface} size={20} />
         </TouchableOpacity>

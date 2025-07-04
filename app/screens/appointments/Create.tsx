@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { AppNavigationProp } from '@/app/navigation/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar, Clock, User, UserCheck } from 'lucide-react-native';
 import { globalStyles, colors } from '@/utils/globalStyles';
@@ -8,10 +9,9 @@ import { ProfileHeader } from '@/components/ProfileHeader';
 import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
 import { useFormValidation } from '@/hooks/useFormValidation';
-import { AppointmentNavigationProp } from '@/app/navigation/types';
 
 export default function AppointmentCreateScreen() {
-  const navigation = useNavigation<AppointmentNavigationProp>();
+  const navigation = useNavigation<AppNavigationProp>();
   const [loading, setLoading] = useState(false);
 
   const patients = [

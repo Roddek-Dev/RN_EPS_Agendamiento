@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { ServiceNavigationProp } from '@/app/navigation/types';
+import { AppNavigationProp } from '@/app/navigation/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Tag, FileText, DollarSign, Activity } from 'lucide-react-native';
 import { globalStyles, colors } from '@/utils/globalStyles';
@@ -8,10 +8,9 @@ import { SearchHeader } from '@/components/SearchHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { ActionButtons } from '@/components/ActionButtons';
 import { EmptyState } from '@/components/EmptyState';
-import { CrudsStackParamList } from '@/app/navigation/types';
 
 export default function ServicesListScreen() {
-  const navigation = useNavigation<ServiceNavigationProp>();
+  const navigation = useNavigation<AppNavigationProp>();
 
   const services = [
     {
@@ -109,8 +108,8 @@ export default function ServicesListScreen() {
         </View>
       </View>
       <ActionButtons
-        onView={() => navigation.navigate('Detail', { id: service.id })}
-        onEdit={() => navigation.navigate('Edit', { id: service.id })}
+        onView={() => navigation.navigate('ServiceDetail', { id: service.id })}
+        onEdit={() => navigation.navigate('ServiceEdit', { id: service.id })}
       />
     </View>
   );
@@ -119,7 +118,7 @@ export default function ServicesListScreen() {
     <SafeAreaView style={globalStyles.container}>
       <SearchHeader
         placeholder="Buscar servicios..."
-        onAdd={() => navigation.navigate('Create')}
+        onAdd={() => navigation.navigate('ServiceCreate')}
       />
       <ScrollView
         contentContainerStyle={[globalStyles.content, { paddingTop: 0 }]}
@@ -137,7 +136,7 @@ export default function ServicesListScreen() {
             title="No hay servicios registrados"
             subtitle="Comienza agregando tu primer servicio al sistema"
             buttonText="Agregar Servicio"
-            onButtonPress={() => navigation.navigate('Create')}
+            onButtonPress={() => navigation.navigate('ServiceCreate')}
           />
         )}
       </ScrollView>

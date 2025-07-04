@@ -9,10 +9,10 @@ import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validationRules } from '@/utils/validationRules';
-import { DoctorNavigationProp } from '@/app/navigation/types';
+import { AppNavigationProp } from '@/app/navigation/types';
 
 export default function DoctorCreateScreen() {
-  const navigation = useNavigation<DoctorNavigationProp>();
+  const navigation = useNavigation<AppNavigationProp>();
   const [loading, setLoading] = useState(false);
 
   const specialties = [

@@ -8,14 +8,11 @@ import { ProfileHeader } from '@/components/ProfileHeader';
 import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
 import { useFormValidation } from '@/hooks/useFormValidation';
-import {
-  SpecialtyStackParamList,
-  SpecialtyNavigationProp,
-} from '@/app/navigation/types';
+import { AppNavigationProp, SpecialtyStackParamList } from '@/app/navigation/types';
 
 export default function SpecialtyEditScreen() {
-  const navigation = useNavigation<SpecialtyNavigationProp>();
-  const route = useRoute<RouteProp<SpecialtyStackParamList, 'Edit'>>();
+  const navigation = useNavigation<AppNavigationProp>();
+  const route = useRoute<RouteProp<SpecialtyStackParamList, 'SpecialtyEdit'>>();
   const { id } = route.params;
   const [loading, setLoading] = useState(false);
   const [isActive, setIsActive] = useState(true);
