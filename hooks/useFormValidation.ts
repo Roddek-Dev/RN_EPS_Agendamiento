@@ -1,159 +1,119 @@
-"use client"
+// Fichero: hooks/useFormValidation.ts
 
-import { useState, useCallback } from "react"
+'use client';
 
+import { useState, useCallback } from 'react';
+
+// Interfaces
 export interface ValidationRule {
-  required?: boolean
-  minLength?: number
-  maxLength?: number
-  pattern?: RegExp
-  custom?: (value: string) => string | null
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: RegExp;
+  // ✅ Cambio clave: la función custom ahora recibe todos los valores del formulario
+  custom?: (value: any, values: Record<string, any>) => string | null;
 }
 
-export interface FormField {
-  value: string
-  error: string | null
-  rules: ValidationRule
-}
+export type ValidationRules<T> = {
+  [K in keyof T]?: ValidationRule;
+};
 
-export interface FormState {
-  [key: string]: FormField
-}
+// Función de utilidad para validar
+const validate = (
+  fieldName: string,
+  value: any,
+  rule: ValidationRule,
+  allValues: Record<string, any> // ✅ Recibe todos los valores
+): string | null => {
+  if (
+    rule.required &&
+    (value === null || value === undefined || value.toString().trim() === '')
+  ) {
+    return 'Este campo es requerido';
+  }
+  if (value === null || value === undefined || value === '') return null;
 
-export const useFormValidation = (initialState: { [key: string]: { value: string; rules: ValidationRule } }) => {
-  const [formState, setFormState] = useState<FormState>(() => {
-    const state: FormState = {}
-    Object.keys(initialState).forEach((key) => {
-      state[key] = {
-        value: initialState[key].value,
-        error: null,
-        rules: initialState[key].rules,
+  const stringValue = value.toString();
+
+  if (rule.minLength && stringValue.length < rule.minLength) {
+    return `Debe tener al menos ${rule.minLength} caracteres`;
+  }
+  if (rule.maxLength && stringValue.length > rule.maxLength) {
+    return `No puede tener más de ${rule.maxLength} caracteres`;
+  }
+  if (rule.pattern && !rule.pattern.test(stringValue)) {
+    if (fieldName.toLowerCase().includes('email'))
+      return 'Formato de email inválido';
+    return 'Formato inválido';
+  }
+  // ✅ Pasa todos los valores a la función custom
+  if (rule.custom) {
+    return rule.custom(value, allValues);
+  }
+  return null;
+};
+
+// El Hook
+export const useFormValidation = <T extends Record<string, any>>(
+  initialState: T,
+  validationRules: ValidationRules<T>
+) => {
+  const [values, setValues] = useState<T>(initialState);
+  const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
+  const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({});
+
+  const handleChange = useCallback((key: keyof T, value: any) => {
+    setValues((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
+  const handleBlur = useCallback(
+    (key: keyof T) => {
+      setTouched((prev) => ({ ...prev, [key]: true }));
+      const rule = validationRules[key];
+      if (rule) {
+        // ✅ Pasa 'values' al validar
+        const error = validate(key as string, values[key], rule, values);
+        setErrors((prev) => ({ ...prev, [key]: error || undefined }));
       }
-    })
-    return state
-  })
-
-  const validateField = useCallback((fieldName: string, value: string, rules: ValidationRule): string | null => {
-    // Required validation
-    if (rules.required && (!value || value.trim() === "")) {
-      return "Este campo es requerido"
-    }
-
-    // Skip other validations if field is empty and not required
-    if (!value || value.trim() === "") {
-      return null
-    }
-
-    // Min length validation
-    if (rules.minLength && value.length < rules.minLength) {
-      return `Debe tener al menos ${rules.minLength} caracteres`
-    }
-
-    // Max length validation
-    if (rules.maxLength && value.length > rules.maxLength) {
-      return `No puede tener más de ${rules.maxLength} caracteres`
-    }
-
-    // Pattern validation
-    if (rules.pattern && !rules.pattern.test(value)) {
-      if (fieldName.toLowerCase().includes("email")) {
-        return "Formato de email inválido"
-      }
-      if (fieldName.toLowerCase().includes("phone")) {
-        return "Formato de teléfono inválido"
-      }
-      return "Formato inválido"
-    }
-
-    // Custom validation
-    if (rules.custom) {
-      return rules.custom(value)
-    }
-
-    return null
-  }, [])
-
-  const updateField = useCallback(
-    (fieldName: string, value: string) => {
-      setFormState((prev) => {
-        const field = prev[fieldName]
-        const error = validateField(fieldName, value, field.rules)
-
-        return {
-          ...prev,
-          [fieldName]: {
-            ...field,
-            value,
-            error,
-          },
-        }
-      })
     },
-    [validateField],
-  )
+    [values, validationRules]
+  );
 
-  const validateForm = useCallback((): boolean => {
-    let isValid = true
-    const newState = { ...formState }
-
-    Object.keys(formState).forEach((fieldName) => {
-      const field = formState[fieldName]
-      const error = validateField(fieldName, field.value, field.rules)
-
-      newState[fieldName] = {
-        ...field,
-        error,
-      }
-
+  const validateForm = useCallback(() => {
+    const newErrors: Partial<Record<keyof T, string>> = {};
+    let isValid = true;
+    for (const key in validationRules) {
+      // ✅ Pasa 'values' al validar
+      const error = validate(key, values[key], validationRules[key]!, values);
       if (error) {
-        isValid = false
+        newErrors[key] = error;
+        isValid = false;
       }
-    })
-
-    setFormState(newState)
-    return isValid
-  }, [formState, validateField])
-
-  const getFieldProps = useCallback(
-    (fieldName: string) => ({
-      value: formState[fieldName]?.value || "",
-      error: formState[fieldName]?.error || undefined,
-      onChangeText: (text: string) => updateField(fieldName, text),
-    }),
-    [formState, updateField],
-  )
+    }
+    setErrors(newErrors);
+    setTouched(
+      Object.keys(validationRules).reduce(
+        (acc, key) => ({ ...acc, [key]: true }),
+        {}
+      )
+    );
+    return isValid;
+  }, [values, validationRules]);
 
   const resetForm = useCallback(() => {
-    const resetState: FormState = {}
-    Object.keys(initialState).forEach((key) => {
-      resetState[key] = {
-        value: initialState[key].value,
-        error: null,
-        rules: initialState[key].rules,
-      }
-    })
-    setFormState(resetState)
-  }, [initialState])
-
-  const getFormData = useCallback(() => {
-    const data: { [key: string]: string } = {}
-    Object.keys(formState).forEach((key) => {
-      data[key] = formState[key].value
-    })
-    return data
-  }, [formState])
-
-  const hasErrors = useCallback(() => {
-    return Object.values(formState).some((field) => field.error !== null)
-  }, [formState])
+    setValues(initialState);
+    setErrors({});
+    setTouched({});
+  }, [initialState]);
 
   return {
-    formState,
-    updateField,
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
     validateForm,
-    getFieldProps,
     resetForm,
-    getFormData,
-    hasErrors,
-  }
-}
+    setValues,
+  };
+};

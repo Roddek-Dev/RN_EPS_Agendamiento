@@ -1,70 +1,76 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { User, Mail, Lock, Phone, MapPin } from "lucide-react-native";
-import { useNavigation } from "@react-navigation/native";
-import { globalStyles, colors } from "@/utils/globalStyles";
-import { FormField } from "@/components/forms/FormField";
-import { useFormValidation } from "@/hooks/useFormValidation";
-import { validationRules } from "@/utils/validationRules";
+// Fichero: screens/auth/register.tsx
+
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { User, Mail, Lock, Phone, MapPin } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
+import { globalStyles, colors, spacing } from '@/utils/globalStyles';
+import { FormField } from '@/components/forms/FormField';
+import { useFormValidation } from '@/hooks/useFormValidation';
+import { validationRules } from '@/utils/validationRules';
 
 export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
-  const { getFieldProps, validateForm, getFormData } = useFormValidation({
-    name: {
-      value: "",
-      rules: validationRules.name,
-    },
-    email: {
-      value: "",
-      rules: validationRules.email,
-    },
-    phone: {
-      value: "",
-      rules: validationRules.phone,
-    },
-    address: {
-      value: "",
-      rules: { required: true },
-    },
-    password: {
-      value: "",
-      rules: validationRules.password,
-    },
-    confirmPassword: {
-      value: "",
-      rules: {
-        required: true,
-        custom: (value: string) => {
-          const formData = getFormData();
-          if (value !== formData.password) {
-            return "Las contraseñas no coinciden";
-          }
-          return null;
-        },
+  // ✅ 1. Hook inicializado con la estructura final y optimizada.
+  const { values, errors, touched, handleChange, handleBlur, validateForm } =
+    useFormValidation(
+      // Estado inicial de los campos del formulario
+      {
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+        password: '',
+        confirmPassword: '',
       },
-    },
-  });
+      // Reglas de validación, usando tu archivo central y una regla custom
+      {
+        name: validationRules.name,
+        email: validationRules.email,
+        phone: validationRules.phone,
+        address: { required: true },
+        password: validationRules.password,
+        confirmPassword: {
+          required: true,
+          custom: (value, formValues) => {
+            if (value !== formValues.password) {
+              return 'Las contraseñas no coinciden';
+            }
+            return null;
+          },
+        },
+      }
+    );
 
   const handleRegister = async () => {
+    // Valida el formulario antes de enviarlo
     if (!validateForm()) {
+      Alert.alert(
+        'Formulario inválido',
+        'Por favor, revisa los campos e intenta de nuevo.'
+      );
       return;
     }
 
     setLoading(true);
     try {
-      const formData = getFormData();
+      // Usa los 'values' directamente del hook
+      console.log('Register data:', values);
+
       // Simular llamada a API
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      console.log("Register data:", formData);
-      Alert.alert("Éxito", "Cuenta creada correctamente", [
-        { text: "OK", onPress: () => navigation.navigate("login" as never) },
+      Alert.alert('Éxito', 'Cuenta creada correctamente', [
+        { text: 'OK', onPress: () => navigation.navigate('login' as never) },
       ]);
     } catch (error) {
-      Alert.alert("Error", "No se pudo crear la cuenta");
+      Alert.alert(
+        'Error',
+        'No se pudo crear la cuenta, por favor intenta más tarde.'
+      );
     } finally {
       setLoading(false);
     }
@@ -72,19 +78,25 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <ScrollView contentContainerStyle={globalStyles.content}>
-        <View style={{ alignItems: "center", marginBottom: 40 }}>
+      <ScrollView contentContainerStyle={{ padding: spacing.lg }}>
+        <View style={{ alignItems: 'center', marginBottom: 40 }}>
           <Text style={globalStyles.title}>Crear Cuenta</Text>
-          <Text style={globalStyles.subtitle}>Completa tus datos para registrarte</Text>
+          <Text style={globalStyles.subtitle}>
+            Completa tus datos para registrarte
+          </Text>
         </View>
 
         <View style={globalStyles.authForm}>
+          {/* ✅ 2. Cada FormField usa las props explícitas para validación onBlur */}
           <FormField
             label="Nombre completo"
             placeholder="Tu nombre completo"
             icon={<User color={colors.text.secondary} size={20} />}
             required
-            {...getFieldProps("name")}
+            value={values.name}
+            onChangeText={(text) => handleChange('name', text)}
+            onBlur={() => handleBlur('name')}
+            error={touched.name ? errors.name : undefined}
           />
 
           <FormField
@@ -93,7 +105,10 @@ export default function RegisterScreen() {
             icon={<Mail color={colors.text.secondary} size={20} />}
             keyboardType="email-address"
             required
-            {...getFieldProps("email")}
+            value={values.email}
+            onChangeText={(text) => handleChange('email', text)}
+            onBlur={() => handleBlur('email')}
+            error={touched.email ? errors.email : undefined}
           />
 
           <FormField
@@ -101,7 +116,10 @@ export default function RegisterScreen() {
             placeholder="+57 300 123 4567"
             icon={<Phone color={colors.text.secondary} size={20} />}
             keyboardType="phone-pad"
-            {...getFieldProps("phone")}
+            value={values.phone}
+            onChangeText={(text) => handleChange('phone', text)}
+            onBlur={() => handleBlur('phone')}
+            error={touched.phone ? errors.phone : undefined}
           />
 
           <FormField
@@ -109,16 +127,22 @@ export default function RegisterScreen() {
             placeholder="Tu dirección"
             icon={<MapPin color={colors.text.secondary} size={20} />}
             required
-            {...getFieldProps("address")}
+            value={values.address}
+            onChangeText={(text) => handleChange('address', text)}
+            onBlur={() => handleBlur('address')}
+            error={touched.address ? errors.address : undefined}
           />
 
           <FormField
             label="Contraseña"
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Mínimo 6 caracteres, con mayúsculas y números"
             icon={<Lock color={colors.text.secondary} size={20} />}
             secureTextEntry
             required
-            {...getFieldProps("password")}
+            value={values.password}
+            onChangeText={(text) => handleChange('password', text)}
+            onBlur={() => handleBlur('password')}
+            error={touched.password ? errors.password : undefined}
           />
 
           <FormField
@@ -127,22 +151,34 @@ export default function RegisterScreen() {
             icon={<Lock color={colors.text.secondary} size={20} />}
             secureTextEntry
             required
-            {...getFieldProps("confirmPassword")}
+            value={values.confirmPassword}
+            onChangeText={(text) => handleChange('confirmPassword', text)}
+            onBlur={() => handleBlur('confirmPassword')}
+            error={touched.confirmPassword ? errors.confirmPassword : undefined}
           />
 
           <TouchableOpacity
-            style={[globalStyles.button, globalStyles.buttonSecondary, { marginTop: 8 }]}
+            style={[
+              globalStyles.button,
+              globalStyles.buttonSecondary,
+              { marginTop: 8 },
+            ]}
             onPress={handleRegister}
             disabled={loading}
           >
-            <Text style={globalStyles.buttonText}>{loading ? "Creando cuenta..." : "Crear Cuenta"}</Text>
+            <Text style={globalStyles.buttonText}>
+              {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
+            </Text>
           </TouchableOpacity>
         </View>
 
         <View style={globalStyles.authLinkContainer}>
           <Text style={globalStyles.authLinkText}>
-            ¿Ya tienes cuenta?{" "}
-            <Text style={globalStyles.authLink} onPress={() => navigation.navigate("login" as never)}>
+            ¿Ya tienes cuenta?{' '}
+            <Text
+              style={globalStyles.authLink}
+              onPress={() => navigation.navigate('login' as never)}
+            >
               Inicia sesión
             </Text>
           </Text>

@@ -1,25 +1,38 @@
-"use client"
+// roddek-dev/rn_eps_agendamiento/RN_EPS_Agendamiento-48feccccdc3a431b15f296d88c542ca6d04ba8e4/components/forms/FormField.tsx
 
-import React from "react"
-import { View, Text, TextInput, TouchableOpacity, type KeyboardTypeOptions } from "react-native"
-import { Eye, EyeOff, ChevronDown } from "lucide-react-native"
-import { globalStyles, colors, spacing } from "../../utils/globalStyles"
+'use client';
+
+import React from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  type KeyboardTypeOptions,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
+  FlexAlignType,
+} from 'react-native';
+import { Eye, EyeOff, ChevronDown } from 'lucide-react-native';
+import { globalStyles, colors, spacing } from '../../utils/globalStyles';
 
 interface FormFieldProps {
-  label: string
-  value: string
-  onChangeText: (text: string) => void
-  placeholder?: string
-  icon?: React.ReactNode
-  error?: string
-  required?: boolean
-  keyboardType?: KeyboardTypeOptions
-  secureTextEntry?: boolean
-  multiline?: boolean
-  editable?: boolean
-  onPress?: () => void
-  isSelector?: boolean
-  disabled?: boolean
+  label: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+  icon?: React.ReactNode;
+  onBlur?: () => void; // ✅ 1. AÑADIR: Se define la nueva prop onBlur.
+  error?: string;
+  required?: boolean;
+  keyboardType?: KeyboardTypeOptions;
+  secureTextEntry?: boolean;
+  multiline?: boolean;
+  editable?: boolean;
+  onPress?: () => void;
+  isSelector?: boolean;
+  disabled?: boolean;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -27,10 +40,11 @@ export const FormField: React.FC<FormFieldProps> = ({
   value,
   onChangeText,
   placeholder,
+  onBlur,
   icon,
   error,
   required = false,
-  keyboardType = "default",
+  keyboardType = 'default',
   secureTextEntry = false,
   multiline = false,
   editable = true,
@@ -38,38 +52,44 @@ export const FormField: React.FC<FormFieldProps> = ({
   isSelector = false,
   disabled = false,
 }) => {
-  const [showPassword, setShowPassword] = React.useState(false)
-  const [isFocused, setIsFocused] = React.useState(false)
+  const [showPassword, setShowPassword] = React.useState(false);
 
-  const isPassword = secureTextEntry
-  const actualSecureEntry = isPassword && !showPassword
+  const isPassword = secureTextEntry;
+  const actualSecureEntry = isPassword && !showPassword;
 
-  const getInputStyle = () => {
-    const style = [globalStyles.inputWithIcon]
+  // ✅ SOLUCIÓN: Construir un único objeto de estilo para evitar conflictos de tipo.
+  const getInputStyle = (): ViewStyle[] => {
+    const styles: ViewStyle[] = [globalStyles.inputWithIcon];
 
     if (multiline) {
-      style.push({ minHeight: 100, alignItems: "flex-start" })
-    }
-
-    if (isFocused && !error) {
-      style.push(globalStyles.inputFocused)
+      // Permite la sobrescritura de 'alignItems'
+      styles.push({
+        minHeight: 100,
+        alignItems: 'flex-start' as FlexAlignType,
+      });
     }
 
     if (error) {
-      style.push(globalStyles.inputError)
+      // Combina el estilo de error
+      styles.push(globalStyles.inputError);
     }
 
     if (disabled) {
-      style.push({ backgroundColor: colors.surfaceVariant, opacity: 0.6 })
+      // Agrega estilos para el estado deshabilitado
+      styles.push({ backgroundColor: colors.surfaceVariant, opacity: 0.6 });
     }
 
-    return style
-  }
+    return styles;
+  };
 
   const renderInput = () => {
     if (isSelector) {
       return (
-        <TouchableOpacity style={getInputStyle()} onPress={onPress} disabled={disabled}>
+        <TouchableOpacity
+          style={getInputStyle()}
+          onPress={onPress}
+          disabled={disabled}
+        >
           {icon && <View style={globalStyles.inputIcon}>{icon}</View>}
           <Text
             style={[
@@ -84,18 +104,27 @@ export const FormField: React.FC<FormFieldProps> = ({
           </Text>
           <ChevronDown color={colors.text.secondary} size={20} />
         </TouchableOpacity>
-      )
+      );
     }
 
     return (
       <View style={getInputStyle()}>
-        {icon && <View style={[globalStyles.inputIcon, multiline && { marginTop: spacing.lg }]}>{icon}</View>}
+        {icon && (
+          <View
+            style={[
+              globalStyles.inputIcon,
+              multiline && { marginTop: spacing.lg },
+            ]}
+          >
+            {icon}
+          </View>
+        )}
         <TextInput
           style={[
             globalStyles.textInput,
             multiline && {
               height: 80,
-              textAlignVertical: "top",
+              textAlignVertical: 'top',
               paddingTop: spacing.lg,
             },
           ]}
@@ -104,15 +133,17 @@ export const FormField: React.FC<FormFieldProps> = ({
           placeholder={placeholder}
           placeholderTextColor={colors.text.muted}
           keyboardType={keyboardType}
+          onBlur={onBlur}
           secureTextEntry={actualSecureEntry}
           multiline={multiline}
           numberOfLines={multiline ? 4 : 1}
           editable={editable && !disabled}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
         />
         {isPassword && (
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{ padding: spacing.xs }}>
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            style={{ padding: spacing.xs }}
+          >
             {showPassword ? (
               <EyeOff color={colors.text.secondary} size={20} />
             ) : (
@@ -121,8 +152,8 @@ export const FormField: React.FC<FormFieldProps> = ({
           </TouchableOpacity>
         )}
       </View>
-    )
-  }
+    );
+  };
 
   return (
     <View style={globalStyles.inputContainer}>
@@ -131,8 +162,15 @@ export const FormField: React.FC<FormFieldProps> = ({
       </Text>
       {renderInput()}
       {error && (
-        <Text style={[globalStyles.captionMuted, { color: colors.errorText, marginTop: spacing.xs }]}>{error}</Text>
+        <Text
+          style={[
+            globalStyles.captionMuted,
+            { color: colors.errorText, marginTop: spacing.xs },
+          ]}
+        >
+          {error}
+        </Text>
       )}
     </View>
-  )
-}
+  );
+};

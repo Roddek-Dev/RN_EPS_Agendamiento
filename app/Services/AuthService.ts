@@ -79,7 +79,7 @@ export const registerUser = async (
   name: string,
 ): Promise<RegisterSuccessResponse | ErrorResponse> => {
   try {
-    const response = await api.post("/register", { email, password });
+    const response = await api.post("/register", { email, password, name });
     return { success: true, data: response.data };
   } catch (error) {
     if (isAxiosError(error) && error.response) {
