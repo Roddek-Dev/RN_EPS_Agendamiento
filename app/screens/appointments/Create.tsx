@@ -3,122 +3,105 @@ import { ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigationProp } from '@/app/navigation/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Calendar, Clock, User, UserCheck } from 'lucide-react-native';
+import { Calendar, MessageSquare, User, UserCheck } from 'lucide-react-native';
+
+// Estilos y componentes reutilizables
 import { globalStyles, colors } from '@/utils/globalStyles';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
-import { useFormValidation } from '@/hooks/useFormValidation';
 
+// Hooks y Servicios
+import { useFormValidation } from '@/hooks/useFormValidation';
+import { createAppointment } from '@/app/Services/AppointmentService';
+
+// --- COMPONENTE PRINCIPAL ---
 export default function AppointmentCreateScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const [loading, setLoading] = useState(false);
 
-  const patients = [
-    { id: '1', name: 'María González' },
-    { id: '2', name: 'Carlos Rodríguez' },
-    { id: '3', name: 'Ana Martínez' },
-  ];
-  const doctors = [
-    { id: '1', name: 'Dr. Juan Pérez' },
-    { id: '2', name: 'Dra. María González' },
-    { id: '3', name: 'Dr. Carlos López' },
-  ];
-  const services = [
-    { id: '1', name: 'Consulta General' },
-    { id: '2', name: 'Electrocardiograma' },
-    { id: '3', name: 'Ecocardiograma' },
-  ];
-
+  // Estado del formulario
   const { getFieldProps, validateForm, getFormData } = useFormValidation({
     patient_id: { value: '', rules: { required: true } },
     doctor_id: { value: '', rules: { required: true } },
-    service_id: { value: '', rules: {} },
-    appointment_date: {
+    date: {
       value: '',
       rules: { required: true, pattern: /^\d{4}-\d{2}-\d{2}$/ },
     },
-    appointment_time: {
-      value: '',
-      rules: { required: true, pattern: /^\d{2}:\d{2}$/ },
-    },
+    description: { value: '', rules: { required: true } },
   });
 
+  // --- MANEJO DEL GUARDADO ---
   const handleSave = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      Alert.alert('Campos incompletos', 'Por favor, completa todos los campos requeridos.');
+      return;
+    }
 
     setLoading(true);
     try {
       const formData = getFormData();
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Appointment data:', formData);
-      Alert.alert('Éxito', 'Cita creada correctamente');
-      navigation.goBack();
+      const result = await createAppointment({
+        // Aseguramos que los IDs se envíen como números
+        patient_id: Number(formData.patient_id),
+        doctor_id: Number(formData.doctor_id),
+        date: formData.date,
+        description: formData.description,
+        status: 'scheduled', // Estado por defecto al crear
+      });
+
+      if (result.success) {
+        Alert.alert('Éxito', 'Cita creada correctamente');
+        navigation.goBack();
+      } else {
+        Alert.alert('Error', result.message || 'No se pudo crear la cita.');
+      }
     } catch (error) {
-      Alert.alert('Error', 'No se pudo crear la cita');
+      Alert.alert('Error Inesperado', 'Ocurrió un error al intentar crear la cita.');
     } finally {
       setLoading(false);
     }
   };
 
+  // --- RENDERIZADO ---
   return (
     <SafeAreaView style={globalStyles.container}>
       <ProfileHeader
         title="Nueva Cita"
-        subtitle="Programar cita médica"
+        subtitle="Programar una nueva cita médica"
         onBack={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <FormField
-          label="Paciente"
-          placeholder="Seleccionar paciente"
+          label="ID del Paciente"
+          placeholder="Ej: 1"
           icon={<User color={colors.text.secondary} size={20} />}
-          isSelector
+          keyboardType="number-pad"
           required
-          onPress={() => {}}
           {...getFieldProps('patient_id')}
-          value={
-            patients.find((p) => p.id === getFieldProps('patient_id').value)
-              ?.name || ''
-          }
         />
         <FormField
-          label="Doctor"
-          placeholder="Seleccionar doctor"
+          label="ID del Doctor"
+          placeholder="Ej: 1"
           icon={<UserCheck color={colors.text.secondary} size={20} />}
-          isSelector
+          keyboardType="number-pad"
           required
-          onPress={() => {}}
           {...getFieldProps('doctor_id')}
-          value={
-            doctors.find((d) => d.id === getFieldProps('doctor_id').value)
-              ?.name || ''
-          }
-        />
-        <FormField
-          label="Servicio"
-          placeholder="Seleccionar servicio (opcional)"
-          isSelector
-          onPress={() => {}}
-          {...getFieldProps('service_id')}
-          value={
-            services.find((s) => s.id === getFieldProps('service_id').value)
-              ?.name || ''
-          }
         />
         <FormField
           label="Fecha"
           placeholder="YYYY-MM-DD"
           icon={<Calendar color={colors.text.secondary} size={20} />}
           required
-          {...getFieldProps('appointment_date')}
+          {...getFieldProps('date')}
         />
         <FormField
-          label="Hora"
-          placeholder="HH:MM"
-          icon={<Clock color={colors.text.secondary} size={20} />}
+          label="Descripción (Motivo y Hora)"
+          placeholder="Ej: Consulta general a las 10:00 AM"
+          icon={<MessageSquare color={colors.text.secondary} size={20} />}
           required
-          {...getFieldProps('appointment_time')}
+          multiline
+          {...getFieldProps('description')}
         />
         <FormActions
           onCancel={() => navigation.goBack()}
