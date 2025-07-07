@@ -1,9 +1,9 @@
 import React from 'react';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Chrome as Home, Calendar, Settings } from 'lucide-react-native';
-import Inicio from "../screens/home";
-import Reservas from "../screens/reservas";
 import CrudsStacks from "./stacks/CrudsStacks";
+import HomeScreen from '../screens/Home';
+import ReservasScreen from '../screens/Reservas';
 
 const Tab = createBottomTabNavigator();
 
@@ -29,7 +29,7 @@ export default function MainNavigation() {
       }}>
       <Tab.Screen
         name="home"
-        component={Inicio}
+        component={HomeScreen}
         options={{
           title: 'Inicio',
           tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
@@ -37,7 +37,7 @@ export default function MainNavigation() {
       />
       <Tab.Screen
         name="reservas"
-        component={Reservas}
+        component={ReservasScreen}
         options={{
           title: 'Reservas',
           tabBarIcon: ({ color, size }) => <Calendar color={color} size={size} />,

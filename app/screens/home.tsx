@@ -8,7 +8,6 @@ import {
   Bell,
   TrendingUp,
 } from 'lucide-react-native';
-import { MOCK_USER } from '@/constants/auth';
 import { globalStyles, colors, spacing } from '@/utils/globalStyles';
 
 export default function HomeScreen() {
@@ -59,11 +58,12 @@ export default function HomeScreen() {
         >
           <View style={globalStyles.row}>
             <Image
-              source={{ uri: MOCK_USER.avatar }}
+              source={{ uri: 'https://via.placeholder.com/150' }} // Avatar estático
               style={globalStyles.avatar}
             />
             <View>
-              <Text style={globalStyles.title}>¡Hola, {MOCK_USER.name}!</Text>
+              <Text style={globalStyles.title}>¡Hola, Dr. Genérico!</Text>{' '}
+              {/* Nombre estático */}
               <Text style={globalStyles.subtitle}>Bienvenido a EPS Salud</Text>
             </View>
           </View>

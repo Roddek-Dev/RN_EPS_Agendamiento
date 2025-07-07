@@ -75,7 +75,8 @@ export const logoutUser = async (): Promise<{ success: boolean; message?: string
  */
 export const registerUser = async (
   email: string,
-  password: string
+  password: string,
+  name: string,
 ): Promise<RegisterSuccessResponse | ErrorResponse> => {
   try {
     const response = await api.post("/register", { email, password });
