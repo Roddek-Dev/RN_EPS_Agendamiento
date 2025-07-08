@@ -1,3 +1,5 @@
+// roddek-dev/rn_eps_agendamiento/RN_EPS_Agendamiento/app/screens/appointments/List.tsx
+
 import {
   View,
   Text,
@@ -15,16 +17,16 @@ import { Calendar, Inbox } from 'lucide-react-native';
 import { globalStyles, colors, spacing } from '@/utils/globalStyles';
 import { SearchHeader } from '@/components/SearchHeader';
 import { EmptyState } from '@/components/EmptyState';
-import { ListItemCard } from '@/components/ListItemCard'; // ✅ Usamos nuestro componente reutilizable
+import { ListItemCard } from '@/components/ListItemCard';
 
 // Servicios y tipos de datos
 import {
   getAppointments,
   deleteAppointment,
-  type Appointment, // Asumo que tu tipo Appointment refleja la nueva estructura
+  type Appointment,
 } from '@/app/Services/AppointmentService';
 import { AppNavigationProp } from '@/app/navigation/types';
-import dayjs from 'dayjs'; // Necesitamos dayjs para formatear la fecha y hora
+import dayjs from 'dayjs';
 
 // --- COMPONENTE PRINCIPAL ---
 export default function AppointmentsListScreen() {
@@ -113,23 +115,21 @@ export default function AppointmentsListScreen() {
             onButtonPress={handleCreate}
           />
         )}
-        // ✅ Usando ListItemCard y adaptando las props a tu base de datos
         renderItem={({ item }) => (
           <ListItemCard
-            title={`Paciente ID: ${item.patient_id}`}
-            subtitle={`Doctor ID: ${item.doctor_id}`}
+            title={`Paciente ID: ${item.patient_id} - Doctor ID: ${item.doctor_id}`}
+            subtitle={`Servicio ID: ${item.service_id || 'No asignado'}`}
             icon={<Calendar color={colors.primary} size={22} />}
-            // Acción principal al presionar la tarjeta
             onPress={() =>
               navigation.navigate('AppointmentDetail', { id: item.id })
             }
-            // Acciones secundarias para editar y eliminar
             onEdit={() =>
               navigation.navigate('AppointmentEdit', { id: item.id })
             }
             onDelete={() => handleDelete(item.id)}
-            // Mostramos la fecha y hora formateadas en el trailingContent
-            trailingText={dayjs(item.date).format('DD/MM/YYYY h:mm A')}
+            trailingText={dayjs(item.appointment_time).format(
+              'DD/MM/YYYY h:mm A'
+            )}
           />
         )}
       />
@@ -143,10 +143,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.background,
-  },
-  dateText: {
-    ...globalStyles.caption,
-    fontWeight: '600',
-    color: colors.text.secondary,
   },
 });

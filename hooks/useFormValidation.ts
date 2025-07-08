@@ -1,6 +1,4 @@
-// Fichero: hooks/useFormValidation.ts
-
-'use client';
+// hooks/useFormValidation.ts
 
 import { useState, useCallback } from 'react';
 
@@ -10,7 +8,6 @@ export interface ValidationRule {
   minLength?: number;
   maxLength?: number;
   pattern?: RegExp;
-  // ✅ Cambio clave: la función custom ahora recibe todos los valores del formulario
   custom?: (value: any, values: Record<string, any>) => string | null;
 }
 
@@ -23,7 +20,7 @@ const validate = (
   fieldName: string,
   value: any,
   rule: ValidationRule,
-  allValues: Record<string, any> // ✅ Recibe todos los valores
+  allValues: Record<string, any>
 ): string | null => {
   if (
     rule.required &&
@@ -46,7 +43,6 @@ const validate = (
       return 'Formato de email inválido';
     return 'Formato inválido';
   }
-  // ✅ Pasa todos los valores a la función custom
   if (rule.custom) {
     return rule.custom(value, allValues);
   }
@@ -71,7 +67,6 @@ export const useFormValidation = <T extends Record<string, any>>(
       setTouched((prev) => ({ ...prev, [key]: true }));
       const rule = validationRules[key];
       if (rule) {
-        // ✅ Pasa 'values' al validar
         const error = validate(key as string, values[key], rule, values);
         setErrors((prev) => ({ ...prev, [key]: error || undefined }));
       }
@@ -83,7 +78,6 @@ export const useFormValidation = <T extends Record<string, any>>(
     const newErrors: Partial<Record<keyof T, string>> = {};
     let isValid = true;
     for (const key in validationRules) {
-      // ✅ Pasa 'values' al validar
       const error = validate(key, values[key], validationRules[key]!, values);
       if (error) {
         newErrors[key] = error;
@@ -106,6 +100,21 @@ export const useFormValidation = <T extends Record<string, any>>(
     setTouched({});
   }, [initialState]);
 
+  // ✅ FUNCIÓN AÑADIDA: Devuelve el estado actual del formulario.
+  const getFormData = useCallback(() => {
+    return values;
+  }, [values]);
+
+  // ✅ FUNCIÓN AÑADIDA: Devuelve las props necesarias para un campo.
+  const getFieldProps = (key: keyof T) => {
+    return {
+      value: values[key],
+      onChangeText: (text: string) => handleChange(key, text),
+      onBlur: () => handleBlur(key),
+      error: touched[key] ? errors[key] : undefined,
+    };
+  };
+
   return {
     values,
     errors,
@@ -115,5 +124,7 @@ export const useFormValidation = <T extends Record<string, any>>(
     validateForm,
     resetForm,
     setValues,
+    getFormData,
+    getFieldProps,
   };
 };

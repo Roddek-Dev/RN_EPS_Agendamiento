@@ -1,9 +1,8 @@
-import { DATE_FORMAT, TIME_FORMAT } from './constants';
 import dayjs from 'dayjs';
 
 // Formatear fecha para mostrar en UI
 export const formatDate = (dateString: string): string => {
-  return dayjs(dateString).format(`${DATE_FORMAT} - ${TIME_FORMAT}`);
+  return dayjs(dateString).format('DD/MM/YYYY - HH:mm:ss');
 };
 
 // Validar si un email es válido

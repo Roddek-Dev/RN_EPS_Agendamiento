@@ -1,9 +1,11 @@
+// screens/appointments/Create.tsx
+
 import { useState } from 'react';
 import { ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigationProp } from '@/app/navigation/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Calendar, MessageSquare, User, UserCheck } from 'lucide-react-native';
+import { Calendar, User, UserCheck, Heart } from 'lucide-react-native';
 
 // Estilos y componentes reutilizables
 import { globalStyles, colors } from '@/utils/globalStyles';
@@ -11,30 +13,39 @@ import { ProfileHeader } from '@/components/ProfileHeader';
 import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
 
-// Hooks y Servicios
+// Hooks, Servicios y Reglas
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { createAppointment } from '@/app/Services/AppointmentService';
+import { validationRules } from '@/utils/validationRules';
 
 // --- COMPONENTE PRINCIPAL ---
 export default function AppointmentCreateScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const [loading, setLoading] = useState(false);
 
-  // Estado del formulario
-  const { getFieldProps, validateForm, getFormData } = useFormValidation({
-    patient_id: { value: '', rules: { required: true } },
-    doctor_id: { value: '', rules: { required: true } },
-    date: {
-      value: '',
-      rules: { required: true, pattern: /^\d{4}-\d{2}-\d{2}$/ },
+  // Estado del formulario usando las reglas de validación
+  const { getFieldProps, validateForm, getFormData } = useFormValidation(
+    {
+      patient_id: '',
+      doctor_id: '',
+      service_id: '',
+      appointment_time: '',
     },
-    description: { value: '', rules: { required: true } },
-  });
+    {
+      patient_id: validationRules.required,
+      doctor_id: validationRules.required,
+      service_id: {}, // No es requerido
+      appointment_time: validationRules.appointment_time,
+    }
+  );
 
   // --- MANEJO DEL GUARDADO ---
   const handleSave = async () => {
     if (!validateForm()) {
-      Alert.alert('Campos incompletos', 'Por favor, completa todos los campos requeridos.');
+      Alert.alert(
+        'Campos incompletos',
+        'Por favor, completa todos los campos requeridos.'
+      );
       return;
     }
 
@@ -42,12 +53,10 @@ export default function AppointmentCreateScreen() {
     try {
       const formData = getFormData();
       const result = await createAppointment({
-        // Aseguramos que los IDs se envíen como números
         patient_id: Number(formData.patient_id),
         doctor_id: Number(formData.doctor_id),
-        date: formData.date,
-        description: formData.description,
-        status: 'scheduled', // Estado por defecto al crear
+        service_id: formData.service_id ? Number(formData.service_id) : null,
+        appointment_time: formData.appointment_time,
       });
 
       if (result.success) {
@@ -57,7 +66,10 @@ export default function AppointmentCreateScreen() {
         Alert.alert('Error', result.message || 'No se pudo crear la cita.');
       }
     } catch (error) {
-      Alert.alert('Error Inesperado', 'Ocurrió un error al intentar crear la cita.');
+      Alert.alert(
+        'Error Inesperado',
+        'Ocurrió un error al intentar crear la cita.'
+      );
     } finally {
       setLoading(false);
     }
@@ -89,19 +101,18 @@ export default function AppointmentCreateScreen() {
           {...getFieldProps('doctor_id')}
         />
         <FormField
-          label="Fecha"
-          placeholder="YYYY-MM-DD"
-          icon={<Calendar color={colors.text.secondary} size={20} />}
-          required
-          {...getFieldProps('date')}
+          label="ID del Servicio (Opcional)"
+          placeholder="Ej: 1"
+          icon={<Heart color={colors.text.secondary} size={20} />}
+          keyboardType="number-pad"
+          {...getFieldProps('service_id')}
         />
         <FormField
-          label="Descripción (Motivo y Hora)"
-          placeholder="Ej: Consulta general a las 10:00 AM"
-          icon={<MessageSquare color={colors.text.secondary} size={20} />}
+          label="Fecha y Hora de la Cita"
+          placeholder="YYYY-MM-DD HH:MM:SS"
+          icon={<Calendar color={colors.text.secondary} size={20} />}
           required
-          multiline
-          {...getFieldProps('description')}
+          {...getFieldProps('appointment_time')}
         />
         <FormActions
           onCancel={() => navigation.goBack()}

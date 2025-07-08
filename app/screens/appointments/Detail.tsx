@@ -1,4 +1,13 @@
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+// roddek-dev/rn_eps_agendamiento/RN_EPS_Agendamiento/app/screens/appointments/Detail.tsx
+
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,25 +16,31 @@ import {
   UserCheck,
   Calendar,
   ClipboardList,
-  MessageSquare,
+  Heart,
 } from 'lucide-react-native';
 
 // Estilos, componentes y tipos
 import { globalStyles, colors } from '@/utils/globalStyles';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { DetailRow } from '@/components/DetailRow';
-import { StatusBadge } from '@/components/StatusBadge';
-import { AppNavigationProp, AppointmentStackParamList } from '@/app/navigation/types';
+import {
+  AppNavigationProp,
+  AppointmentStackParamList,
+} from '@/app/navigation/types';
 import { EmptyState } from '@/components/EmptyState';
-import { mapStatus } from './List';
 
 // Servicio y tipo de datos
-import { getAppointmentById, type Appointment } from '@/app/Services/AppointmentService';
+import {
+  getAppointmentById,
+  type Appointment,
+} from '@/app/Services/AppointmentService';
+import dayjs from 'dayjs';
 
 // --- COMPONENTE PRINCIPAL ---
 export default function AppointmentDetailScreen() {
   const navigation = useNavigation<AppNavigationProp>();
-  const route = useRoute<RouteProp<AppointmentStackParamList, 'AppointmentDetail'>>();
+  const route =
+    useRoute<RouteProp<AppointmentStackParamList, 'AppointmentDetail'>>();
   const { id } = route.params;
 
   // --- ESTADO ---
@@ -54,7 +69,6 @@ export default function AppointmentDetailScreen() {
   }, [id, navigation]);
 
   // --- RENDERIZADO CONDICIONAL ---
-
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -66,7 +80,10 @@ export default function AppointmentDetailScreen() {
   if (!appointment) {
     return (
       <SafeAreaView style={globalStyles.container}>
-        <ProfileHeader title="Detalle de Cita" onBack={() => navigation.goBack()} />
+        <ProfileHeader
+          title="Detalle de Cita"
+          onBack={() => navigation.goBack()}
+        />
         <EmptyState
           icon={ClipboardList}
           title="Cita no encontrada"
@@ -88,29 +105,21 @@ export default function AppointmentDetailScreen() {
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <View style={globalStyles.card}>
-          <View style={globalStyles.spaceBetween}>
-            <Text style={globalStyles.sectionTitle}>Estado de la Cita</Text>
-            <StatusBadge status={mapStatus(appointment.status)} />
-          </View>
-        </View>
-
-        <View style={globalStyles.card}>
           <Text style={globalStyles.sectionTitle}>Información Principal</Text>
           <DetailRow
             icon={Calendar}
-            label="Fecha"
-            value={appointment.date}
+            label="Fecha y Hora"
+            value={dayjs(appointment.appointment_time).format(
+              'DD/MM/YYYY, h:mm A'
+            )}
             color={colors.primary}
-          />
-          <DetailRow
-            icon={MessageSquare}
-            label="Descripción"
-            value={appointment.description}
           />
         </View>
 
         <View style={globalStyles.card}>
-          <Text style={globalStyles.sectionTitle}>Participantes</Text>
+          <Text style={globalStyles.sectionTitle}>
+            Participantes y Servicio
+          </Text>
           <DetailRow
             icon={User}
             label="ID Paciente"
@@ -120,6 +129,11 @@ export default function AppointmentDetailScreen() {
             icon={UserCheck}
             label="ID Doctor"
             value={String(appointment.doctor_id)}
+          />
+          <DetailRow
+            icon={Heart}
+            label="ID Servicio"
+            value={String(appointment.service_id || 'No especificado')}
           />
         </View>
       </ScrollView>

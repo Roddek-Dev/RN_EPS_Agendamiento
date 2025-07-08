@@ -9,7 +9,6 @@ import {
   TrendingUp,
 } from 'lucide-react-native';
 import { globalStyles, colors, spacing } from '@/utils/globalStyles';
-import { StatusBadge } from '@/components/StatusBadge';
 
 export default function ReservasScreen() {
   const appointments = [
@@ -63,7 +62,6 @@ export default function ReservasScreen() {
             {appointment.time}
           </Text>
         </View>
-        <StatusBadge status={appointment.status} />
       </View>
       <View style={globalStyles.appointmentDetails}>
         <Text style={globalStyles.patientName}>{appointment.patient}</Text>

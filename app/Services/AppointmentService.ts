@@ -7,11 +7,10 @@ import { isAxiosError } from "axios";
 // Puedes ajustar estos campos según los datos que maneje tu API
 export interface Appointment {
   id: number;
-  date: string; // O puedes usar el tipo Date si prefieres
-  description: string;
-  doctor_id?: number;
-  patient_id?: number;
-  status?: 'scheduled' | 'completed' | 'canceled';
+  appointment_time: string; // Cambiado de date
+  doctor_id: number;
+  patient_id: number;
+  service_id: number | null;
 }
 
 // Define una forma genérica para las respuestas de error

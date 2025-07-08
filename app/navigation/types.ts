@@ -1,6 +1,7 @@
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { NavigatorScreenParams } from '@react-navigation/native'; // Importa este tipo
 
+
 // --- PARÁMETROS PARA CADA STACK INDIVIDUAL ---
 // Mantenemos estos para organizar y para poder usarlos en CrudsStackParamList si es necesario
 
@@ -55,11 +56,16 @@ export type CrudsStackParamList = {
   appointments: NavigatorScreenParams<AppointmentStackParamList>;
 };
 
-// --- TIPO DE NAVEGACIÓN GLOBAL ---
-// Este es el único tipo de navegación que necesitarás usar en tus pantallas.
+// --- ROOT STACK DE LA APP ---
+// Aquí se definen las rutas principales de la app, incluyendo NavigationMain y Login
+export type RootStackParamList = {
+  Login: undefined;
+  NavigationMain: undefined;
+  // Puedes agregar otras pantallas raíz aquí
+};
 
+// --- TIPO DE NAVEGACIÓN GLOBAL (para stacks anidados) ---
 export type AppNavigationProp = NativeStackNavigationProp<
-  // Combina todos los tipos en uno solo
   PatientStackParamList &
     DoctorStackParamList &
     ServiceStackParamList &
