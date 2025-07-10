@@ -1,35 +1,55 @@
 import { useState } from 'react';
 import { ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { AppNavigationProp } from '@/app/navigation/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Heart, FileText } from 'lucide-react-native';
+import { Star, ClipboardList } from 'lucide-react-native';
 import { globalStyles, colors } from '@/utils/globalStyles';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
 import { useFormValidation } from '@/hooks/useFormValidation';
+import { validationRules } from '@/utils/validationRules';
+import { AppNavigationProp } from '@/app/navigation/types';
+import { createSpecialty } from '@/app/Services/SpecialtyService';
 
 export default function SpecialtyCreateScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const [loading, setLoading] = useState(false);
 
-  const { getFieldProps, validateForm, getFormData } = useFormValidation({
-    name: { value: '', rules: { required: true, minLength: 3 } },
-    description: { value: '', rules: {} },
-  });
+  const { getFieldProps, validateForm, getFormData } = useFormValidation(
+    {
+      name: '',
+      description: '',
+    },
+    {
+      name: validationRules.name,
+    }
+  );
 
   const handleSave = async () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
       const formData = getFormData();
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Specialty data:', formData);
-      Alert.alert('Éxito', 'Especialidad creada correctamente');
-      navigation.goBack();
+      const result = await createSpecialty({
+        name: formData.name,
+        description: formData.description || null,
+      });
+
+      if (result.success) {
+        Alert.alert('Éxito', 'Especialidad creada correctamente');
+        navigation.goBack();
+      } else {
+        Alert.alert(
+          'Error',
+          result.message || 'No se pudo crear la especialidad'
+        );
+      }
     } catch (error) {
-      Alert.alert('Error', 'No se pudo crear la especialidad');
+      Alert.alert(
+        'Error Inesperado',
+        'Ocurrió un error al intentar crear la especialidad.'
+      );
     } finally {
       setLoading(false);
     }
@@ -39,21 +59,21 @@ export default function SpecialtyCreateScreen() {
     <SafeAreaView style={globalStyles.container}>
       <ProfileHeader
         title="Nueva Especialidad"
-        subtitle="Registrar nueva especialidad médica"
+        subtitle="Registrar nueva especialidad"
         onBack={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <FormField
           label="Nombre de la especialidad"
-          placeholder="Ej: Cardiología"
-          icon={<Heart color={colors.text.secondary} size={20} />}
+          placeholder="Nombre de la especialidad"
+          icon={<Star color={colors.text.secondary} size={20} />}
           required
           {...getFieldProps('name')}
         />
         <FormField
           label="Descripción"
-          placeholder="Descripción de la especialidad (opcional)"
-          icon={<FileText color={colors.text.secondary} size={20} />}
+          placeholder="Descripción de la especialidad"
+          icon={<ClipboardList color={colors.text.secondary} size={20} />}
           multiline
           {...getFieldProps('description')}
         />
@@ -62,7 +82,7 @@ export default function SpecialtyCreateScreen() {
           onSave={handleSave}
           saveText="Crear Especialidad"
           loading={loading}
-          saveButtonColor={colors.primary}
+          saveButtonColor={colors.warning}
         />
       </ScrollView>
     </SafeAreaView>

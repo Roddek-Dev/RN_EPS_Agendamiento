@@ -1,145 +1,130 @@
-import { View, Text, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { AppNavigationProp } from '@/app/navigation/types';
+import {
+  View,
+  FlatList,
+  Alert,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Tag, FileText, DollarSign, Activity } from 'lucide-react-native';
-import { globalStyles, colors } from '@/utils/globalStyles';
+import { Stethoscope, Inbox } from 'lucide-react-native';
+import { globalStyles, colors, spacing } from '@/utils/globalStyles';
 import { SearchHeader } from '@/components/SearchHeader';
-import { StatusBadge } from '@/components/StatusBadge';
-import { ActionButtons } from '@/components/ActionButtons';
 import { EmptyState } from '@/components/EmptyState';
+import { ListItemCard } from '@/components/ListItemCard';
+import {
+  getServices,
+  deleteService,
+  type Service,
+} from '@/app/Services/ServiceService';
+import { AppNavigationProp } from '@/app/navigation/types';
 
 export default function ServicesListScreen() {
   const navigation = useNavigation<AppNavigationProp>();
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const services = [
-    {
-      id: 1,
-      name: 'Consulta General',
-      description: 'Consulta médica general con revisión completa.',
-      price: 50000,
-      status: 'available' as const,
-      category: 'Consultas',
-    },
-    {
-      id: 2,
-      name: 'Electrocardiograma',
-      description: 'Análisis del ritmo cardíaco.',
-      price: 75000,
-      status: 'available' as const,
-      category: 'Exámenes',
-    },
-    {
-      id: 3,
-      name: 'Ecocardiograma',
-      description: 'Examen del corazón por ultrasonido.',
-      price: 120000,
-      status: 'busy' as const,
-      category: 'Exámenes',
-    },
-  ];
+  const handleGetServices = useCallback(async () => {
+    if (!loading) setLoading(true);
+    try {
+      const result = await getServices();
+      if (result.success) {
+        setServices(result.data);
+      } else {
+        Alert.alert(
+          'Error',
+          result.message || 'No se pudieron cargar los servicios.'
+        );
+      }
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      Alert.alert('Error Crítico', 'Ocurrió un problema al obtener los datos.');
+    } finally {
+      setLoading(false);
+    }
+  }, [loading]);
 
-  const ServiceCard = ({ service }: { service: (typeof services)[0] }) => (
-    <View style={globalStyles.listCard}>
-      <View
-        style={[
-          globalStyles.avatar,
-          {
-            backgroundColor: colors.primary,
-            justifyContent: 'center',
-            alignItems: 'center',
-          },
-        ]}
-      >
-        <Tag color={colors.surface} size={24} />
-      </View>
-      <View style={{ flex: 1, marginLeft: 12 }}>
-        <View
-          style={[
-            globalStyles.row,
-            {
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              marginBottom: 4,
-            },
-          ]}
-        >
-          <Text style={globalStyles.itemTitle}>{service.name}</Text>
-          <StatusBadge
-            status={service.status}
-            customText={
-              service.status === 'available' ? 'Disponible' : 'No Disponible'
-            }
-          />
-        </View>
-        <Text style={[globalStyles.caption, { marginBottom: 8 }]}>
-          Categoría: {service.category}
-        </Text>
-        <View style={{ gap: 4, marginBottom: 8 }}>
-          <View style={[globalStyles.row, { alignItems: 'center', gap: 6 }]}>
-            <FileText color={colors.text.secondary} size={14} />
-            <Text
-              style={[globalStyles.caption, { fontSize: 12, flex: 1 }]}
-              numberOfLines={2}
-            >
-              {service.description}
-            </Text>
-          </View>
-          <View
-            style={[
-              globalStyles.row,
-              { alignItems: 'center', gap: 6, marginTop: 4 },
-            ]}
-          >
-            <DollarSign color={colors.primary} size={16} />
-            <Text
-              style={[
-                globalStyles.itemTitle,
-                { fontSize: 16, color: colors.primary },
-              ]}
-            >
-              {new Intl.NumberFormat('es-CO', {
-                style: 'currency',
-                currency: 'COP',
-                minimumFractionDigits: 0,
-              }).format(service.price)}
-            </Text>
-          </View>
-        </View>
-      </View>
-      <ActionButtons
-        onView={() => navigation.navigate('ServiceDetail', { id: service.id })}
-        onEdit={() => navigation.navigate('ServiceEdit', { id: service.id })}
-      />
-    </View>
+  useFocusEffect(
+    useCallback(() => {
+      handleGetServices();
+    }, [handleGetServices])
   );
+
+  const handleCreate = () => navigation.navigate('ServiceCreate');
+
+  const handleDelete = (id: number) => {
+    Alert.alert(
+      'Eliminar Servicio',
+      '¿Estás seguro de que deseas eliminar este servicio?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await deleteService(id);
+            if (result.success) {
+              Alert.alert('Éxito', 'Servicio eliminado correctamente.');
+              setServices((prev) => prev.filter((s) => s.id !== id));
+            } else {
+              Alert.alert(
+                'Error',
+                result.message || 'No se pudo eliminar el servicio.'
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <SearchHeader
-        placeholder="Buscar servicios..."
-        onAdd={() => navigation.navigate('ServiceCreate')}
-      />
-      <ScrollView
-        contentContainerStyle={[globalStyles.content, { paddingTop: 0 }]}
-        showsVerticalScrollIndicator={false}
-      >
-        {services.length > 0 ? (
-          <View style={{ gap: 12 }}>
-            {services.map((service) => (
-              <ServiceCard key={service.id} service={service} />
-            ))}
-          </View>
-        ) : (
+      <SearchHeader placeholder="Buscar servicios..." onAdd={handleCreate} />
+      <FlatList
+        data={services}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={{ padding: spacing.md, flexGrow: 1 }}
+        ListEmptyComponent={() => (
           <EmptyState
-            icon={Activity}
+            icon={Inbox}
             title="No hay servicios registrados"
-            subtitle="Comienza agregando tu primer servicio al sistema"
-            buttonText="Agregar Servicio"
-            onButtonPress={() => navigation.navigate('ServiceCreate')}
+            subtitle="Crea un nuevo servicio para empezar."
+            buttonText="Crear Servicio"
+            onButtonPress={handleCreate}
           />
         )}
-      </ScrollView>
+        renderItem={({ item }) => (
+          <ListItemCard
+            title={item.name}
+            subtitle={item.description || 'Sin descripción'}
+            icon={<Stethoscope color={colors.primary} size={22} />}
+            onPress={() =>
+              navigation.navigate('ServiceDetail', { id: item.id })
+            }
+            onEdit={() => navigation.navigate('ServiceEdit', { id: item.id })}
+            onDelete={() => handleDelete(item.id)}
+          />
+        )}
+      />
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+});

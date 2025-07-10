@@ -1,147 +1,129 @@
-import { View, Text, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { AppNavigationProp } from '@/app/navigation/types';
+import {
+  View,
+  Text,
+  FlatList,
+  Alert,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Star, Briefcase, Calendar } from 'lucide-react-native';
-import { globalStyles, colors } from '@/utils/globalStyles';
+import { UserCheck, Inbox } from 'lucide-react-native';
+import { globalStyles, colors, spacing } from '@/utils/globalStyles';
 import { SearchHeader } from '@/components/SearchHeader';
-import { StatusBadge } from '@/components/StatusBadge';
-import { ActionButtons } from '@/components/ActionButtons';
-import { ContactInfo } from '@/components/ContactInfo';
+import { EmptyState } from '@/components/EmptyState';
+import { ListItemCard } from '@/components/ListItemCard';
+import {
+  getDoctors,
+  deleteDoctor,
+  type Doctor,
+} from '@/app/Services/DoctorService';
+import { AppNavigationProp } from '@/app/navigation/types';
 
 export default function DoctorsListScreen() {
   const navigation = useNavigation<AppNavigationProp>();
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const doctors = [
-    {
-      id: 1,
-      name: 'Dr. Juan Pérez',
-      specialty: 'Cardiología',
-      experience: '10 años',
-      rating: 4.8,
-      appointments: 156,
-      status: 'available' as const,
-      phone: '+57 301 234 5678',
-      email: 'juan.perez@hospital.com',
-      avatar:
-        'https://images.pexels.com/photos/612999/pexels-photo-612999.jpeg?auto=compress&cs=tinysrgb&w=400',
-    },
-    {
-      id: 2,
-      name: 'Dra. María González',
-      specialty: 'Dermatología',
-      experience: '8 años',
-      rating: 4.9,
-      appointments: 98,
-      status: 'busy' as const,
-      phone: '+57 302 345 6789',
-      email: 'maria.gonzalez@hospital.com',
-      avatar:
-        'https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=400',
-    },
-    {
-      id: 3,
-      name: 'Dr. Carlos López',
-      specialty: 'Cardiología',
-      experience: '12 años',
-      rating: 4.7,
-      appointments: 203,
-      status: 'available' as const,
-      phone: '+57 303 456 7890',
-      email: 'carlos.lopez@hospital.com',
-      avatar:
-        'https://images.pexels.com/photos/582750/pexels-photo-582750.jpeg?auto=compress&cs=tinysrgb&w=400',
-    },
-  ];
+  const handleGetDoctors = useCallback(async () => {
+    if (!loading) setLoading(true);
+    try {
+      const result = await getDoctors();
+      if (result.success) {
+        setDoctors(result.data);
+      } else {
+        Alert.alert(
+          'Error',
+          result.message || 'No se pudieron cargar los doctores.'
+        );
+      }
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+      Alert.alert('Error Crítico', 'Ocurrió un problema al obtener los datos.');
+    } finally {
+      setLoading(false);
+    }
+  }, [loading]);
 
-  const DoctorCard = ({ doctor }: { doctor: (typeof doctors)[0] }) => (
-    <View style={globalStyles.listCard}>
-      <View
-        style={[
-          globalStyles.avatar,
-          {
-            backgroundColor: colors.warning,
-            justifyContent: 'center',
-            alignItems: 'center',
-          },
-        ]}
-      >
-        <Briefcase color={colors.surface} size={24} />
-      </View>
-      <View style={{ flex: 1, marginLeft: 12 }}>
-        <View
-          style={[
-            globalStyles.row,
-            {
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              marginBottom: 4,
-            },
-          ]}
-        >
-          <Text style={globalStyles.itemTitle}>{doctor.name}</Text>
-          <StatusBadge status={doctor.status} />
-        </View>
-        <Text
-          style={[
-            globalStyles.caption,
-            { color: colors.primary, fontWeight: '600', marginBottom: 8 },
-          ]}
-        >
-          {doctor.specialty}
-        </Text>
-        <ContactInfo phone={doctor.phone} email={doctor.email} />
-        <View
-          style={[
-            globalStyles.row,
-            { justifyContent: 'space-between', marginTop: 8 },
-          ]}
-        >
-          <View style={globalStyles.row}>
-            <Star color="#fbbf24" size={16} fill="#fbbf24" />
-            <Text
-              style={[
-                globalStyles.caption,
-                { marginLeft: 4, fontWeight: '600' },
-              ]}
-            >
-              {doctor.rating}
-            </Text>
-          </View>
-          <View style={globalStyles.row}>
-            <Briefcase color={colors.text.secondary} size={16} />
-            <Text style={[globalStyles.caption, { marginLeft: 4 }]}>
-              {doctor.experience}
-            </Text>
-          </View>
-          <View style={globalStyles.row}>
-            <Calendar color={colors.text.secondary} size={16} />
-            <Text style={[globalStyles.caption, { marginLeft: 4 }]}>
-              {doctor.appointments} citas
-            </Text>
-          </View>
-        </View>
-      </View>
-      <ActionButtons
-        onView={() => navigation.navigate('DoctorDetail', { id: doctor.id })}
-        onEdit={() => navigation.navigate('DoctorEdit', { id: doctor.id })}
-      />
-    </View>
+  useFocusEffect(
+    useCallback(() => {
+      handleGetDoctors();
+    }, [handleGetDoctors])
   );
+
+  const handleCreate = () => navigation.navigate('DoctorCreate');
+
+  const handleDelete = (id: number) => {
+    Alert.alert(
+      'Eliminar Doctor',
+      '¿Estás seguro de que deseas eliminar este doctor?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await deleteDoctor(id);
+            if (result.success) {
+              Alert.alert('Éxito', 'Doctor eliminado correctamente.');
+              setDoctors((prev) => prev.filter((d) => d.id !== id));
+            } else {
+              Alert.alert(
+                'Error',
+                result.message || 'No se pudo eliminar el doctor.'
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <SearchHeader
-        placeholder="Buscar doctores..."
-        onAdd={() => navigation.navigate('DoctorCreate')}
+      <SearchHeader placeholder="Buscar doctores..." onAdd={handleCreate} />
+      <FlatList
+        data={doctors}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={{ padding: spacing.md, flexGrow: 1 }}
+        ListEmptyComponent={() => (
+          <EmptyState
+            icon={Inbox}
+            title="No hay doctores registrados"
+            subtitle="Crea un nuevo doctor para empezar."
+            buttonText="Crear Doctor"
+            onButtonPress={handleCreate}
+          />
+        )}
+        renderItem={({ item }) => (
+          <ListItemCard
+            title={item.name}
+            subtitle={`Especialidad ID: ${item.specialty_id || 'No asignada'}`}
+            icon={<UserCheck color={colors.primary} size={22} />}
+            onPress={() => navigation.navigate('DoctorDetail', { id: item.id })}
+            onEdit={() => navigation.navigate('DoctorEdit', { id: item.id })}
+            onDelete={() => handleDelete(item.id)}
+          />
+        )}
       />
-      <ScrollView contentContainerStyle={globalStyles.content}>
-        <View style={{ gap: 12 }}>
-          {doctors.map((doctor) => (
-            <DoctorCard key={doctor.id} doctor={doctor} />
-          ))}
-        </View>
-      </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+});

@@ -6,7 +6,7 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
-const API_BASE_URL: string = "http://172.30.4.119:8001/api"; 
+const API_BASE_URL: string = 'http://172.30.4.119:8001/api';
 const RutasPublicas: string[] = ['/login', '/register'];
 
 const api = axios.create({

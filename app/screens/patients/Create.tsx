@@ -1,59 +1,56 @@
 import { useState } from 'react';
-import { ScrollView, Alert, View } from 'react-native';
+import { ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { AppNavigationProp } from '@/app/navigation/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Mail, Phone, MapPin, Calendar } from 'lucide-react-native';
+import { User, Mail } from 'lucide-react-native';
 import { globalStyles, colors } from '@/utils/globalStyles';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validationRules } from '@/utils/validationRules';
+import { AppNavigationProp } from '@/app/navigation/types';
+import { createPatient } from '@/app/Services/PatientService';
 
 export default function PatientCreateScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const [loading, setLoading] = useState(false);
 
-  const { getFieldProps, validateForm, getFormData, resetForm } =
-    useFormValidation({
-      name: { value: '', rules: validationRules.name },
-      email: { value: '', rules: validationRules.email },
-      phone: { value: '', rules: validationRules.phone },
-      address: { value: '', rules: { required: true } },
-      birthDate: {
-        value: '',
-        rules: {
-          required: true,
-          pattern: /^\d{4}-\d{2}-\d{2}$/,
-          custom: (value: string) => {
-            if (new Date(value) > new Date())
-              return 'La fecha no puede ser futura';
-            return null;
-          },
-        },
-      },
-    });
+  const { getFieldProps, validateForm, getFormData } = useFormValidation(
+    {
+      name: '',
+      email: '',
+    },
+    {
+      name: validationRules.name,
+      email: validationRules.email, // Asumiendo que el email no es requerido
+    }
+  );
 
   const handleSave = async () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
       const formData = getFormData();
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Patient data:', formData);
-      Alert.alert('Éxito', 'Paciente creado correctamente');
-      navigation.goBack();
+      const result = await createPatient({
+        name: formData.name,
+        email: formData.email || null, // Enviar nulo si está vacío
+      });
+
+      if (result.success) {
+        Alert.alert('Éxito', 'Paciente creado correctamente');
+        navigation.goBack();
+      } else {
+        Alert.alert('Error', result.message || 'No se pudo crear el paciente');
+      }
     } catch (error) {
-      Alert.alert('Error', 'No se pudo crear el paciente');
+      Alert.alert(
+        'Error Inesperado',
+        'Ocurrió un error al intentar crear el paciente.'
+      );
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCancel = () => {
-    resetForm();
-    navigation.goBack();
   };
 
   return (
@@ -61,53 +58,29 @@ export default function PatientCreateScreen() {
       <ProfileHeader
         title="Nuevo Paciente"
         subtitle="Registrar nuevo paciente"
-        onBack={handleCancel}
+        onBack={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
-        <View style={globalStyles.card}>
-          <FormField
-            label="Nombre completo"
-            placeholder="Nombre del paciente"
-            icon={<User color={colors.text.secondary} size={20} />}
-            required
-            {...getFieldProps('name')}
-          />
-          <FormField
-            label="Teléfono"
-            placeholder="+57 300 123 4567"
-            icon={<Phone color={colors.text.secondary} size={20} />}
-            keyboardType="phone-pad"
-            {...getFieldProps('phone')}
-          />
-          <FormField
-            label="Correo electrónico"
-            placeholder="paciente@email.com"
-            icon={<Mail color={colors.text.secondary} size={20} />}
-            keyboardType="email-address"
-            required
-            {...getFieldProps('email')}
-          />
-          <FormField
-            label="Dirección"
-            placeholder="Dirección del paciente"
-            icon={<MapPin color={colors.text.secondary} size={20} />}
-            required
-            {...getFieldProps('address')}
-          />
-          <FormField
-            label="Fecha de nacimiento"
-            placeholder="YYYY-MM-DD"
-            icon={<Calendar color={colors.text.secondary} size={20} />}
-            required
-            {...getFieldProps('birthDate')}
-          />
-        </View>
+        <FormField
+          label="Nombre completo"
+          placeholder="Nombre del paciente"
+          icon={<User color={colors.text.secondary} size={20} />}
+          required
+          {...getFieldProps('name')}
+        />
+        <FormField
+          label="Correo Electrónico"
+          placeholder="email@ejemplo.com"
+          icon={<Mail color={colors.text.secondary} size={20} />}
+          keyboardType="email-address"
+          {...getFieldProps('email')}
+        />
         <FormActions
-          onCancel={handleCancel}
+          onCancel={() => navigation.goBack()}
           onSave={handleSave}
           saveText="Crear Paciente"
           loading={loading}
-          saveButtonColor={colors.secondary}
+          saveButtonColor={colors.warning}
         />
       </ScrollView>
     </SafeAreaView>

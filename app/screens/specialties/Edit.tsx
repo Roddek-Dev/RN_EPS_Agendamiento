@@ -1,111 +1,146 @@
-import { useState } from 'react';
-import { ScrollView, Alert, Switch, View, Text } from 'react-native';
+import { useState, useEffect } from 'react';
+import {
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+  View,
+  StyleSheet,
+} from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Heart, FileText, Activity } from 'lucide-react-native';
+import { Star, ClipboardList } from 'lucide-react-native';
 import { globalStyles, colors } from '@/utils/globalStyles';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
 import { useFormValidation } from '@/hooks/useFormValidation';
-import { AppNavigationProp, SpecialtyStackParamList } from '@/app/navigation/types';
+import { validationRules } from '@/utils/validationRules';
+import {
+  AppNavigationProp,
+  SpecialtyStackParamList,
+} from '@/app/navigation/types';
+import {
+  getSpecialtyById,
+  updateSpecialty,
+} from '@/app/Services/SpecialtyService';
 
 export default function SpecialtyEditScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const route = useRoute<RouteProp<SpecialtyStackParamList, 'SpecialtyEdit'>>();
   const { id } = route.params;
-  const [loading, setLoading] = useState(false);
-  const [isActive, setIsActive] = useState(true);
 
-  const { getFieldProps, validateForm, getFormData } = useFormValidation({
-    name: { value: 'Cardiología', rules: { required: true, minLength: 3 } },
-    description: {
-      value:
-        'Especialidad médica que se encarga del estudio, diagnóstico y tratamiento de las enfermedades del corazón y del aparato circulatorio.',
-      rules: {},
-    },
-  });
+  const [loading, setLoading] = useState(true);
+
+  const { getFieldProps, validateForm, getFormData, setValues } =
+    useFormValidation(
+      {
+        name: '',
+        description: '',
+      },
+      {
+        name: validationRules.name,
+      }
+    );
+
+  useEffect(() => {
+    const fetchSpecialtyData = async () => {
+      const result = await getSpecialtyById(id);
+      if (result.success) {
+        const { name, description } = result.data;
+        setValues({
+          name: name,
+          description: description || '',
+        });
+      } else {
+        Alert.alert(
+          'Error',
+          result.message ||
+            'No se pudieron cargar los datos de la especialidad.'
+        );
+        navigation.goBack();
+      }
+      setLoading(false);
+    };
+
+    fetchSpecialtyData();
+  }, [id, navigation, setValues]);
 
   const handleSave = async () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
-      const formData = { ...getFormData(), isActive };
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Specialty data:', formData);
-      Alert.alert('Éxito', 'Especialidad actualizada correctamente');
-      navigation.goBack();
+      const formData = getFormData();
+      const result = await updateSpecialty(id, {
+        name: formData.name,
+        description: formData.description || null,
+      });
+
+      if (result.success) {
+        Alert.alert('Éxito', 'Especialidad actualizada correctamente');
+        navigation.goBack();
+      } else {
+        Alert.alert(
+          'Error',
+          result.message || 'No se pudo actualizar la especialidad.'
+        );
+      }
     } catch (error) {
-      Alert.alert('Error', 'No se pudo actualizar la especialidad');
+      Alert.alert(
+        'Error Inesperado',
+        'Ocurrió un error al intentar actualizar la especialidad.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={globalStyles.container}>
       <ProfileHeader
         title="Editar Especialidad"
-        subtitle={`ID de la especialidad: ${id}`}
+        subtitle={`ID: ${id}`}
         onBack={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <FormField
           label="Nombre de la especialidad"
-          placeholder="Ej: Cardiología"
-          icon={<Heart color={colors.text.secondary} size={20} />}
+          placeholder="Nombre de la especialidad"
+          icon={<Star color={colors.text.secondary} size={20} />}
           required
           {...getFieldProps('name')}
         />
         <FormField
           label="Descripción"
-          placeholder="Descripción de la especialidad (opcional)"
-          icon={<FileText color={colors.text.secondary} size={20} />}
+          placeholder="Descripción de la especialidad"
+          icon={<ClipboardList color={colors.text.secondary} size={20} />}
           multiline
           {...getFieldProps('description')}
         />
-        <View style={globalStyles.inputContainer}>
-          <View
-            style={[
-              globalStyles.inputWithIcon,
-              {
-                backgroundColor: colors.surface,
-                borderWidth: 1,
-                borderColor: '#e2e8f0',
-              },
-            ]}
-          >
-            <Activity
-              color={colors.text.secondary}
-              size={20}
-              style={globalStyles.inputIcon}
-            />
-            <View style={{ flex: 1 }}>
-              <Text style={[globalStyles.detailText, { fontWeight: '500' }]}>
-                Estado de la especialidad
-              </Text>
-              <Text style={[globalStyles.caption, { marginTop: 2 }]}>
-                {isActive
-                  ? 'La especialidad está activa'
-                  : 'La especialidad está inactiva'}
-              </Text>
-            </View>
-            <Switch
-              value={isActive}
-              onValueChange={setIsActive}
-              trackColor={{ false: '#e2e8f0', true: colors.primary }}
-              thumbColor={isActive ? colors.surface : '#94a3b8'}
-            />
-          </View>
-        </View>
         <FormActions
           onCancel={() => navigation.goBack()}
           onSave={handleSave}
           saveText="Guardar Cambios"
           loading={loading}
-          saveButtonColor={colors.primary}
+          saveButtonColor={colors.warning}
         />
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+});

@@ -1,121 +1,121 @@
-import { View, Text, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  Tag,
-  FileText,
-  DollarSign,
-  BarChart2,
-  Calendar,
-} from 'lucide-react-native';
+import { Stethoscope, ClipboardList, DollarSign } from 'lucide-react-native';
 import { globalStyles, colors } from '@/utils/globalStyles';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { DetailRow } from '@/components/DetailRow';
-import { StatItem } from '@/components/StatItem';
-import { MetadataSection } from '@/components/MetadataSection';
-import { AppNavigationProp, ServiceStackParamList } from '@/app/navigation/types';
+import { EmptyState } from '@/components/EmptyState';
+import { getServiceById, type Service } from '@/app/Services/ServiceService';
+import {
+  AppNavigationProp,
+  ServiceStackParamList,
+} from '@/app/navigation/types';
 
 export default function ServiceDetailScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const route = useRoute<RouteProp<ServiceStackParamList, 'ServiceDetail'>>();
   const { id } = route.params;
 
-  const service = {
-    id: id,
-    name: 'Consulta General',
-    description:
-      'Consulta médica general con revisión completa del paciente, diagnóstico y formulación de tratamiento inicial.',
-    price: 50000,
-    status: 'available' as const,
-    category: 'Consultas',
-    createdAt: '2023-02-15',
-    updatedAt: '2024-01-20',
-    appointmentsThisMonth: 23,
-    appointmentsTotal: 156,
-  };
+  const [service, setService] = useState<Service | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadServiceDetails = async () => {
+      setLoading(true);
+      const result = await getServiceById(id);
+
+      if (result.success) {
+        setService(result.data);
+      } else {
+        Alert.alert(
+          'Error al Cargar',
+          result.message || 'No se pudieron obtener los detalles del servicio.',
+          [{ text: 'Volver', onPress: () => navigation.goBack() }]
+        );
+      }
+      setLoading(false);
+    };
+
+    loadServiceDetails();
+  }, [id, navigation]);
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (!service) {
+    return (
+      <SafeAreaView style={globalStyles.container}>
+        <ProfileHeader
+          title="Detalle de Servicio"
+          onBack={() => navigation.goBack()}
+        />
+        <EmptyState
+          icon={ClipboardList}
+          title="Servicio no encontrado"
+          subtitle="No se pudo cargar la información del servicio. Por favor, intenta de nuevo."
+          buttonText="Volver a la lista"
+          onButtonPress={() => navigation.goBack()}
+        />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={globalStyles.container}>
       <ProfileHeader
         title="Detalle del Servicio"
+        subtitle={service.name}
         onBack={() => navigation.goBack()}
-        onEdit={() => navigation.navigate('ServiceEdit', { id: id })}
+        onEdit={() => navigation.navigate('ServiceEdit', { id: service.id })}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
-        <View
-          style={[
-            globalStyles.card,
-            { alignItems: 'center', marginBottom: 20 },
-          ]}
-        >
-          <View
-            style={[
-              globalStyles.avatarLarge,
-              {
-                width: 100,
-                height: 100,
-                borderRadius: 50,
-                marginBottom: 16,
-                backgroundColor: colors.primary,
-                justifyContent: 'center',
-                alignItems: 'center',
-              },
-            ]}
-          >
-            <Tag color={colors.surface} size={48} />
-          </View>
-          <Text
-            style={[globalStyles.title, { fontSize: 22, textAlign: 'center' }]}
-          >
-            {service.name}
+        <View style={globalStyles.card}>
+          <Text style={globalStyles.sectionTitle}>
+            Información del Servicio
           </Text>
-          <View style={globalStyles.statContainer}>
-            <StatItem
-              icon={<DollarSign color={colors.text.secondary} size={24} />}
-              value={new Intl.NumberFormat('es-CO', {
-                style: 'currency',
-                currency: 'COP',
-                minimumFractionDigits: 0,
-              }).format(service.price)}
-              label="Precio"
-            />
-            <StatItem
-              icon={<BarChart2 color={colors.text.secondary} size={24} />}
-              value={`${service.appointmentsTotal}`}
-              label="Citas Totales"
-            />
-          </View>
-        </View>
-        <View style={globalStyles.card}>
-          <Text style={globalStyles.sectionTitle}>Información General</Text>
-          <DetailRow icon={Tag} value={service.category} label="Categoría" />
           <DetailRow
-            icon={FileText}
-            value={service.description}
+            icon={Stethoscope}
+            label="Nombre"
+            value={service.name}
+            color={colors.primary}
+          />
+          <DetailRow
+            icon={ClipboardList}
             label="Descripción"
-          />
-        </View>
-        <View style={globalStyles.card}>
-          <Text style={globalStyles.sectionTitle}>Estadísticas</Text>
-          <DetailRow
-            icon={Calendar}
-            value={`${service.appointmentsThisMonth} citas`}
-            label="Este mes"
+            value={service.description || 'No especificada'}
           />
           <DetailRow
-            icon={BarChart2}
-            value={`${service.appointmentsTotal} citas`}
-            label="En total"
+            icon={DollarSign}
+            label="Precio"
+            value={
+              service.price ? `$${service.price.toFixed(2)}` : 'No especificado'
+            }
           />
         </View>
-        <MetadataSection
-          title="Información del Sistema"
-          items={[
-            { label: 'Fecha de Creación', value: service.createdAt },
-            { label: 'Última Actualización', value: service.updatedAt },
-          ]}
-        />
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+});

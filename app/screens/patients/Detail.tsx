@@ -1,141 +1,112 @@
-import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  User,
-  Phone,
-  Mail,
-  Calendar,
-  Edit,
-  Clock,
-  ArrowLeft,
-} from 'lucide-react-native';
+import { User, Mail, ClipboardList } from 'lucide-react-native';
 import { globalStyles, colors } from '@/utils/globalStyles';
-import { StatusBadge } from '@/components/StatusBadge';
-import { StatItem } from '@/components/StatItem';
-import { AppNavigationProp, PatientStackParamList } from '@/app/navigation/types';
+import { ProfileHeader } from '@/components/ProfileHeader';
+import { DetailRow } from '@/components/DetailRow';
+import { EmptyState } from '@/components/EmptyState';
+import { getPatientById, type Patient } from '@/app/Services/PatientService';
+import {
+  AppNavigationProp,
+  PatientStackParamList,
+} from '@/app/navigation/types';
 
 export default function PatientDetailScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const route = useRoute<RouteProp<PatientStackParamList, 'PatientDetail'>>();
   const { id } = route.params;
 
-  const patient = {
-    id: id,
-    name: 'María González',
-    email: 'maria.gonzalez@example.com',
-    phone: '+57 300 123 4567',
-    address: 'Calle 123 #45-67, Bogotá',
-    birthDate: '1990-05-15',
-    age: 33,
-    bloodType: 'O+',
-    status: 'active' as const,
-    createdAt: '2023-01-10',
-    updatedAt: '2023-12-15',
-    lastAppointment: '2023-12-10',
-    totalAppointments: 12,
-    avatar:
-      'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400',
-  };
+  const [patient, setPatient] = useState<Patient | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const DetailRow = ({
-    icon: Icon,
-    label,
-    value,
-  }: {
-    icon: any;
-    label: string;
-    value: string;
-  }) => (
-    <View style={globalStyles.detailRow}>
-      <Icon
-        color={colors.text.secondary}
-        size={20}
-        style={globalStyles.detailIcon}
-      />
-      <View>
-        <Text style={globalStyles.caption}>{label}</Text>
-        <Text style={globalStyles.detailText}>{value}</Text>
+  useEffect(() => {
+    const loadPatientDetails = async () => {
+      setLoading(true);
+      const result = await getPatientById(id);
+
+      if (result.success) {
+        setPatient(result.data);
+      } else {
+        Alert.alert(
+          'Error al Cargar',
+          result.message || 'No se pudieron obtener los detalles del paciente.',
+          [{ text: 'Volver', onPress: () => navigation.goBack() }]
+        );
+      }
+      setLoading(false);
+    };
+
+    loadPatientDetails();
+  }, [id, navigation]);
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
-    </View>
-  );
+    );
+  }
+
+  if (!patient) {
+    return (
+      <SafeAreaView style={globalStyles.container}>
+        <ProfileHeader
+          title="Detalle de Paciente"
+          onBack={() => navigation.goBack()}
+        />
+        <EmptyState
+          icon={ClipboardList}
+          title="Paciente no encontrado"
+          subtitle="No se pudo cargar la información del paciente. Por favor, intenta de nuevo."
+          buttonText="Volver a la lista"
+          onButtonPress={() => navigation.goBack()}
+        />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <View style={globalStyles.header}>
-        <TouchableOpacity
-          style={globalStyles.iconButton}
-          onPress={() => navigation.goBack()}
-        >
-          <ArrowLeft color={colors.text.secondary} size={24} />
-        </TouchableOpacity>
-        <View style={globalStyles.flex1}>
-          <Text style={globalStyles.headerTitle}>{patient.name}</Text>
-          <StatusBadge status={patient.status} />
-        </View>
-        <TouchableOpacity
-          style={[globalStyles.iconButton, { backgroundColor: colors.primary }]}
-          onPress={() => navigation.navigate('PatientEdit', { id: id })}
-        >
-          <Edit color={colors.surface} size={20} />
-        </TouchableOpacity>
-      </View>
+      <ProfileHeader
+        title="Perfil del Paciente"
+        subtitle={patient.name}
+        onBack={() => navigation.goBack()}
+        onEdit={() => navigation.navigate('PatientEdit', { id: patient.id })}
+      />
       <ScrollView contentContainerStyle={globalStyles.content}>
-        <View style={globalStyles.profileSection}>
-          <Image
-            source={{ uri: patient.avatar }}
-            style={globalStyles.profileAvatar}
-          />
-          <View style={globalStyles.statContainer}>
-            <StatItem value={patient.age} label="Años" />
-            <StatItem value={patient.totalAppointments} label="Citas" />
-            <StatItem value={patient.bloodType} label="Tipo Sanguíneo" />
-          </View>
-        </View>
         <View style={globalStyles.card}>
-          <Text style={globalStyles.sectionTitle}>Información Personal</Text>
-          <DetailRow icon={Phone} label="Teléfono" value={patient.phone} />
-          <DetailRow icon={Mail} label="Email" value={patient.email} />
-          <DetailRow icon={User} label="Dirección" value={patient.address} />
+          <Text style={globalStyles.sectionTitle}>Información Principal</Text>
           <DetailRow
-            icon={Calendar}
-            label="Fecha de Nacimiento"
-            value={patient.birthDate}
-          />
-        </View>
-        <View style={globalStyles.card}>
-          <Text style={globalStyles.sectionTitle}>Historial Reciente</Text>
-          <DetailRow
-            icon={Clock}
-            label="Última cita"
-            value={patient.lastAppointment}
+            icon={User}
+            label="Nombre del Paciente"
+            value={patient.name}
+            color={colors.primary}
           />
           <DetailRow
-            icon={Clock}
-            label="Total de citas"
-            value={patient.totalAppointments.toString()}
+            icon={Mail}
+            label="Correo Electrónico"
+            value={patient.email || 'No especificado'}
           />
-        </View>
-        <View style={globalStyles.card}>
-          <Text style={globalStyles.sectionTitle}>Información del Sistema</Text>
-          <View style={globalStyles.metadataCard}>
-            <View style={globalStyles.metadataItem}>
-              <Text style={globalStyles.metadataLabel}>Fecha de Creación:</Text>
-              <Text style={globalStyles.metadataValue}>
-                {patient.createdAt}
-              </Text>
-            </View>
-            <View style={globalStyles.metadataItem}>
-              <Text style={globalStyles.metadataLabel}>
-                Última Actualización:
-              </Text>
-              <Text style={globalStyles.metadataValue}>
-                {patient.updatedAt}
-              </Text>
-            </View>
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+});

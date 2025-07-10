@@ -1,95 +1,116 @@
-import api from "./conexion"; // Ajustamos la ruta de importación según la estructura de tu proyecto
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { isAxiosError } from "axios";
+import api from './conexion';
+import { isAxiosError } from 'axios';
 
 // --- INTERFACES PARA TIPADO ---
-// Define la forma de la respuesta exitosa del login
-interface LoginSuccessResponse {
-  success: true;
+
+// Lo que tu API de Laravel debería devolver en un login/registro exitoso
+export interface AuthResponse {
   token: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    role: 'admin' | 'user';
+  };
 }
 
-// Define la forma de la respuesta de registro
-interface RegisterSuccessResponse {
-  success: true;
-  data: any; // Puedes cambiar 'any' por un tipo más específico si conoces la estructura
+// Datos para el registro
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string; // Laravel espera esto por defecto
 }
 
-// Define la forma de la respuesta de error genérica
-interface ErrorResponse {
-  success: false;
+// Datos para el login
+export interface LoginData {
+  email: string;
+  password: string;
+}
+
+// Estructura de un error de validación de Laravel
+interface ValidationError {
   message: string;
+  errors: {
+    [key: string]: string[];
+  };
 }
 
 // --- FUNCIONES DEL SERVICIO ---
 
 /**
- * Autentica a un usuario y guarda el token si es exitoso.
- */
-export const loginUser = async (
-  email: string,
-  password: string
-): Promise<LoginSuccessResponse | ErrorResponse> => {
-  try {
-    const response = await api.post<{ token: string }>("/login", { email, password });
-    const { token } = response.data;
-    await AsyncStorage.setItem("userToken", token);
-    return { success: true, token };
-  } catch (error) {
-    // Usamos el type guard 'isAxiosError' para un manejo de errores más seguro
-    if (isAxiosError(error) && error.response) {
-      console.error("Error de login:", error.response.data);
-      return {
-        success: false,
-        message: error.response.data.message || "Credenciales incorrectas.",
-      };
-    }
-    console.error("Error de login (inesperado):", error);
-    return { success: false, message: "Error al conectar con el servidor." };
-  }
-};
-
-/**
- * Cierra la sesión del usuario, eliminando el token.
- */
-export const logoutUser = async (): Promise<{ success: boolean; message?: string }> => {
-  try {
-    // Suponiendo que el endpoint de logout existe y está protegido por token
-    await api.post("/logout");
-    await AsyncStorage.removeItem("userToken");
-    return { success: true };
-  } catch (error) {
-    if (isAxiosError(error) && error.response) {
-      console.error("Error al cerrar sesión:", error.response.data);
-      return { success: false, message: error.response.data.message };
-    }
-    // Aunque falle la llamada a la API, intentamos limpiar el token localmente
-    await AsyncStorage.removeItem("userToken");
-    console.error("Error al cerrar sesión (inesperado):", error);
-    return { success: false, message: "No se pudo cerrar la sesión en el servidor." };
-  }
-};
-
-/**
  * Registra un nuevo usuario.
  */
-export const registerUser = async (
-  email: string,
-  password: string,
-  name: string,
-): Promise<RegisterSuccessResponse | ErrorResponse> => {
+export const register = async (
+  data: RegisterData
+): Promise<
+  { success: true; data: AuthResponse } | { success: false; message: string }
+> => {
   try {
-    const response = await api.post("/register", { email, password, name });
+    const response = await api.post<AuthResponse>('/register', data);
     return { success: true, data: response.data };
   } catch (error) {
     if (isAxiosError(error) && error.response) {
-      console.error("Error de registro:", error.response.data);
+      // Capturamos errores de validación de Laravel
+      const errorData = error.response.data as ValidationError;
+      if (errorData.errors) {
+        // Devolvemos el primer error de validación que encontremos
+        const firstError = Object.values(errorData.errors)[0][0];
+        return { success: false, message: firstError };
+      }
       return {
         success: false,
-        message: error.response.data.message || "No se pudo completar el registro.",
+        message: errorData.message || 'Error al registrar el usuario.',
       };
     }
-    console.error("Error de registro (inesperado):", error);
-    return { success: false, message: "Error al conectar con el servidor." };
+    return {
+      success: false,
+      message: 'Error de conexión. Inténtalo de nuevo.',
+    };
+  }
+};
+
+/**
+ * Inicia sesión de un usuario.
+ */
+export const login = async (
+  data: LoginData
+): Promise<
+  { success: true; data: AuthResponse } | { success: false; message: string }
+> => {
+  try {
+    const response = await api.post<AuthResponse>('/login', data);
+    return { success: true, data: response.data };
+  } catch (error) {
+    if (isAxiosError(error) && error.response) {
+      const errorData = error.response.data;
+      return {
+        success: false,
+        message: errorData.message || 'Email o contraseña incorrectos.',
+      };
+    }
+    return {
+      success: false,
+      message: 'Error de conexión. Inténtalo de nuevo.',
+    };
+  }
+};
+
+/**
+ * Cierra la sesión del usuario (Opcional pero recomendado).
+ * Necesita que el token sea enviado en los headers, lo cual `conexion.ts` debería hacer.
+ */
+export const logout = async (): Promise<{
+  success: boolean;
+  message?: string;
+}> => {
+  try {
+    await api.post('/logout');
+    return { success: true };
+  } catch (error) {
+    if (isAxiosError(error) && error.response) {
+      return { success: false, message: 'No se pudo cerrar la sesión.' };
+    }
+    return { success: false, message: 'Error de conexión.' };
   }
 };

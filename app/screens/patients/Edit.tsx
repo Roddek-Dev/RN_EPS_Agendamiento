@@ -1,53 +1,103 @@
-import { useState } from 'react';
-import { ScrollView, Alert, Switch, View, Text } from 'react-native';
+import { useState, useEffect } from 'react';
+import {
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+  View,
+  StyleSheet,
+} from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Mail, Phone, MapPin, Calendar } from 'lucide-react-native';
-import { globalStyles, colors, spacing } from '@/utils/globalStyles';
+import { User, Mail } from 'lucide-react-native';
+import { globalStyles, colors } from '@/utils/globalStyles';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validationRules } from '@/utils/validationRules';
-import { AppNavigationProp, PatientStackParamList } from '@/app/navigation/types';
+import {
+  AppNavigationProp,
+  PatientStackParamList,
+} from '@/app/navigation/types';
+import { getPatientById, updatePatient } from '@/app/Services/PatientService';
 
 export default function PatientEditScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const route = useRoute<RouteProp<PatientStackParamList, 'PatientEdit'>>();
   const { id } = route.params;
-  const [loading, setLoading] = useState(false);
-  const [isActive, setIsActive] = useState(true);
-  const [bloodType, setBloodType] = useState('O+');
 
-  const { getFieldProps, validateForm, getFormData } = useFormValidation({
-    name: { value: 'María González', rules: validationRules.name },
-    email: {
-      value: 'maria.gonzalez@example.com',
-      rules: validationRules.email,
-    },
-    phone: { value: '+57 300 123 4567', rules: validationRules.phone },
-    address: { value: 'Calle 123 #45-67, Bogotá', rules: { required: true } },
-    birthDate: {
-      value: '1990-05-15',
-      rules: { required: true, pattern: /^\d{4}-\d{2}-\d{2}$/ },
-    },
-  });
+  const [loading, setLoading] = useState(true);
+
+  const { getFieldProps, validateForm, getFormData, setValues } =
+    useFormValidation(
+      {
+        name: '',
+        email: '',
+      },
+      {
+        name: validationRules.name,
+        email: validationRules.email,
+      }
+    );
+
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      const result = await getPatientById(id);
+      if (result.success) {
+        const { name, email } = result.data;
+        setValues({
+          name: name,
+          email: email || '',
+        });
+      } else {
+        Alert.alert(
+          'Error',
+          result.message || 'No se pudieron cargar los datos del paciente.'
+        );
+        navigation.goBack();
+      }
+      setLoading(false);
+    };
+
+    fetchPatientData();
+  }, [id, navigation, setValues]);
 
   const handleSave = async () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
-      const formData = { ...getFormData(), bloodType, isActive };
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Patient data:', formData);
-      Alert.alert('Éxito', 'Paciente actualizado');
-      navigation.goBack();
+      const formData = getFormData();
+      const result = await updatePatient(id, {
+        name: formData.name,
+        email: formData.email || null,
+      });
+
+      if (result.success) {
+        Alert.alert('Éxito', 'Paciente actualizado correctamente');
+        navigation.goBack();
+      } else {
+        Alert.alert(
+          'Error',
+          result.message || 'No se pudo actualizar el paciente.'
+        );
+      }
     } catch (error) {
-      Alert.alert('Error', 'No se pudo actualizar el paciente');
+      Alert.alert(
+        'Error Inesperado',
+        'Ocurrió un error al intentar actualizar el paciente.'
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -65,62 +115,29 @@ export default function PatientEditScreen() {
           {...getFieldProps('name')}
         />
         <FormField
-          label="Teléfono"
-          placeholder="+57 300 123 4567"
-          icon={<Phone color={colors.text.secondary} size={20} />}
-          keyboardType="phone-pad"
-          {...getFieldProps('phone')}
-        />
-        <FormField
-          label="Correo electrónico"
-          placeholder="paciente@email.com"
+          label="Correo Electrónico"
+          placeholder="email@ejemplo.com"
           icon={<Mail color={colors.text.secondary} size={20} />}
           keyboardType="email-address"
-          required
           {...getFieldProps('email')}
         />
-        <FormField
-          label="Dirección"
-          placeholder="Dirección del paciente"
-          icon={<MapPin color={colors.text.secondary} size={20} />}
-          required
-          {...getFieldProps('address')}
-        />
-        <FormField
-          label="Fecha de nacimiento"
-          placeholder="YYYY-MM-DD"
-          icon={<Calendar color={colors.text.secondary} size={20} />}
-          required
-          {...getFieldProps('birthDate')}
-        />
-        <FormField
-          label="Tipo Sanguíneo"
-          placeholder="Ej: O+, A-, etc."
-          value={bloodType}
-          onChangeText={setBloodType}
-        />
-        <View style={globalStyles.inputContainer}>
-          <View style={[globalStyles.row, { justifyContent: 'space-between' }]}>
-            <Text style={globalStyles.label}>Estado</Text>
-            <Switch
-              value={isActive}
-              onValueChange={setIsActive}
-              trackColor={{ false: colors.border, true: colors.success }}
-              thumbColor={isActive ? colors.successText : colors.text.muted}
-            />
-          </View>
-          <Text style={[globalStyles.caption, { marginTop: spacing.xs }]}>
-            {isActive ? 'Paciente activo' : 'Paciente inactivo'}
-          </Text>
-        </View>
         <FormActions
           onCancel={() => navigation.goBack()}
           onSave={handleSave}
           saveText="Guardar Cambios"
           loading={loading}
-          saveButtonColor={colors.secondary}
+          saveButtonColor={colors.warning}
         />
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+});
