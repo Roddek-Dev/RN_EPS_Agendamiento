@@ -2,8 +2,8 @@ import React from 'react';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Chrome as Home, Calendar, Settings } from 'lucide-react-native';
 import CrudsStacks from "./stacks/CrudsStacks";
-import HomeScreen from '../screens/Home';
-import ReservasScreen from '../screens/Reservas';
+import HomeScreen from '../screens/home';
+import ReservasScreen from '../screens/reservas';
 
 const Tab = createBottomTabNavigator();
 
