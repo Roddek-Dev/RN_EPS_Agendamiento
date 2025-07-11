@@ -10,31 +10,35 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User, Mail, Lock } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native'; // Importamos useNavigation
 import { globalStyles, colors, spacing } from '@/utils/globalStyles';
 import { FormField } from '@/components/forms/FormField';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validationRules } from '@/utils/validationRules';
 import { register as registerUser } from '@/app/Services/AuthService';
-import { useAuth } from '@/app/context/AuthContext'; // Importamos el hook
 
 export default function RegisterScreen() {
-  const { login } = useAuth(); // Obtenemos la función para hacer login automático
+  const navigation = useNavigation(); // Hook para poder navegar
   const [loading, setLoading] = useState(false);
 
-  const { getFieldProps, validateForm, getFormData } = useFormValidation({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-  }, {
-    name: validationRules.name,
-    email: validationRules.email,
-    password: validationRules.password,
-    password_confirmation: {
-      required: true,
-      custom: (value, values) => (value !== values?.password ? 'Las contraseñas no coinciden' : null),
+  const { getFieldProps, validateForm, getFormData } = useFormValidation(
+    {
+      name: '',
+      email: '',
+      password: '',
+      password_confirmation: '',
     },
-  });
+    {
+      name: validationRules.name,
+      email: validationRules.email,
+      password: validationRules.password,
+      password_confirmation: {
+        required: true,
+        custom: (value, values) =>
+          value !== values?.password ? 'Las contraseñas no coinciden' : null,
+      },
+    }
+  );
 
   const handleRegister = async () => {
     if (!validateForm()) return;
@@ -45,14 +49,21 @@ export default function RegisterScreen() {
       const result = await registerUser(formData);
 
       if (result.success) {
-        Alert.alert('¡Éxito!', 'Usuario registrado correctamente.');
-        // Hacemos login automático después de un registro exitoso
-        login(result.data.user, result.data.token);
+        // ¡CAMBIO CLAVE! Ya no hacemos login automático.
+        // Mostramos una alerta y, al presionar OK, navegamos al login.
+        Alert.alert(
+          '¡Éxito!',
+          'Usuario registrado correctamente. Ahora puedes iniciar sesión.',
+          [{ text: 'OK', onPress: () => navigation.navigate('login' as never) }]
+        );
       } else {
-        Alert.alert('Error de Registro', result.message);
+        Alert.alert('Error de Registro', result.message || 'Ocurrió un error.');
       }
     } catch (error) {
-      Alert.alert('Error Inesperado', 'Ocurrió un problema. Por favor, intenta de nuevo.');
+      Alert.alert(
+        'Error Inesperado',
+        'Ocurrió un problema. Por favor, intenta de nuevo.'
+      );
     } finally {
       setLoading(false);
     }
@@ -115,7 +126,7 @@ export default function RegisterScreen() {
   );
 }
 
-// Estilos limpios y centrados
+// Estilos (sin cambios)
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,

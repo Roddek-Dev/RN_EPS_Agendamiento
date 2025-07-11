@@ -15,10 +15,13 @@ import { FormField } from '@/components/forms/FormField';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validationRules } from '@/utils/validationRules';
 import { login as loginUser } from '@/app/Services/AuthService';
-import { useAuth } from '@/app/context/AuthContext'; // ¡Paso 1: Importar el hook!
 
-export default function LoginScreen() {
-  const { login } = useAuth(); // ¡Paso 2: Obtener la función de login del contexto!
+// ¡CAMBIO CLAVE! Aceptamos onLoginSuccess como prop
+export default function LoginScreen({
+  onLoginSuccess,
+}: {
+  onLoginSuccess: () => void;
+}) {
   const [loading, setLoading] = useState(false);
 
   const { getFieldProps, validateForm, getFormData } = useFormValidation(
@@ -38,14 +41,19 @@ export default function LoginScreen() {
       const result = await loginUser(formData);
 
       if (result.success) {
-        // ✅ ¡Paso 3: LA CORRECCIÓN CLAVE!
-        // Llamamos a la función del contexto para guardar el token y cambiar de pantalla.
-        login(result.data.user, result.data.token);
+        // ¡CAMBIO CLAVE! Llamamos a la función para notificar que el login fue exitoso
+        onLoginSuccess();
       } else {
-        Alert.alert('Error de Inicio de Sesión', result.message);
+        Alert.alert(
+          'Error de Inicio de Sesión',
+          result.message || 'Ocurrió un error.'
+        );
       }
     } catch (error) {
-      Alert.alert('Error Inesperado', 'Ocurrió un problema. Por favor, intenta de nuevo.');
+      Alert.alert(
+        'Error Inesperado',
+        'Ocurrió un problema. Por favor, intenta de nuevo.'
+      );
     } finally {
       setLoading(false);
     }
@@ -56,7 +64,9 @@ export default function LoginScreen() {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
           <Text style={globalStyles.title}>Bienvenido de Nuevo</Text>
-          <Text style={globalStyles.subtitle}>Inicia sesión para continuar</Text>
+          <Text style={globalStyles.subtitle}>
+            Inicia sesión para continuar
+          </Text>
         </View>
 
         <FormField
@@ -93,7 +103,7 @@ export default function LoginScreen() {
   );
 }
 
-// Estilos limpios y centrados
+// Estilos (sin cambios)
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,

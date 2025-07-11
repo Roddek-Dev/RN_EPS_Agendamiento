@@ -1,17 +1,22 @@
 import React from 'react';
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { LogIn, UserPlus } from 'lucide-react-native';
-import LoginScreen from "../screens/auth/login";
-import RegisterScreen from "../screens/auth/register";
+import LoginScreen from '../screens/auth/login';
+import RegisterScreen from '../screens/auth/register';
 import { colors } from '@/utils/globalStyles';
 
 const Tab = createBottomTabNavigator();
 
-export default function AuthNavigation() {
+// ¡CAMBIO CLAVE! El componente ahora acepta props
+export default function AuthNavigation({
+  onLoginSuccess,
+}: {
+  onLoginSuccess: () => void;
+}) {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerShown: false, // Oculta el header superior de todas las pestañas
+        headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.text.muted,
         tabBarStyle: {
@@ -25,10 +30,12 @@ export default function AuthNavigation() {
           fontSize: 12,
           fontWeight: '600',
         },
-      }}>
+      }}
+    >
       <Tab.Screen
         name="login"
-        component={LoginScreen}
+        // ¡CAMBIO CLAVE! Pasamos la prop a la pantalla de Login
+        children={() => <LoginScreen onLoginSuccess={onLoginSuccess} />}
         options={{
           title: 'Iniciar Sesión',
           tabBarIcon: ({ color, size }) => <LogIn color={color} size={size} />,
@@ -39,7 +46,9 @@ export default function AuthNavigation() {
         component={RegisterScreen}
         options={{
           title: 'Registrarse',
-          tabBarIcon: ({ color, size }) => <UserPlus color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <UserPlus color={color} size={size} />
+          ),
         }}
       />
     </Tab.Navigator>
