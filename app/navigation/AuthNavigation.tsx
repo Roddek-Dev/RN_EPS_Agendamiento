@@ -1,8 +1,9 @@
+import React from 'react';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { LogIn, UserPlus } from 'lucide-react-native';
-
-import Login from "../screens/auth/login";
-import Register from "../screens/auth/register";
+import LoginScreen from "../screens/auth/login";
+import RegisterScreen from "../screens/auth/register";
+import { colors } from '@/utils/globalStyles';
 
 const Tab = createBottomTabNavigator();
 
@@ -10,16 +11,15 @@ export default function AuthNavigation() {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: '#2563eb',
-        tabBarInactiveTintColor: '#64748b',
+        headerShown: false, // Oculta el header superior de todas las pestañas
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.text.muted,
         tabBarStyle: {
-          backgroundColor: '#ffffff',
-          borderTopWidth: 1,
-          borderTopColor: '#e2e8f0',
-          paddingTop: 8,
-          paddingBottom: 8,
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
           height: 70,
+          paddingBottom: 10,
+          paddingTop: 5,
         },
         tabBarLabelStyle: {
           fontSize: 12,
@@ -28,7 +28,7 @@ export default function AuthNavigation() {
       }}>
       <Tab.Screen
         name="login"
-        component={Login}
+        component={LoginScreen}
         options={{
           title: 'Iniciar Sesión',
           tabBarIcon: ({ color, size }) => <LogIn color={color} size={size} />,
@@ -36,7 +36,7 @@ export default function AuthNavigation() {
       />
       <Tab.Screen
         name="register"
-        component={Register}
+        component={RegisterScreen}
         options={{
           title: 'Registrarse',
           tabBarIcon: ({ color, size }) => <UserPlus color={color} size={size} />,

@@ -5,30 +5,27 @@ import {
   Alert,
   ActivityIndicator,
   StyleSheet,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Mail, Lock } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import { globalStyles, colors } from '@/utils/globalStyles';
-import { ProfileHeader } from '@/components/ProfileHeader';
+import { globalStyles, colors, spacing } from '@/utils/globalStyles';
 import { FormField } from '@/components/forms/FormField';
-import { FormActions } from '@/components/forms/FormActions';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validationRules } from '@/utils/validationRules';
 import { login as loginUser } from '@/app/Services/AuthService';
+import { useAuth } from '@/app/context/AuthContext'; // ¡Paso 1: Importar el hook!
 
 export default function LoginScreen() {
-  const navigation = useNavigation();
+  const { login } = useAuth(); // ¡Paso 2: Obtener la función de login del contexto!
   const [loading, setLoading] = useState(false);
 
   const { getFieldProps, validateForm, getFormData } = useFormValidation(
-    {
-      email: '',
-      password: '',
-    },
+    { email: '', password: '' },
     {
       email: validationRules.email,
-      password: validationRules.password,
+      password: { required: true },
     }
   );
 
@@ -38,20 +35,17 @@ export default function LoginScreen() {
 
     try {
       const formData = getFormData();
-      const result = await loginUser({
-        email: formData.email,
-        password: formData.password,
-      });
+      const result = await loginUser(formData);
 
       if (result.success) {
+        // ✅ ¡Paso 3: LA CORRECCIÓN CLAVE!
+        // Llamamos a la función del contexto para guardar el token y cambiar de pantalla.
+        login(result.data.user, result.data.token);
       } else {
         Alert.alert('Error de Inicio de Sesión', result.message);
       }
     } catch (error) {
-      Alert.alert(
-        'Error Inesperado',
-        'Ocurrió un problema. Por favor, intenta de nuevo.'
-      );
+      Alert.alert('Error Inesperado', 'Ocurrió un problema. Por favor, intenta de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -59,12 +53,12 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <ProfileHeader
-        title="Iniciar Sesión"
-        subtitle="Bienvenido de nuevo"
-        onBack={() => navigation.goBack()}
-      />
-      <ScrollView contentContainerStyle={globalStyles.content}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.header}>
+          <Text style={globalStyles.title}>Bienvenido de Nuevo</Text>
+          <Text style={globalStyles.subtitle}>Inicia sesión para continuar</Text>
+        </View>
+
         <FormField
           label="Correo Electrónico"
           placeholder="email@ejemplo.com"
@@ -85,12 +79,13 @@ export default function LoginScreen() {
           {loading ? (
             <ActivityIndicator size="large" color={colors.primary} />
           ) : (
-            <FormActions
-              onCancel={() => navigation.goBack()}
-              onSave={handleLogin}
-              saveText="Iniciar Sesión"
-              saveButtonColor={colors.primary}
-            />
+            <TouchableOpacity
+              style={[globalStyles.button, globalStyles.buttonPrimary]}
+              onPress={handleLogin}
+              activeOpacity={0.8}
+            >
+              <Text style={globalStyles.buttonText}>Iniciar Sesión</Text>
+            </TouchableOpacity>
           )}
         </View>
       </ScrollView>
@@ -98,8 +93,18 @@ export default function LoginScreen() {
   );
 }
 
+// Estilos limpios y centrados
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: spacing.xl,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: spacing.xxxl,
+  },
   actionsContainer: {
-    marginTop: 20,
+    marginTop: spacing.xl,
   },
 });

@@ -24,10 +24,8 @@ interface AuthContextData {
   logout: () => Promise<void>;
 }
 
-// --- CREACIÓN DEL CONTEXT ---
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-// --- EL PROVEEDOR (PROVIDER) ---
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [authState, setAuthState] = useState<AuthState>({
     token: null,
@@ -41,23 +39,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const token = await AsyncStorage.getItem('token');
         const userString = await AsyncStorage.getItem('user');
-
         if (token && userString) {
           const user: User = JSON.parse(userString);
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           setAuthState({ token, user, isAuthenticated: true });
         }
       } catch (e) {
-        console.error('Failed to load auth state from storage', e);
+        console.error("Failed to load auth state", e);
       } finally {
         setIsLoading(false);
       }
     };
-
     loadTokenFromStorage();
   }, []);
 
   const login = async (user: User, token: string) => {
+    // ✅ CORRECCIÓN CLAVE: Verificamos que el token no sea nulo o indefinido antes de guardarlo
+    if (!token || !user) {
+      console.error("Intento de login con token o usuario inválido.");
+      return;
+    }
     try {
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       await AsyncStorage.setItem('token', token);
@@ -94,7 +95,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// --- HOOK PERSONALIZADO ---
 export const useAuth = () => {
   return useContext(AuthContext);
 };

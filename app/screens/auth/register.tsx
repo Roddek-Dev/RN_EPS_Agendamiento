@@ -5,45 +5,36 @@ import {
   Alert,
   ActivityIndicator,
   StyleSheet,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User, Mail, Lock } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/app/navigation/types';
-import { globalStyles, colors } from '@/utils/globalStyles';
-import { ProfileHeader } from '@/components/ProfileHeader';
+import { globalStyles, colors, spacing } from '@/utils/globalStyles';
 import { FormField } from '@/components/forms/FormField';
-import { FormActions } from '@/components/forms/FormActions';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validationRules } from '@/utils/validationRules';
 import { register as registerUser } from '@/app/Services/AuthService';
+import { useAuth } from '@/app/context/AuthContext'; // Importamos el hook
 
 export default function RegisterScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { login } = useAuth(); // Obtenemos la función para hacer login automático
   const [loading, setLoading] = useState(false);
 
-  const { getFieldProps, validateForm, getFormData } = useFormValidation(
-    {
-      name: '',
-      email: '',
-      password: '',
-      password_confirmation: '',
+  const { getFieldProps, validateForm, getFormData } = useFormValidation({
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+  }, {
+    name: validationRules.name,
+    email: validationRules.email,
+    password: validationRules.password,
+    password_confirmation: {
+      required: true,
+      custom: (value, values) => (value !== values?.password ? 'Las contraseñas no coinciden' : null),
     },
-    {
-      name: validationRules.name,
-      email: validationRules.email,
-      password: validationRules.password,
-      password_confirmation: {
-        required: true,
-        custom: (value: string, values: any) => {
-          if (!value) return 'Debes confirmar la contraseña';
-          if (value !== values?.password) return 'Las contraseñas no coinciden';
-          return '';
-        },
-      },
-    }
-  );
+  });
 
   const handleRegister = async () => {
     if (!validateForm()) return;
@@ -51,29 +42,17 @@ export default function RegisterScreen() {
 
     try {
       const formData = getFormData();
-      const result = await registerUser({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        password_confirmation: formData.password_confirmation,
-      });
+      const result = await registerUser(formData);
 
       if (result.success) {
-        Alert.alert('Éxito', 'Usuario registrado correctamente.');
-        // Guardamos los datos en el contexto y navegamos a la app principal
-          navigation.reset({
-          index: 0,
-          routes: [{ name: 'NavigationMain' }],
-        });
+        Alert.alert('¡Éxito!', 'Usuario registrado correctamente.');
+        // Hacemos login automático después de un registro exitoso
+        login(result.data.user, result.data.token);
       } else {
-        // AQUÍ ESTÁ LA CORRECCIÓN CLAVE: mostramos el error de la API
         Alert.alert('Error de Registro', result.message);
       }
     } catch (error) {
-      Alert.alert(
-        'Error Inesperado',
-        'Ocurrió un problema. Por favor, intenta de nuevo.'
-      );
+      Alert.alert('Error Inesperado', 'Ocurrió un problema. Por favor, intenta de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -81,12 +60,12 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <ProfileHeader
-        title="Crear Cuenta"
-        subtitle="Regístrate para empezar"
-        onBack={() => navigation.goBack()}
-      />
-      <ScrollView contentContainerStyle={globalStyles.content}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.header}>
+          <Text style={globalStyles.title}>Crear una Cuenta</Text>
+          <Text style={globalStyles.subtitle}>Es rápido y fácil</Text>
+        </View>
+
         <FormField
           label="Nombre Completo"
           placeholder="Tu nombre completo"
@@ -104,7 +83,7 @@ export default function RegisterScreen() {
         />
         <FormField
           label="Contraseña"
-          placeholder="Crea una contraseña segura"
+          placeholder="Debe tener al menos 6 caracteres"
           icon={<Lock color={colors.text.secondary} size={20} />}
           secureTextEntry
           required
@@ -122,12 +101,13 @@ export default function RegisterScreen() {
           {loading ? (
             <ActivityIndicator size="large" color={colors.primary} />
           ) : (
-            <FormActions
-              onCancel={() => navigation.goBack()}
-              onSave={handleRegister}
-              saveText="Registrarse"
-              saveButtonColor={colors.primary}
-            />
+            <TouchableOpacity
+              style={[globalStyles.button, globalStyles.buttonPrimary]}
+              onPress={handleRegister}
+              activeOpacity={0.8}
+            >
+              <Text style={globalStyles.buttonText}>Registrarse</Text>
+            </TouchableOpacity>
           )}
         </View>
       </ScrollView>
@@ -135,8 +115,18 @@ export default function RegisterScreen() {
   );
 }
 
+// Estilos limpios y centrados
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: spacing.xl,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: spacing.xxxl,
+  },
   actionsContainer: {
-    marginTop: 20,
+    marginTop: spacing.xl,
   },
 });
