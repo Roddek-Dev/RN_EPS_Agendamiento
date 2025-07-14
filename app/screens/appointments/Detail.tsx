@@ -1,11 +1,9 @@
-// roddek-dev/rn_eps_agendamiento/RN_EPS_Agendamiento/app/screens/appointments/Detail.tsx
-
 import {
   View,
   Text,
   ScrollView,
-  StyleSheet,
   ActivityIndicator,
+  StyleSheet,
   Alert,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
@@ -14,61 +12,85 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   User,
   UserCheck,
+  Heart,
   Calendar,
   ClipboardList,
-  Heart,
 } from 'lucide-react-native';
+import dayjs from 'dayjs';
 
-// Estilos, componentes y tipos
 import { globalStyles, colors } from '@/utils/globalStyles';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { DetailRow } from '@/components/DetailRow';
+import { EmptyState } from '@/components/EmptyState';
 import {
   AppNavigationProp,
   AppointmentStackParamList,
 } from '@/app/navigation/types';
-import { EmptyState } from '@/components/EmptyState';
 
-// Servicio y tipo de datos
+// Servicios y Tipos necesarios
 import {
   getAppointmentById,
   type Appointment,
 } from '@/app/Services/AppointmentService';
-import dayjs from 'dayjs';
+import { getPatientById, type Patient } from '@/app/Services/PatientService';
+import { getDoctorById, type Doctor } from '@/app/Services/DoctorService';
+import { getServiceById, type Service } from '@/app/Services/ServiceService';
 
-// --- COMPONENTE PRINCIPAL ---
 export default function AppointmentDetailScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const route =
     useRoute<RouteProp<AppointmentStackParamList, 'AppointmentDetail'>>();
   const { id } = route.params;
 
-  // --- ESTADO ---
   const [appointment, setAppointment] = useState<Appointment | null>(null);
+  const [patient, setPatient] = useState<Patient | null>(null);
+  const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // --- EFECTO PARA CARGAR DATOS ---
   useEffect(() => {
     const loadAppointmentDetails = async () => {
       setLoading(true);
-      const result = await getAppointmentById(id);
+      try {
+        const appointmentResult = await getAppointmentById(id);
 
-      if (result.success) {
-        setAppointment(result.data);
-      } else {
+        if (appointmentResult.success) {
+          const appData = appointmentResult.data;
+          setAppointment(appData);
+
+          // Cargar detalles relacionados en paralelo
+          const [patientResult, doctorResult, serviceResult] =
+            await Promise.all([
+              getPatientById(appData.patient_id),
+              getDoctorById(appData.doctor_id),
+              appData.service_id
+                ? getServiceById(appData.service_id)
+                : Promise.resolve(null),
+            ]);
+
+          if (patientResult?.success) setPatient(patientResult.data);
+          if (doctorResult?.success) setDoctor(doctorResult.data);
+          if (serviceResult?.success) setService(serviceResult.data);
+        } else {
+          Alert.alert(
+            'Error',
+            appointmentResult.message || 'No se pudieron cargar los detalles.'
+          );
+          navigation.goBack();
+        }
+      } catch (error) {
         Alert.alert(
-          'Error al Cargar',
-          result.message || 'No se pudieron obtener los detalles de la cita.',
-          [{ text: 'Volver', onPress: () => navigation.goBack() }]
+          'Error Crítico',
+          'Ocurrió un problema al obtener los datos.'
         );
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     loadAppointmentDetails();
   }, [id, navigation]);
 
-  // --- RENDERIZADO CONDICIONAL ---
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -87,7 +109,7 @@ export default function AppointmentDetailScreen() {
         <EmptyState
           icon={ClipboardList}
           title="Cita no encontrada"
-          subtitle="No se pudo cargar la información de la cita. Por favor, intenta de nuevo."
+          subtitle="No se pudo cargar la información. Intenta de nuevo."
           buttonText="Volver a la lista"
           onButtonPress={() => navigation.goBack()}
         />
@@ -98,42 +120,38 @@ export default function AppointmentDetailScreen() {
   return (
     <SafeAreaView style={globalStyles.container}>
       <ProfileHeader
-        title="Detalle de Cita"
-        subtitle={`ID de la Cita: ${id}`}
+        title="Detalle de la Cita"
+        subtitle={`ID de Cita: ${appointment.id}`}
         onBack={() => navigation.goBack()}
-        onEdit={() => navigation.navigate('AppointmentEdit', { id: id })}
+        onEdit={() =>
+          navigation.navigate('AppointmentEdit', { id: appointment.id })
+        }
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <View style={globalStyles.card}>
-          <Text style={globalStyles.sectionTitle}>Información Principal</Text>
+          <Text style={globalStyles.sectionTitle}>Información de la Cita</Text>
+          <DetailRow
+            icon={User}
+            label="Paciente"
+            value={patient?.name || 'Cargando...'}
+            color={colors.primary}
+          />
+          <DetailRow
+            icon={UserCheck}
+            label="Doctor Asignado"
+            value={doctor?.name || 'Cargando...'}
+          />
+          <DetailRow
+            icon={Heart}
+            label="Servicio"
+            value={service?.name || 'No especificado'}
+          />
           <DetailRow
             icon={Calendar}
             label="Fecha y Hora"
             value={dayjs(appointment.appointment_time).format(
-              'DD/MM/YYYY, h:mm A'
+              'dddd, D [de] MMMM [de] YYYY - hh:mm A'
             )}
-            color={colors.primary}
-          />
-        </View>
-
-        <View style={globalStyles.card}>
-          <Text style={globalStyles.sectionTitle}>
-            Participantes y Servicio
-          </Text>
-          <DetailRow
-            icon={User}
-            label="ID Paciente"
-            value={String(appointment.patient_id)}
-          />
-          <DetailRow
-            icon={UserCheck}
-            label="ID Doctor"
-            value={String(appointment.doctor_id)}
-          />
-          <DetailRow
-            icon={Heart}
-            label="ID Servicio"
-            value={String(appointment.service_id || 'No especificado')}
           />
         </View>
       </ScrollView>

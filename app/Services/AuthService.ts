@@ -30,6 +30,13 @@ interface ValidationError {
   errors: { [key: string]: string[] };
 }
 
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: 'admin' | 'user';
+}
+
 // --- FUNCIONES DEL SERVICIO ---
 
 export const register = async (
@@ -101,5 +108,18 @@ export const logout = async (): Promise<{
     return { success: true };
   } catch (error) {
     return { success: false, message: 'No se pudo cerrar la sesión.' };
+  }
+};
+
+export const getStoredUser = async (): Promise<User | null> => {
+  try {
+    const userJson = await AsyncStorage.getItem('user');
+    if (userJson) {
+      return JSON.parse(userJson) as User;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error al obtener el usuario del storage:', error);
+    return null;
   }
 };

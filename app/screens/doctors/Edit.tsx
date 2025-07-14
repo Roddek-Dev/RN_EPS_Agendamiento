@@ -1,15 +1,23 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ScrollView,
   Alert,
   ActivityIndicator,
   View,
   StyleSheet,
+  Text,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Briefcase } from 'lucide-react-native';
-import { globalStyles, colors } from '@/utils/globalStyles';
+import { User } from 'lucide-react-native';
+import { Picker } from '@react-native-picker/picker';
+
+import {
+  globalStyles,
+  colors,
+  spacing,
+  borderRadius,
+} from '@/utils/globalStyles';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
@@ -20,6 +28,10 @@ import {
   DoctorStackParamList,
 } from '@/app/navigation/types';
 import { getDoctorById, updateDoctor } from '@/app/Services/DoctorService';
+import {
+  getSpecialties,
+  type Specialty,
+} from '@/app/Services/SpecialtyService';
 
 export default function DoctorEditScreen() {
   const navigation = useNavigation<AppNavigationProp>();
@@ -27,8 +39,9 @@ export default function DoctorEditScreen() {
   const { id } = route.params;
 
   const [loading, setLoading] = useState(true);
+  const [specialties, setSpecialties] = useState<Specialty[]>([]);
 
-  const { getFieldProps, validateForm, getFormData, setValues } =
+  const { getFieldProps, validateForm, getFormData, setValues, handleChange } =
     useFormValidation(
       {
         name: '',
@@ -41,25 +54,43 @@ export default function DoctorEditScreen() {
     );
 
   useEffect(() => {
-    const fetchDoctorData = async () => {
-      const result = await getDoctorById(id);
-      if (result.success) {
-        const { name, specialty_id } = result.data;
-        setValues({
-          name: name,
-          specialty_id: specialty_id ? String(specialty_id) : '',
-        });
-      } else {
+    const fetchAllData = async () => {
+      try {
+        const [doctorResult, specialtiesResult] = await Promise.all([
+          getDoctorById(id),
+          getSpecialties(),
+        ]);
+
+        if (specialtiesResult.success) {
+          setSpecialties(specialtiesResult.data);
+        }
+
+        if (doctorResult.success) {
+          const { name, specialty_id } = doctorResult.data;
+          setValues({
+            name: name,
+            specialty_id: specialty_id ? String(specialty_id) : '',
+          });
+        } else {
+          Alert.alert(
+            'Error',
+            doctorResult.message ||
+              'No se pudieron cargar los datos del doctor.'
+          );
+          navigation.goBack();
+        }
+      } catch (error) {
         Alert.alert(
-          'Error',
-          result.message || 'No se pudieron cargar los datos del doctor.'
+          'Error Crítico',
+          'Ocurrió un problema al cargar los datos.'
         );
         navigation.goBack();
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
-    fetchDoctorData();
+    fetchAllData();
   }, [id, navigation, setValues]);
 
   const handleSave = async () => {
@@ -114,14 +145,29 @@ export default function DoctorEditScreen() {
           required
           {...getFieldProps('name')}
         />
-        <FormField
-          label="ID de Especialidad"
-          placeholder="ID de la especialidad"
-          icon={<Briefcase color={colors.text.secondary} size={20} />}
-          keyboardType="number-pad"
-          required
-          {...getFieldProps('specialty_id')}
-        />
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Especialidad *</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={getFieldProps('specialty_id').value}
+              onValueChange={(itemValue) =>
+                handleChange('specialty_id', itemValue)
+              }
+              style={styles.picker}
+            >
+              <Picker.Item label="Seleccione una especialidad..." value="" />
+              {specialties.map((specialty) => (
+                <Picker.Item
+                  key={specialty.id}
+                  label={specialty.name}
+                  value={specialty.id.toString()}
+                />
+              ))}
+            </Picker>
+          </View>
+        </View>
+
         <FormActions
           onCancel={() => navigation.goBack()}
           onSave={handleSave}
@@ -140,5 +186,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.background,
+  },
+  inputContainer: {
+    marginBottom: spacing.lg,
+  },
+  label: {
+    ...globalStyles.label,
+  },
+  pickerContainer: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: borderRadius.md,
+    height: 50,
+    justifyContent: 'center',
+  },
+  picker: {
+    flex: 1,
   },
 });

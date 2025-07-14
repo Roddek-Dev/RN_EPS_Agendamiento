@@ -79,8 +79,8 @@ export default function ReservasScreen() {
       {/* Header optimizado */}
       <View style={globalStyles.header}>
         <View style={globalStyles.flex1}>
-          <Text style={globalStyles.headerTitle}>Reservas de Citas</Text>
-          <Text style={globalStyles.headerSubtitle}>
+          <Text style={globalStyles.title}>Reservas de Citas</Text>
+          <Text style={globalStyles.subtitle}>
             Gestiona las citas médicas
           </Text>
         </View>

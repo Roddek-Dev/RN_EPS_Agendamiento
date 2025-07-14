@@ -1,9 +1,16 @@
-import { useState } from 'react';
-import { ScrollView, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { ScrollView, Alert, View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User, Briefcase } from 'lucide-react-native';
-import { globalStyles, colors } from '@/utils/globalStyles';
+import { Picker } from '@react-native-picker/picker';
+
+import {
+  globalStyles,
+  colors,
+  spacing,
+  borderRadius,
+} from '@/utils/globalStyles';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { FormField } from '@/components/forms/FormField';
 import { FormActions } from '@/components/forms/FormActions';
@@ -11,24 +18,45 @@ import { useFormValidation } from '@/hooks/useFormValidation';
 import { validationRules } from '@/utils/validationRules';
 import { AppNavigationProp } from '@/app/navigation/types';
 import { createDoctor } from '@/app/Services/DoctorService';
+import {
+  getSpecialties,
+  type Specialty,
+} from '@/app/Services/SpecialtyService';
 
 export default function DoctorCreateScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const [loading, setLoading] = useState(false);
+  const [specialties, setSpecialties] = useState<Specialty[]>([]);
 
-  const { getFieldProps, validateForm, getFormData } = useFormValidation(
-    {
-      name: '',
-      specialty_id: '',
-    },
-    {
-      name: validationRules.name,
-      specialty_id: { required: true },
-    }
-  );
+  const { getFieldProps, validateForm, getFormData, handleChange } =
+    useFormValidation(
+      {
+        name: '',
+        specialty_id: '',
+      },
+      {
+        name: validationRules.name,
+        specialty_id: { required: true },
+      }
+    );
+
+  useEffect(() => {
+    const loadSpecialties = async () => {
+      const result = await getSpecialties();
+      if (result.success && result.data.length > 0) {
+        setSpecialties(result.data);
+      } else if (!result.success) {
+        Alert.alert('Error', 'No se pudieron cargar las especialidades.');
+      }
+    };
+    loadSpecialties();
+  }, []);
 
   const handleSave = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      Alert.alert('Campo Requerido', 'Por favor, seleccione una especialidad.');
+      return;
+    }
     setLoading(true);
     try {
       const formData = getFormData();
@@ -68,14 +96,29 @@ export default function DoctorCreateScreen() {
           required
           {...getFieldProps('name')}
         />
-        <FormField
-          label="ID de Especialidad"
-          placeholder="ID de la especialidad"
-          icon={<Briefcase color={colors.text.secondary} size={20} />}
-          keyboardType="number-pad"
-          required
-          {...getFieldProps('specialty_id')}
-        />
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Especialidad *</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={getFieldProps('specialty_id').value}
+              onValueChange={(itemValue) =>
+                handleChange('specialty_id', itemValue)
+              }
+              style={styles.picker}
+            >
+              <Picker.Item label="Seleccione una especialidad..." value="" />
+              {specialties.map((specialty) => (
+                <Picker.Item
+                  key={specialty.id}
+                  label={specialty.name}
+                  value={specialty.id.toString()}
+                />
+              ))}
+            </Picker>
+          </View>
+        </View>
+
         <FormActions
           onCancel={() => navigation.goBack()}
           onSave={handleSave}
@@ -87,3 +130,23 @@ export default function DoctorCreateScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  inputContainer: {
+    marginBottom: spacing.lg,
+  },
+  label: {
+    ...globalStyles.label,
+  },
+  pickerContainer: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: borderRadius.md,
+    height: 50,
+    justifyContent: 'center',
+  },
+  picker: {
+    flex: 1,
+  },
+});

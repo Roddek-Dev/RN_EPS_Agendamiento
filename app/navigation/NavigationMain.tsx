@@ -31,7 +31,6 @@ export default function MainNavigation() {
         name="home"
         component={HomeScreen}
         options={{
-          title: 'Inicio',
           tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
         }}
       />
@@ -39,7 +38,6 @@ export default function MainNavigation() {
         name="reservas"
         component={ReservasScreen}
         options={{
-          title: 'Reservas',
           tabBarIcon: ({ color, size }) => <Calendar color={color} size={size} />,
         }}
       />
@@ -47,7 +45,6 @@ export default function MainNavigation() {
         name="cruds"
         component={CrudsStacks}
         options={{
-          title: 'Gestión',
           headerShown: false,
           tabBarIcon: ({ color, size }) => <Settings color={color} size={size} />,
         }}

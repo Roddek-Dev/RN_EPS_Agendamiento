@@ -1,5 +1,6 @@
 import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useState, useEffect } from 'react'; // ✅ AÑADIR: useState y useEffect
 import {
   Calendar,
   Users,
@@ -9,8 +10,13 @@ import {
   TrendingUp,
 } from 'lucide-react-native';
 import { globalStyles, colors, spacing } from '@/utils/globalStyles';
+import { getStoredUser, type User } from '@/app/Services/AuthService'; // ✅ AÑADIR: Importar servicio y tipo
+
 
 export default function HomeScreen() {
+
+    const [user, setUser] = useState<User | null>(null);
+
   const quickActions = [
     { id: 1, title: 'Nueva Cita', icon: Calendar, color: colors.primary },
     { id: 2, title: 'Pacientes', icon: Users, color: colors.secondary },
@@ -46,6 +52,20 @@ export default function HomeScreen() {
     { label: 'Doctores', value: '8', icon: UserCheck, color: colors.warning },
   ];
 
+  useEffect(() => {
+    // Función para cargar los datos del usuario al abrir la pantalla
+    const loadUserData = async () => {
+      const storedUser = await getStoredUser();
+      if (storedUser) {
+        setUser(storedUser);
+      }
+    };
+
+    loadUserData();
+  }, []);
+
+  
+
   return (
     <SafeAreaView style={globalStyles.container}>
       <ScrollView
@@ -64,8 +84,9 @@ export default function HomeScreen() {
               style={globalStyles.avatar}
             />
             <View>
-              <Text style={globalStyles.title}>¡Hola, Dr.!</Text>{''}
-              {/* Nombre estático */}
+              <Text style={globalStyles.title}>
+                ¡Hola, {user ? user.name.split(' ')[0] : 'Dr.'}!
+              </Text>
               <Text style={globalStyles.subtitle}>Bienvenido a EPS Salud</Text>
             </View>
           </View>

@@ -16,8 +16,8 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ title, subtitle, o
       <ArrowLeft color={colors.text.secondary} size={24} />
     </TouchableOpacity>
     <View style={globalStyles.flex1}>
-      <Text style={globalStyles.headerTitle}>{title}</Text>
-      {subtitle && <Text style={globalStyles.headerSubtitle}>{subtitle}</Text>}
+      <Text style={globalStyles.title}>{title}</Text>
+      {subtitle && <Text style={globalStyles.subtitle}>{subtitle}</Text>}
     </View>
     {onEdit && (
       <TouchableOpacity style={[globalStyles.iconButton, { backgroundColor: colors.primary }]} onPress={onEdit}>

@@ -1,5 +1,3 @@
-// roddek-dev/rn_eps_agendamiento/RN_EPS_Agendamiento/app/screens/appointments/List.tsx
-
 import {
   View,
   FlatList,
@@ -7,60 +5,76 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar, Inbox } from 'lucide-react-native';
+import dayjs from 'dayjs';
 
-// Componentes y estilos reutilizables
 import { globalStyles, colors, spacing } from '@/utils/globalStyles';
 import { SearchHeader } from '@/components/SearchHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { ListItemCard } from '@/components/ListItemCard';
+import { AppNavigationProp } from '@/app/navigation/types';
 
-// Servicios y tipos de datos
+// Servicios y Tipos necesarios
 import {
   getAppointments,
   deleteAppointment,
   type Appointment,
 } from '@/app/Services/AppointmentService';
-import { AppNavigationProp } from '@/app/navigation/types';
-import dayjs from 'dayjs';
+import { getPatients, type Patient } from '@/app/Services/PatientService';
+import { getDoctors, type Doctor } from '@/app/Services/DoctorService';
 
-// --- COMPONENTE PRINCIPAL ---
-export default function AppointmentsListScreen() {
+// Interfaz para los datos combinados
+interface AppointmentWithDetails extends Appointment {
+  patientName: string;
+  doctorName: string;
+}
+
+export default function AppointmentListScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // --- MANEJO DE DATOS ---
-  const handleGetAppointments = useCallback(async () => {
+  const handleGetData = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await getAppointments();
-      if (result.success) {
-        setAppointments(result.data);
-      } else {
-        Alert.alert(
-          'Error',
-          result.message || 'No se pudieron cargar las citas.'
-        );
-      }
+      const [appointmentsResult, patientsResult, doctorsResult] =
+        await Promise.all([getAppointments(), getPatients(), getDoctors()]);
+
+      if (appointmentsResult.success) setAppointments(appointmentsResult.data);
+      if (patientsResult.success) setPatients(patientsResult.data);
+      if (doctorsResult.success) setDoctors(doctorsResult.data);
     } catch (error) {
-      console.error('Error fetching appointments:', error);
       Alert.alert('Error Crítico', 'Ocurrió un problema al obtener los datos.');
     } finally {
       setLoading(false);
     }
-  }, []); // ✅ ARREGLO DE DEPENDENCIAS VACÍO
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      handleGetAppointments();
-    }, [handleGetAppointments])
+      handleGetData();
+    }, [handleGetData])
   );
 
-  // --- NAVEGACIÓN Y ACCIONES ---
+  // Combinar datos para mostrar nombres en lugar de IDs
+  const displayedAppointments: AppointmentWithDetails[] = useMemo(() => {
+    const patientsMap = new Map(patients.map((p) => [p.id, p.name]));
+    const doctorsMap = new Map(doctors.map((d) => [d.id, d.name]));
+
+    return appointments.map((appointment) => ({
+      ...appointment,
+      patientName:
+        patientsMap.get(appointment.patient_id) || 'Paciente no encontrado',
+      doctorName:
+        doctorsMap.get(appointment.doctor_id) || 'Doctor no encontrado',
+    }));
+  }, [appointments, patients, doctors]);
+
   const handleCreate = () => navigation.navigate('AppointmentCreate');
 
   const handleDelete = (id: number) => {
@@ -89,7 +103,6 @@ export default function AppointmentsListScreen() {
     );
   };
 
-  // --- RENDERIZADO ---
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -102,15 +115,15 @@ export default function AppointmentsListScreen() {
     <SafeAreaView style={globalStyles.container}>
       <SearchHeader placeholder="Buscar citas..." onAdd={handleCreate} />
       <FlatList
-        data={appointments}
+        data={displayedAppointments}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ padding: spacing.md, flexGrow: 1 }}
         ListEmptyComponent={() => (
           <EmptyState
             icon={Inbox}
             title="No hay citas registradas"
-            subtitle="Crea tu primera cita para empezar a gestionar."
-            buttonText="Crear Nueva Cita"
+            subtitle="Crea una nueva cita para empezar."
+            buttonText="Agendar Cita"
             onButtonPress={handleCreate}
           />
         )}
@@ -125,8 +138,11 @@ export default function AppointmentsListScreen() {
           const iconColor = itemColors[index % itemColors.length];
           return (
             <ListItemCard
-              title={`Paciente ID: ${item.patient_id} - Doctor ID: ${item.doctor_id}`}
-              subtitle={`Servicio ID: ${item.service_id || 'No asignado'}`}
+              title={item.patientName}
+              subtitle={`Dr(a). ${item.doctorName}`}
+              trailingText={dayjs(item.appointment_time).format(
+                'DD/MM/YYYY hh:mm A'
+              )}
               iconBackgroundColor={iconColor}
               icon={<Calendar color={colors.text.inverse} size={22} />}
               onPress={() =>
@@ -136,9 +152,6 @@ export default function AppointmentsListScreen() {
                 navigation.navigate('AppointmentEdit', { id: item.id })
               }
               onDelete={() => handleDelete(item.id)}
-              trailingText={dayjs(item.appointment_time).format(
-                'DD/MM/YYYY h:mm A'
-              )}
             />
           );
         }}

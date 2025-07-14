@@ -5,51 +5,88 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react'; // ✅ CAMBIO: Añadir useMemo
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UserCheck, Inbox } from 'lucide-react-native';
+
 import { globalStyles, colors, spacing } from '@/utils/globalStyles';
 import { SearchHeader } from '@/components/SearchHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { ListItemCard } from '@/components/ListItemCard';
+import { AppNavigationProp } from '@/app/navigation/types';
+
+// ✅ CAMBIO: Importar servicios y tipos de especialidades
 import {
   getDoctors,
   deleteDoctor,
   type Doctor,
 } from '@/app/Services/DoctorService';
-import { AppNavigationProp } from '@/app/navigation/types';
+import {
+  getSpecialties,
+  type Specialty,
+} from '@/app/Services/SpecialtyService';
+
+// ✅ CAMBIO: Crear una nueva interfaz para los datos combinados
+interface DoctorWithSpecialty extends Doctor {
+  specialtyName: string;
+}
 
 export default function DoctorsListScreen() {
   const navigation = useNavigation<AppNavigationProp>();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [specialties, setSpecialties] = useState<Specialty[]>([]); // Estado para especialidades
   const [loading, setLoading] = useState(true);
 
-  const handleGetDoctors = useCallback(async () => {
+  // ✅ CAMBIO: Cargar doctores y especialidades al mismo tiempo
+  const handleGetData = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await getDoctors();
-      if (result.success) {
-        setDoctors(result.data);
+      const [doctorsResult, specialtiesResult] = await Promise.all([
+        getDoctors(),
+        getSpecialties(),
+      ]);
+
+      if (doctorsResult.success) {
+        setDoctors(doctorsResult.data);
       } else {
         Alert.alert(
           'Error',
-          result.message || 'No se pudieron cargar los doctores.'
+          doctorsResult.message || 'No se pudieron cargar los doctores.'
+        );
+      }
+
+      if (specialtiesResult.success) {
+        setSpecialties(specialtiesResult.data);
+      } else {
+        Alert.alert(
+          'Error',
+          specialtiesResult.message ||
+            'No se pudieron cargar las especialidades.'
         );
       }
     } catch (error) {
-      console.error('Error fetching doctors:', error);
+      console.error('Error fetching data:', error);
       Alert.alert('Error Crítico', 'Ocurrió un problema al obtener los datos.');
     } finally {
       setLoading(false);
     }
-  }, []); // ✅ ARREGLO DE DEPENDENCIAS VACÍO
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      handleGetDoctors();
-    }, [handleGetDoctors])
+      handleGetData();
+    }, [handleGetData])
   );
+
+  // ✅ CAMBIO: Combinar los datos de doctores y especialidades usando useMemo
+  const displayedDoctors: DoctorWithSpecialty[] = useMemo(() => {
+    const specialtiesMap = new Map(specialties.map((s) => [s.id, s.name]));
+    return doctors.map((doctor) => ({
+      ...doctor,
+      specialtyName: specialtiesMap.get(doctor.specialty_id ?? 0) || 'No asignada',
+    }));
+  }, [doctors, specialties]);
 
   const handleCreate = () => navigation.navigate('DoctorCreate');
 
@@ -91,7 +128,7 @@ export default function DoctorsListScreen() {
     <SafeAreaView style={globalStyles.container}>
       <SearchHeader placeholder="Buscar doctores..." onAdd={handleCreate} />
       <FlatList
-        data={doctors}
+        data={displayedDoctors} // ✅ CAMBIO: Usar la lista con los datos combinados
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ padding: spacing.md, flexGrow: 1 }}
         ListEmptyComponent={() => (
@@ -115,10 +152,13 @@ export default function DoctorsListScreen() {
           return (
             <ListItemCard
               title={item.name}
-              subtitle={`Especialidad ID: ${item.specialty_id || 'No asignada'}`}
+              // ✅ CAMBIO: Mostrar el nombre de la especialidad en lugar del ID
+              subtitle={item.specialtyName}
               iconBackgroundColor={iconColor}
               icon={<UserCheck color={colors.text.inverse} size={22} />}
-              onPress={() => navigation.navigate('DoctorDetail', { id: item.id })}
+              onPress={() =>
+                navigation.navigate('DoctorDetail', { id: item.id })
+              }
               onEdit={() => navigation.navigate('DoctorEdit', { id: item.id })}
               onDelete={() => handleDelete(item.id)}
             />
