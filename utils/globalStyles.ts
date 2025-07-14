@@ -101,25 +101,21 @@ export const typography = {
     fontSize: 30,
     fontWeight: 'bold' as const,
     color: colors.text.primary,
-    lineHeight: 38,
   },
   h2: {
     fontSize: 26,
     fontWeight: 'bold' as const,
     color: colors.text.primary,
-    lineHeight: 34,
   },
   h3: {
     fontSize: 22,
     fontWeight: '600' as const,
     color: colors.text.primary,
-    lineHeight: 30,
   },
   h4: {
     fontSize: 18,
     fontWeight: '600' as const,
     color: colors.text.primary,
-    lineHeight: 26,
   },
 
   // Texto del cuerpo
@@ -220,10 +216,11 @@ export const globalStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.lg,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    minHeight: 70,
+    borderBottomColor: colors.border, 
   },
   headerTitle: {
     ...typography.h3,
@@ -610,7 +607,6 @@ export const globalStyles = StyleSheet.create({
   },
   detailText: {
     ...typography.body,
-    flex: 1,
   },
   detailLabel: {
     ...typography.caption,
@@ -705,7 +701,8 @@ export const globalStyles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     ...shadows.md,
     backgroundColor: colors.surface,
-    width: 90,
+    width: '48%', // ✅ CAMBIO: de width: 90 a '48%'
+    marginBottom: spacing.md, // ✅ AÑADIR: para el espaciado vertical
   },
   quickActionIcon: {
     width: 48,

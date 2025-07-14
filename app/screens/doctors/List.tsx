@@ -103,16 +103,27 @@ export default function DoctorsListScreen() {
             onButtonPress={handleCreate}
           />
         )}
-        renderItem={({ item }) => (
-          <ListItemCard
-            title={item.name}
-            subtitle={`Especialidad ID: ${item.specialty_id || 'No asignada'}`}
-            icon={<UserCheck color={colors.primary} size={22} />}
-            onPress={() => navigation.navigate('DoctorDetail', { id: item.id })}
-            onEdit={() => navigation.navigate('DoctorEdit', { id: item.id })}
-            onDelete={() => handleDelete(item.id)}
-          />
-        )}
+        renderItem={({ item, index }) => {
+          const itemColors = [
+            colors.primary,
+            colors.secondary,
+            colors.warning,
+            colors.purple,
+            colors.accent,
+          ];
+          const iconColor = itemColors[index % itemColors.length];
+          return (
+            <ListItemCard
+              title={item.name}
+              subtitle={`Especialidad ID: ${item.specialty_id || 'No asignada'}`}
+              iconBackgroundColor={iconColor}
+              icon={<UserCheck color={colors.text.inverse} size={22} />}
+              onPress={() => navigation.navigate('DoctorDetail', { id: item.id })}
+              onEdit={() => navigation.navigate('DoctorEdit', { id: item.id })}
+              onDelete={() => handleDelete(item.id)}
+            />
+          );
+        }}
       />
     </SafeAreaView>
   );

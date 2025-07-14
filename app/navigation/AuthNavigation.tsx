@@ -15,23 +15,23 @@ export default function AuthNavigation({
 }) {
   return (
     <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.text.muted,
-        tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border,
-          height: 70,
-          paddingBottom: 10,
-          paddingTop: 5,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
-        },
-      }}
-    >
+    screenOptions={{
+      headerShown: false,
+      tabBarActiveTintColor: colors.primary,
+      tabBarInactiveTintColor: colors.text.muted,
+      tabBarStyle: {
+        backgroundColor: colors.surface, // Fondo más limpio
+        borderTopColor: colors.borderLight, // Borde más sutil
+        height: 80, // Un poco más de altura para un look moderno
+        paddingBottom: 20, // Más espacio inferior
+        paddingTop: 10, // Espacio superior
+      },
+      tabBarLabelStyle: {
+        fontSize: 12,
+        fontWeight: '600',
+      },
+    }}
+  >
       <Tab.Screen
         name="login"
         // ¡CAMBIO CLAVE! Pasamos la prop a la pantalla de Login

@@ -103,18 +103,29 @@ export default function ServicesListScreen() {
             onButtonPress={handleCreate}
           />
         )}
-        renderItem={({ item }) => (
-          <ListItemCard
-            title={item.name}
-            subtitle={item.description || 'Sin descripción'}
-            icon={<Stethoscope color={colors.primary} size={22} />}
-            onPress={() =>
-              navigation.navigate('ServiceDetail', { id: item.id })
-            }
-            onEdit={() => navigation.navigate('ServiceEdit', { id: item.id })}
-            onDelete={() => handleDelete(item.id)}
-          />
-        )}
+        renderItem={({ item, index }) => {
+          const itemColors = [
+            colors.primary,
+            colors.secondary,
+            colors.warning,
+            colors.purple,
+            colors.accent,
+          ];
+          const iconColor = itemColors[index % itemColors.length];
+          return (
+            <ListItemCard
+              title={item.name}
+              subtitle={item.description || 'Sin descripción'}
+              iconBackgroundColor={iconColor}
+              icon={<Stethoscope color={colors.text.inverse} size={22} />}
+              onPress={() =>
+                navigation.navigate('ServiceDetail', { id: item.id })
+              }
+              onEdit={() => navigation.navigate('ServiceEdit', { id: item.id })}
+              onDelete={() => handleDelete(item.id)}
+            />
+          );
+        }}
       />
     </SafeAreaView>
   );

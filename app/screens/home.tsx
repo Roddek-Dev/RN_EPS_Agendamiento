@@ -58,11 +58,13 @@ export default function HomeScreen() {
         >
           <View style={globalStyles.row}>
             <Image
-              source={{ uri: 'https://via.placeholder.com/150' }} // Avatar estático
+              source={{
+                uri: 'https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
+              }}
               style={globalStyles.avatar}
             />
             <View>
-              <Text style={globalStyles.title}>¡Hola, Dr. Genérico!</Text>{''}
+              <Text style={globalStyles.title}>¡Hola, Dr.!</Text>{''}
               {/* Nombre estático */}
               <Text style={globalStyles.subtitle}>Bienvenido a EPS Salud</Text>
             </View>
@@ -107,7 +109,11 @@ export default function HomeScreen() {
         <View style={globalStyles.section}>
           <Text style={globalStyles.sectionTitle}>Acciones Rápidas</Text>
           <View
-            style={[globalStyles.row, { flexWrap: 'wrap', gap: spacing.lg }]}
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+            }}
           >
             {quickActions.map((action) => (
               <TouchableOpacity

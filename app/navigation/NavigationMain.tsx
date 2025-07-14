@@ -48,6 +48,7 @@ export default function MainNavigation() {
         component={CrudsStacks}
         options={{
           title: 'Gestión',
+          headerShown: false,
           tabBarIcon: ({ color, size }) => <Settings color={color} size={size} />,
         }}
       />

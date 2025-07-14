@@ -2,61 +2,69 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Stethoscope, Heart, Users, UserCheck, Calendar, ChevronRight, TrendingUp } from "lucide-react-native";
+import {
+  HeartPulse, // ✅ CAMBIO
+  ClipboardList, // ✅ CAMBIO
+  Users,
+  Stethoscope, // ✅ CAMBIO
+  CalendarDays, // ✅ CAMBIO
+  ChevronRight,
+  TrendingUp,
+} from 'lucide-react-native';
 import { globalStyles, colors, spacing } from "@/utils/globalStyles";
 
 export default function CrudsHomeScreen() {
   const navigation = useNavigation();
 
-  // ✅ CAMBIA LOS 'id' EN ESTE ARRAY
+  // ✅ CORRECTO: Los 'id' ahora coinciden con las rutas de CrudsStacks.tsx
   const modules = [
     {
-      id: 'SpecialtyList', // antes era "specialties"
+      id: 'SpecialtyList',
       title: 'Especialidades',
       description: 'Gestionar especialidades médicas',
-      icon: Stethoscope,
+      icon: Stethoscope, // Más apropiado aquí
       color: colors.primary,
       count: 12,
     },
     {
-      id: 'ServiceList', // antes era "services"
+      id: 'ServiceList',
       title: 'Servicios',
       description: 'Administrar servicios disponibles',
-      icon: Heart,
+      icon: ClipboardList, // Representa un listado de servicios
       color: colors.accent,
       count: 25,
     },
     {
-      id: 'PatientList', // antes era "patients"
+      id: 'PatientList',
       title: 'Pacientes',
       description: 'Registro de pacientes',
-      icon: Users,
+      icon: Users, // Este icono ya es adecuado
       color: colors.secondary,
       count: 156,
     },
     {
-      id: 'DoctorList', // antes era "doctors"
+      id: 'DoctorList',
       title: 'Doctores',
       description: 'Directorio médico',
-      icon: UserCheck,
+      icon: HeartPulse, // Relacionado con la salud y el cuidado
       color: colors.warning,
       count: 8,
     },
     {
-      id: 'AppointmentList', // antes era "appointments"
+      id: 'AppointmentList',
       title: 'Citas',
       description: 'Historial de citas médicas',
-      icon: Calendar,
+      icon: CalendarDays, // Una versión más detallada del calendario
       color: colors.purple,
       count: 342,
     },
   ];
 
   const navigateToModule = (moduleId: string) => {
-    // Esta función ahora recibirá el nombre correcto (ej. "SpecialtyList")
-    // y la navegación funcionará.
+    // La navegación ahora es segura porque los IDs coinciden con las rutas.
     navigation.navigate(moduleId as never);
   };
+
   return (
     <SafeAreaView style={globalStyles.container}>
       <ScrollView contentContainerStyle={globalStyles.content} showsVerticalScrollIndicator={false}>

@@ -103,18 +103,29 @@ export default function PatientsListScreen() {
             onButtonPress={handleCreate}
           />
         )}
-        renderItem={({ item }) => (
-          <ListItemCard
-            title={item.name}
-            subtitle={item.email || 'Sin correo electrónico'}
-            icon={<User color={colors.primary} size={22} />}
-            onPress={() =>
-              navigation.navigate('PatientDetail', { id: item.id })
-            }
-            onEdit={() => navigation.navigate('PatientEdit', { id: item.id })}
-            onDelete={() => handleDelete(item.id)}
-          />
-        )}
+        renderItem={({ item, index }) => {
+          const itemColors = [
+            colors.primary,
+            colors.secondary,
+            colors.warning,
+            colors.purple,
+            colors.accent,
+          ];
+          const iconColor = itemColors[index % itemColors.length];
+          return (
+            <ListItemCard
+              title={item.name}
+              subtitle={item.email || 'Sin correo electrónico'}
+              iconBackgroundColor={iconColor}
+              icon={<User color={colors.text.inverse} size={22} />}
+              onPress={() =>
+                navigation.navigate('PatientDetail', { id: item.id })
+              }
+              onEdit={() => navigation.navigate('PatientEdit', { id: item.id })}
+              onDelete={() => handleDelete(item.id)}
+            />
+          );
+        }}
       />
     </SafeAreaView>
   );

@@ -12,7 +12,8 @@ interface DetailRowProps {
 export const DetailRow: React.FC<DetailRowProps> = ({ icon: Icon, label, value, color = colors.text.secondary }) => (
   <View style={[globalStyles.row, { gap: 12, alignItems: "flex-start", marginBottom: 12 }]}>
     <Icon color={color} size={20} style={globalStyles.detailIcon} />
-    <View>
+    {/* ✅ CAMBIO: Añadir un View con flex: 1 para que el texto se ajuste */}
+    <View style={{ flex: 1 }}>
       {label && <Text style={globalStyles.caption}>{label}</Text>}
       <Text style={[globalStyles.detailText, !label && { lineHeight: 20 }]}>{value}</Text>
     </View>

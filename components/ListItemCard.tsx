@@ -11,6 +11,7 @@ interface ListItemCardProps {
   title: string;
   subtitle?: string;
   icon?: React.ReactNode;
+  iconBackgroundColor?: string; // ✅ AÑADIR ESTA LÍNEA
   trailingText?: string;
 
   // --- Props de Acción ---
@@ -23,6 +24,7 @@ export const ListItemCard: React.FC<ListItemCardProps> = ({
   title,
   subtitle,
   icon,
+  iconBackgroundColor,
   trailingText,
   onPress,
   onEdit,
@@ -32,7 +34,7 @@ export const ListItemCard: React.FC<ListItemCardProps> = ({
 
   const renderAvatar = () => {
     // ... (la lógica del avatar/icono no cambia)
-    if (icon) return <View style={styles.iconContainer}>{icon}</View>;
+    if (icon) return <View style={[styles.iconContainer, { backgroundColor: iconBackgroundColor }]}>{icon}</View>;
     return (
       <View style={styles.avatarInitial}>
         <Text style={styles.avatarInitialText}>
@@ -94,7 +96,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -102,7 +103,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },

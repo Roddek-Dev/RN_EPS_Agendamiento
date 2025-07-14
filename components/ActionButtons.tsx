@@ -28,7 +28,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       )}
       {onDelete && (
         <TouchableOpacity style={styles.button} onPress={onDelete}>
-          <Trash2 color={colors.error} size={20} />
+          <Trash2 color={colors.accent} size={20} />
         </TouchableOpacity>
       )}
     </View>

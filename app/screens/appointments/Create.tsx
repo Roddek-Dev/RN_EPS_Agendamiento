@@ -119,7 +119,7 @@ export default function AppointmentCreateScreen() {
           onSave={handleSave}
           saveText="Crear Cita"
           loading={loading}
-          saveButtonColor={colors.purple}
+          saveButtonColor={colors.warning}
         />
       </ScrollView>
     </SafeAreaView>

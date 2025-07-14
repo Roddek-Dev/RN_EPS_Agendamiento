@@ -114,23 +114,34 @@ export default function AppointmentsListScreen() {
             onButtonPress={handleCreate}
           />
         )}
-        renderItem={({ item }) => (
-          <ListItemCard
-            title={`Paciente ID: ${item.patient_id} - Doctor ID: ${item.doctor_id}`}
-            subtitle={`Servicio ID: ${item.service_id || 'No asignado'}`}
-            icon={<Calendar color={colors.primary} size={22} />}
-            onPress={() =>
-              navigation.navigate('AppointmentDetail', { id: item.id })
-            }
-            onEdit={() =>
-              navigation.navigate('AppointmentEdit', { id: item.id })
-            }
-            onDelete={() => handleDelete(item.id)}
-            trailingText={dayjs(item.appointment_time).format(
-              'DD/MM/YYYY h:mm A'
-            )}
-          />
-        )}
+        renderItem={({ item, index }) => {
+          const itemColors = [
+            colors.primary,
+            colors.secondary,
+            colors.warning,
+            colors.purple,
+            colors.accent,
+          ];
+          const iconColor = itemColors[index % itemColors.length];
+          return (
+            <ListItemCard
+              title={`Paciente ID: ${item.patient_id} - Doctor ID: ${item.doctor_id}`}
+              subtitle={`Servicio ID: ${item.service_id || 'No asignado'}`}
+              iconBackgroundColor={iconColor}
+              icon={<Calendar color={colors.text.inverse} size={22} />}
+              onPress={() =>
+                navigation.navigate('AppointmentDetail', { id: item.id })
+              }
+              onEdit={() =>
+                navigation.navigate('AppointmentEdit', { id: item.id })
+              }
+              onDelete={() => handleDelete(item.id)}
+              trailingText={dayjs(item.appointment_time).format(
+                'DD/MM/YYYY h:mm A'
+              )}
+            />
+          );
+        }}
       />
     </SafeAreaView>
   );
