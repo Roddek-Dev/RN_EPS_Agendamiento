@@ -2,7 +2,6 @@
 
 import {
   View,
-  Text,
   FlatList,
   Alert,
   ActivityIndicator,
@@ -36,7 +35,7 @@ export default function AppointmentsListScreen() {
 
   // --- MANEJO DE DATOS ---
   const handleGetAppointments = useCallback(async () => {
-    if (!loading) setLoading(true);
+    setLoading(true);
     try {
       const result = await getAppointments();
       if (result.success) {
@@ -53,7 +52,7 @@ export default function AppointmentsListScreen() {
     } finally {
       setLoading(false);
     }
-  }, [loading]);
+  }, []); // ✅ ARREGLO DE DEPENDENCIAS VACÍO
 
   useFocusEffect(
     useCallback(() => {

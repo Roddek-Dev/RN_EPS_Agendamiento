@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   FlatList,
   Alert,
   ActivityIndicator,
@@ -27,7 +26,7 @@ export default function PatientsListScreen() {
   const [loading, setLoading] = useState(true);
 
   const handleGetPatients = useCallback(async () => {
-    if (!loading) setLoading(true);
+    setLoading(true);
     try {
       const result = await getPatients();
       if (result.success) {
@@ -44,7 +43,7 @@ export default function PatientsListScreen() {
     } finally {
       setLoading(false);
     }
-  }, [loading]);
+  }, []); // ✅ ARREGLO DE DEPENDENCIAS VACÍO
 
   useFocusEffect(
     useCallback(() => {

@@ -101,8 +101,11 @@ export default function ServiceDetailScreen() {
           <DetailRow
             icon={DollarSign}
             label="Precio"
+            // ✅ SOLUCIÓN: Usar Number() para convertir el precio antes de formatearlo.
             value={
-              service.price ? `$${service.price.toFixed(2)}` : 'No especificado'
+              service.price
+                ? `$${Number(service.price).toFixed(2)}`
+                : 'No especificado'
             }
           />
         </View>

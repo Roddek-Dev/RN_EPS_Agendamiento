@@ -26,7 +26,7 @@ export default function ServicesListScreen() {
   const [loading, setLoading] = useState(true);
 
   const handleGetServices = useCallback(async () => {
-    if (!loading) setLoading(true);
+    setLoading(true);
     try {
       const result = await getServices();
       if (result.success) {
@@ -43,7 +43,7 @@ export default function ServicesListScreen() {
     } finally {
       setLoading(false);
     }
-  }, [loading]);
+  }, []); // ✅ ARREGLO DE DEPENDENCIAS VACÍO
 
   useFocusEffect(
     useCallback(() => {

@@ -62,7 +62,7 @@ export default function HomeScreen() {
               style={globalStyles.avatar}
             />
             <View>
-              <Text style={globalStyles.title}>¡Hola, Dr. Genérico!</Text>{' '}
+              <Text style={globalStyles.title}>¡Hola, Dr. Genérico!</Text>{''}
               {/* Nombre estático */}
               <Text style={globalStyles.subtitle}>Bienvenido a EPS Salud</Text>
             </View>

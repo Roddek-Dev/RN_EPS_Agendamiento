@@ -25,8 +25,9 @@ export default function SpecialtiesListScreen() {
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // ✅ SOLUCIÓN: El array de dependencias ahora está vacío.
   const handleGetSpecialties = useCallback(async () => {
-    if (!loading) setLoading(true);
+    setLoading(true); // Se simplifica, siempre se pone en loading al iniciar la carga.
     try {
       const result = await getSpecialties();
       if (result.success) {
@@ -43,7 +44,7 @@ export default function SpecialtiesListScreen() {
     } finally {
       setLoading(false);
     }
-  }, [loading]);
+  }, []); // <--- ¡Array de dependencias vacío!
 
   useFocusEffect(
     useCallback(() => {
@@ -51,6 +52,7 @@ export default function SpecialtiesListScreen() {
     }, [handleGetSpecialties])
   );
 
+  // ... el resto del componente no cambia ...
   const handleCreate = () => navigation.navigate('SpecialtyCreate');
 
   const handleDelete = (id: number) => {
