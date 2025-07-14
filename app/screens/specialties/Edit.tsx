@@ -106,7 +106,7 @@ export default function SpecialtyEditScreen() {
     <SafeAreaView style={globalStyles.container}>
       <ProfileHeader
         title="Editar Especialidad"
-        subtitle={`ID: ${id}`}
+        subtitle={`Editando especialidad${getFieldProps('name').value ? `: ${getFieldProps('name').value}` : ''}`}
         onBack={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>

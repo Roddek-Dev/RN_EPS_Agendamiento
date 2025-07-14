@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   ScrollView,
   Alert,
@@ -121,6 +121,13 @@ export default function AppointmentEditScreen() {
     fetchAllData();
   }, [id, navigation, setValues]);
 
+  // ✅ CAMBIO: Encontrar el nombre del paciente para usarlo en el subtítulo
+  const patientName = useMemo(() => {
+    const patientId = getFieldProps('patient_id').value;
+    const foundPatient = patients.find((p) => p.id.toString() === patientId);
+    return foundPatient ? foundPatient.name : 'Cita';
+  }, [getFieldProps('patient_id').value, patients]);
+
   const handleSave = async () => {
     if (!validateForm()) {
       Alert.alert(
@@ -180,7 +187,8 @@ export default function AppointmentEditScreen() {
     <SafeAreaView style={globalStyles.container}>
       <ProfileHeader
         title="Editar Cita"
-        subtitle={`Modificando la cita ID: ${id}`}
+        // ✅ CAMBIO: Mostrar el nombre del paciente en el subtítulo
+        subtitle={`Editando cita para ${patientName}`}
         onBack={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>

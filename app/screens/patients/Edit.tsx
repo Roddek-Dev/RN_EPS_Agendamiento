@@ -103,7 +103,7 @@ export default function PatientEditScreen() {
     <SafeAreaView style={globalStyles.container}>
       <ProfileHeader
         title="Editar Paciente"
-        subtitle={`ID: ${id}`}
+        subtitle={`Editando paciente${getFieldProps('name').value ? `: ${getFieldProps('name').value}` : ''}`}
         onBack={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>

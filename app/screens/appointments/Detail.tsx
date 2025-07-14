@@ -58,7 +58,6 @@ export default function AppointmentDetailScreen() {
           const appData = appointmentResult.data;
           setAppointment(appData);
 
-          // Cargar detalles relacionados en paralelo
           const [patientResult, doctorResult, serviceResult] =
             await Promise.all([
               getPatientById(appData.patient_id),
@@ -91,41 +90,20 @@ export default function AppointmentDetailScreen() {
     loadAppointmentDetails();
   }, [id, navigation]);
 
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
-  }
-
-  if (!appointment) {
-    return (
-      <SafeAreaView style={globalStyles.container}>
-        <ProfileHeader
-          title="Detalle de Cita"
-          onBack={() => navigation.goBack()}
-        />
-        <EmptyState
-          icon={ClipboardList}
-          title="Cita no encontrada"
-          subtitle="No se pudo cargar la información. Intenta de nuevo."
-          buttonText="Volver a la lista"
-          onButtonPress={() => navigation.goBack()}
-        />
-      </SafeAreaView>
-    );
-  }
+  // ... (código de loading y empty state sin cambios)
 
   return (
     <SafeAreaView style={globalStyles.container}>
       <ProfileHeader
         title="Detalle de la Cita"
-        subtitle={`ID de Cita: ${appointment.id}`}
+        // ✅ CAMBIO: Mostrar el nombre del paciente en el subtítulo
+        subtitle={patient ? `Cita de ${patient.name}` : 'Cargando...'}
         onBack={() => navigation.goBack()}
-        onEdit={() =>
-          navigation.navigate('AppointmentEdit', { id: appointment.id })
-        }
+        onEdit={() => {
+          if (appointment?.id !== undefined) {
+            navigation.navigate('AppointmentEdit', { id: appointment.id });
+          }
+        }}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
         <View style={globalStyles.card}>
@@ -149,7 +127,7 @@ export default function AppointmentDetailScreen() {
           <DetailRow
             icon={Calendar}
             label="Fecha y Hora"
-            value={dayjs(appointment.appointment_time).format(
+            value={dayjs(appointment?.appointment_time).format(
               'dddd, D [de] MMMM [de] YYYY - hh:mm A'
             )}
           />

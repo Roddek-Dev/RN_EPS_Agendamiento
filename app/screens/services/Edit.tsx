@@ -105,7 +105,7 @@ export default function ServiceEditScreen() {
     <SafeAreaView style={globalStyles.container}>
       <ProfileHeader
         title="Editar Servicio"
-        subtitle={`ID: ${id}`}
+        subtitle={`Editando servicio${getFieldProps('name').value ? `: ${getFieldProps('name').value}` : ''}`}
         onBack={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={globalStyles.content}>
