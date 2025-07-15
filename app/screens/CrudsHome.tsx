@@ -1,28 +1,28 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native"; // ✅ AÑADIDO: Alert
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  HeartPulse, // ✅ CAMBIO
-  ClipboardList, // ✅ CAMBIO
+  HeartPulse,
+  ClipboardList,
   Users,
-  Stethoscope, // ✅ CAMBIO
-  CalendarDays, // ✅ CAMBIO
+  Stethoscope,
+  CalendarDays,
   ChevronRight,
   TrendingUp,
 } from 'lucide-react-native';
 import { globalStyles, colors, spacing } from "@/utils/globalStyles";
+import { getStoredUser } from '@/app/Services/AuthService'; // ✅ AÑADIDO: Importar servicio de usuario
 
 export default function CrudsHomeScreen() {
   const navigation = useNavigation();
 
-  // ✅ CORRECTO: Los 'id' ahora coinciden con las rutas de CrudsStacks.tsx
   const modules = [
     {
       id: 'SpecialtyList',
       title: 'Especialidades',
       description: 'Gestionar especialidades médicas',
-      icon: Stethoscope, // Más apropiado aquí
+      icon: Stethoscope,
       color: colors.primary,
       count: 12,
     },
@@ -30,7 +30,7 @@ export default function CrudsHomeScreen() {
       id: 'ServiceList',
       title: 'Servicios',
       description: 'Administrar servicios disponibles',
-      icon: ClipboardList, // Representa un listado de servicios
+      icon: ClipboardList,
       color: colors.accent,
       count: 25,
     },
@@ -38,7 +38,7 @@ export default function CrudsHomeScreen() {
       id: 'PatientList',
       title: 'Pacientes',
       description: 'Registro de pacientes',
-      icon: Users, // Este icono ya es adecuado
+      icon: Users,
       color: colors.secondary,
       count: 156,
     },
@@ -46,7 +46,7 @@ export default function CrudsHomeScreen() {
       id: 'DoctorList',
       title: 'Doctores',
       description: 'Directorio médico',
-      icon: HeartPulse, // Relacionado con la salud y el cuidado
+      icon: HeartPulse,
       color: colors.warning,
       count: 8,
     },
@@ -54,15 +54,38 @@ export default function CrudsHomeScreen() {
       id: 'AppointmentList',
       title: 'Citas',
       description: 'Historial de citas médicas',
-      icon: CalendarDays, // Una versión más detallada del calendario
+      icon: CalendarDays,
       color: colors.purple,
       count: 342,
     },
   ];
 
-  const navigateToModule = (moduleId: string) => {
-    // La navegación ahora es segura porque los IDs coinciden con las rutas.
-    navigation.navigate(moduleId as never);
+  // ✅ FUNCIÓN MODIFICADA: Ahora es asíncrona y valida el rol
+  const navigateToModule = async (moduleId: string) => {
+    const user = await getStoredUser();
+
+    // Si el usuario es 'admin', puede acceder a todo.
+    if (user?.role === 'admin') {
+      navigation.navigate(moduleId as never);
+      return;
+    }
+
+    // Si el usuario es 'user', solo puede acceder a 'AppointmentList'.
+    if (user?.role === 'user') {
+      if (moduleId === 'AppointmentList') {
+        navigation.navigate(moduleId as never);
+      } else {
+        // Si intenta acceder a otro módulo, muestra una alerta.
+        Alert.alert(
+          'Acceso Denegado',
+          'No tienes los permisos necesarios para acceder a esta sección.'
+        );
+      }
+      return;
+    }
+
+    // Fallback por si no se encuentra el usuario o el rol
+    Alert.alert('Error', 'No se pudo verificar tu rol de usuario.');
   };
 
   return (

@@ -18,6 +18,7 @@ export interface RegisterData {
   email: string;
   password: string;
   password_confirmation: string;
+  role: 'admin' | 'user'; // ✅ AÑADIDO: El rol es ahora parte de los datos de registro
 }
 
 export interface LoginData {

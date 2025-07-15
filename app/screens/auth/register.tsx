@@ -9,24 +9,26 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Mail, Lock } from 'lucide-react-native';
+import { User, Mail, Lock, UserCog } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native'; // Importamos useNavigation
 import { globalStyles, colors, spacing } from '@/utils/globalStyles';
 import { FormField } from '@/components/forms/FormField';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { validationRules } from '@/utils/validationRules';
 import { register as registerUser } from '@/app/Services/AuthService';
+import { Picker } from '@react-native-picker/picker';
 
 export default function RegisterScreen() {
   const navigation = useNavigation(); // Hook para poder navegar
   const [loading, setLoading] = useState(false);
 
-  const { getFieldProps, validateForm, getFormData } = useFormValidation(
+  const { getFieldProps, validateForm, getFormData, handleChange } = useFormValidation(
     {
       name: '',
       email: '',
       password: '',
       password_confirmation: '',
+      role: 'user', // ✅ AÑADIDO: Rol por defecto
     },
     {
       name: validationRules.name,
@@ -37,6 +39,7 @@ export default function RegisterScreen() {
         custom: (value, values) =>
           value !== values?.password ? 'Las contraseñas no coinciden' : null,
       },
+      role: validationRules.required, // ✅ AÑADIDO: Validación para el rol
     }
   );
 
@@ -46,7 +49,9 @@ export default function RegisterScreen() {
 
     try {
       const formData = getFormData();
-      const result = await registerUser(formData);
+      // Forzamos el valor de role para que sea del tipo correcto
+      const roleValue = formData.role === 'admin' ? 'admin' : 'user';
+      const result = await registerUser({ ...formData, role: roleValue });
 
       if (result.success) {
         // ¡CAMBIO CLAVE! Ya no hacemos login automático.
@@ -92,6 +97,30 @@ export default function RegisterScreen() {
           required
           {...getFieldProps('email')}
         />
+
+        {/* ✅ INICIO: PICKER DE ROL */}
+        <View style={globalStyles.inputContainer}>
+          <Text style={globalStyles.label}>
+            Tipo de Usuario <Text style={{ color: colors.accent }}>*</Text>
+          </Text>
+          <View style={styles.pickerContainer}>
+            <UserCog
+              color={colors.text.secondary}
+              size={20}
+              style={styles.pickerIcon}
+            />
+            <Picker
+              selectedValue={getFieldProps('role').value}
+              onValueChange={(itemValue) => handleChange('role', itemValue)}
+              style={styles.picker}
+            >
+              <Picker.Item label="Usuario" value="user" />
+              <Picker.Item label="Administrador" value="admin" />
+            </Picker>
+          </View>
+        </View>
+        {/* ✅ FIN: PICKER DE ROL */}
+
         <FormField
           label="Contraseña"
           placeholder="Debe tener al menos 6 caracteres"
@@ -126,7 +155,7 @@ export default function RegisterScreen() {
   );
 }
 
-// Estilos (sin cambios)
+// Estilos
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
@@ -140,4 +169,21 @@ const styles = StyleSheet.create({
   actionsContainer: {
     marginTop: spacing.xl,
   },
+  // ✅ INICIO: ESTILOS PARA EL PICKER
+  pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12, // Coincide con borderRadius.md
+    height: 50,
+  },
+  pickerIcon: {
+    marginLeft: spacing.md,
+  },
+  picker: {
+    flex: 1,
+  },
+  // ✅ FIN: ESTILOS PARA EL PICKER
 });
