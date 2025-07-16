@@ -46,6 +46,12 @@ export type AppointmentStackParamList = {
 export type CrudsStackParamList = {
   // Pantalla principal que muestra la lista de CRUDS
   CrudsHome: undefined;
+  // Pantallas directas (añade estas)
+  AppointmentList: undefined;
+  AppointmentCreate: undefined;
+  AppointmentDetail: { id: number };
+  PatientList: undefined;
+  DoctorList: undefined;
 
   // Cada CRUD es ahora un navegador anidado
   // NavigatorScreenParams se asegura de que los tipos se pasen correctamente
@@ -55,17 +61,22 @@ export type CrudsStackParamList = {
   specialties: NavigatorScreenParams<SpecialtyStackParamList>;
   appointments: NavigatorScreenParams<AppointmentStackParamList>;
 };
-
-// --- ROOT STACK DE LA APP ---
-// Aquí se definen las rutas principales de la app, incluyendo NavigationMain y Login
-export type RootStackParamList = {
-  Login: undefined;
-  NavigationMain: undefined;
-  // Puedes agregar otras pantallas raíz aquí
+// NUEVO: Tipo para el BottomTabNavigator
+export type MainTabParamList = {
+  home: undefined;
+  reservas: undefined;
+  cruds: NavigatorScreenParams<CrudsStackParamList>;
 };
 
+// --- ROOT STACK DE LA APP ---
+export type RootStackParamList = {
+  Login: undefined;
+  NavigationMain: NavigatorScreenParams<MainTabParamList>; // MODIFICADO
+  // Puedes agregar otras pantallas raíz aquí
+};
 // --- TIPO DE NAVEGACIÓN GLOBAL (para stacks anidados) ---
 export type AppNavigationProp = NativeStackNavigationProp<
+RootStackParamList & MainTabParamList &// MODIFICADO
   PatientStackParamList &
     DoctorStackParamList &
     ServiceStackParamList &
