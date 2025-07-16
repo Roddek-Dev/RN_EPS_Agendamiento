@@ -11,17 +11,43 @@ import {
 } from 'lucide-react-native';
 import { globalStyles, colors, spacing } from '@/utils/globalStyles';
 import { getStoredUser, type User } from '@/app/Services/AuthService'; // ✅ AÑADIR: Importar servicio y tipo
-
+import { useNavigation } from '@react-navigation/native'; // 1. Importa useNavigation
+import { AppNavigationProp } from '@/app/navigation/types';
 
 export default function HomeScreen() {
+  const navigation = useNavigation<AppNavigationProp>(); // 3. Obtén el objeto de navegación
 
-    const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const quickActions = [
-    { id: 1, title: 'Nueva Cita', icon: Calendar, color: colors.primary },
-    { id: 2, title: 'Pacientes', icon: Users, color: colors.secondary },
-    { id: 3, title: 'Doctores', icon: UserCheck, color: colors.warning },
-    { id: 4, title: 'Historial', icon: Clock, color: colors.purple },
+    {
+      id: 1,
+      title: 'Nueva Cita',
+      icon: Calendar,
+      color: colors.primary,
+      targetScreen: 'AppointmentCreate',
+    },
+    {
+      id: 2,
+      title: 'Pacientes',
+      icon: Users,
+      color: colors.secondary,
+      targetScreen: 'PatientList',
+    },
+    {
+      id: 3,
+      title: 'Doctores',
+      icon: UserCheck,
+      color: colors.warning,
+      targetScreen: 'DoctorList',
+    },
+    {
+      id: 4,
+      title: 'Historial',
+      icon: Clock,
+      color: colors.purple,
+      targetScreen: 'AppointmentList',
+    },
   ];
   const recentActivity = [
     {
@@ -63,8 +89,6 @@ export default function HomeScreen() {
 
     loadUserData();
   }, []);
-
-  
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -143,6 +167,11 @@ export default function HomeScreen() {
                   globalStyles.quickActionCard,
                   { backgroundColor: action.color },
                 ]}
+                onPress={() =>
+                  (navigation as any).navigate('cruds', {
+                    screen: action.targetScreen,
+                  })
+                }
               >
                 <View
                   style={[

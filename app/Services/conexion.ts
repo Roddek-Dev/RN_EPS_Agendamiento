@@ -5,8 +5,8 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
- const API_BASE_URL: string = 'http://192.168.1.6:8000/api'; //RODDEK
-// const API_BASE_URL: string = 'http://172.30.4.119:8001/api'; //SENA
+// const API_BASE_URL: string = 'http://192.168.1.6:8000/api'; //RODDEK
+ const API_BASE_URL: string = 'http://172.30.4.119:8001/api'; //SENA
 
 
 const RutasPublicas: string[] = ['/login', '/register'];
