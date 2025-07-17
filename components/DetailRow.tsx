@@ -2,6 +2,7 @@ import type React from "react"
 import { View, Text } from "react-native"
 import { globalStyles, colors } from "../utils/globalStyles"
 
+
 interface DetailRowProps {
   icon: React.ComponentType<{ color: string; size: number; style?: any }>
   label?: string
