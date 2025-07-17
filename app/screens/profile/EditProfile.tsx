@@ -42,10 +42,12 @@ const EditProfileScreen = () => {
     {
       current_password: validationRules.password,
       password: validationRules.password,
-      password_confirmation: (value, values) => {
-        if (!value) return 'La confirmación es requerida.';
-        if (value !== values?.password) return 'Las contraseñas no coinciden.';
-        return '';
+      password_confirmation: {
+        custom: (value: any, values: any) => {
+          if (!value) return 'La confirmación es requerida.';
+          if (value !== values?.password) return 'Las contraseñas no coinciden.';
+          return null; // return null for valid, string for error
+        }
       },
     }
   );
