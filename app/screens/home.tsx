@@ -116,6 +116,7 @@ export default function HomeScreen() {
           </View>
           <TouchableOpacity
             style={[globalStyles.iconButton, globalStyles.iconButtonPrimary]}
+            onPress={() => navigation.navigate('Profile')}
           >
             <Bell color={colors.text.inverse} size={24} />
           </TouchableOpacity>
@@ -167,11 +168,9 @@ export default function HomeScreen() {
                   globalStyles.quickActionCard,
                   { backgroundColor: action.color },
                 ]}
-                onPress={() =>
-                  (navigation as any).navigate('cruds', {
-                    screen: action.targetScreen,
-                  })
-                }
+                onPress={() => (navigation as any).navigate('cruds', { 
+                  screen: action.targetScreen 
+                })}
               >
                 <View
                   style={[

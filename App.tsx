@@ -3,10 +3,15 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { ActivityIndicator, View, StyleSheet, AppState, type AppStateStatus } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import AuthNavigation from './app/navigation/AuthNavigation';
 import NavigationMain from './app/navigation/NavigationMain';
+import ProfileScreen from './app/screens/profile/Profile';
+import EditProfileScreen from './app/screens/profile/EditProfile';
 import { colors } from './utils/globalStyles';
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [token, setToken] = useState<string | null>(null);
@@ -61,7 +66,21 @@ export default function App() {
   return (
     <NavigationContainer>
       {token ? (
-        <NavigationMain />
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Main"
+            component={NavigationMain}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="Profile" options={{ title: 'Perfil' }}>
+            {(props) => <ProfileScreen {...props} onLogoutSuccess={checkToken} />}
+          </Stack.Screen>
+          <Stack.Screen
+            name="EditProfile"
+            component={EditProfileScreen}
+            options={{ title: 'Editar Perfil' }}
+          />
+        </Stack.Navigator>
       ) : (
         <AuthNavigation onLoginSuccess={checkToken} />
       )}

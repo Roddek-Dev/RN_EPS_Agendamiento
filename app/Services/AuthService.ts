@@ -124,3 +124,71 @@ export const getStoredUser = async (): Promise<User | null> => {
     return null;
   }
 };
+
+export interface ChangePasswordData {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export const changePassword = async (
+  data: ChangePasswordData
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const response = await api.post('/change-password', data);
+    return { success: true, message: response.data.message || 'Contraseña actualizada con éxito.' };
+  } catch (error) {
+    if (isAxiosError(error) && error.response) {
+      const errorData = error.response.data as ValidationError;
+      if (errorData.errors) {
+        return {
+          success: false,
+          message: Object.values(errorData.errors)[0][0],
+        };
+      }
+      return {
+        success: false,
+        message: errorData.message || 'Error al cambiar la contraseña.',
+      };
+    }
+    return { success: false, message: 'Error de conexión.' };
+  }
+};
+
+export interface UpdateProfileData {
+  name: string;
+  email: string;
+}
+
+export const updateProfile = async (
+  data: UpdateProfileData
+): Promise<{ success: boolean; message: string; user?: User }> => {
+  try {
+    const response = await api.put<{ user: User; message: string }>('/profile', data);
+    const { user, message } = response.data;
+
+    // Actualizar el usuario en AsyncStorage
+    const storedUser = await getStoredUser();
+    if (storedUser) {
+      const updatedUser = { ...storedUser, ...user };
+      await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+
+    return { success: true, message: message || 'Perfil actualizado con éxito.', user };
+  } catch (error) {
+    if (isAxiosError(error) && error.response) {
+      const errorData = error.response.data as ValidationError;
+      if (errorData.errors) {
+        return {
+          success: false,
+          message: Object.values(errorData.errors)[0][0],
+        };
+      }
+      return {
+        success: false,
+        message: errorData.message || 'Error al actualizar el perfil.',
+      };
+    }
+    return { success: false, message: 'Error de conexión.' };
+  }
+};

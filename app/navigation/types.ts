@@ -71,14 +71,14 @@ export type MainTabParamList = {
 export type RootStackParamList = {
   Login: undefined;
   NavigationMain: NavigatorScreenParams<MainTabParamList>; // MODIFICADO
+  Profile: undefined;
+  EditProfile: undefined;
   // Puedes agregar otras pantallas raíz aquí
 };
 // --- TIPO DE NAVEGACIÓN GLOBAL (para stacks anidados) ---
 export type AppNavigationProp = NativeStackNavigationProp<
-  RootStackParamList &
-    MainTabParamList & // MODIFICADO
-    
-    PatientStackParamList &
+RootStackParamList & MainTabParamList &// MODIFICADO
+  PatientStackParamList &
     DoctorStackParamList &
     ServiceStackParamList &
     SpecialtyStackParamList &
