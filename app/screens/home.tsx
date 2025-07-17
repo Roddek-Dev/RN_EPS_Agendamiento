@@ -116,6 +116,7 @@ export default function HomeScreen() {
           </View>
           <TouchableOpacity
             style={[globalStyles.iconButton, globalStyles.iconButtonPrimary]}
+            onPress={() => navigation.navigate('Profile')}
           >
             <Bell color={colors.text.inverse} size={24} />
           </TouchableOpacity>
